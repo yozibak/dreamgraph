@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  backend
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+  SampleTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: createdAt
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+
+  HelloWorldGraphQLApi:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaUri: ./graphql/schema.graphql
+      Auth:
+        Type: API_KEY
+      ApiKeys:
+        MyApiKey:
+          Description: my api key
+      DataSources:
+        DynamoDb:
+          Notes:
+            TableName: !Ref SampleTable
+            TableArn: !GetAtt SampleTable.Arn
+      Functions:
+        getNotes:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: Notes
+          CodeUri: ./graphql/getNotes.js
+        addNote:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: Notes
+          CodeUri: ./graphql/addNote.js
+      Resolvers:
+        Query:
+          getNotes:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - getNotes
+        Mutation:
+          addNote:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - addNote
+
+Outputs:
+  HelloWorldGraphQLApi:
+    Description: HelloWorldGraphQLApi endpoint URL for Prod environment
+    Value: !GetAtt HelloWorldGraphQLApi.GraphQLUrl
+  HelloWorldGraphQLApiMyApiKey:
+    Description: API Key for HelloWorldGraphQLApi
+    Value: !GetAtt HelloWorldGraphQLApiMyApiKey.ApiKey

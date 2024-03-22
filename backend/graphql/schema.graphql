@@ -1,0 +1,17 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Mutation {
+  addNote(content: String!): Note
+}
+
+type Query {
+  getNotes(number: Int): [Note!]!
+}
+
+type Note {
+  createdAt: String!
+  content: String!
+}

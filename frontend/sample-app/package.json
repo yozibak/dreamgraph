@@ -1,0 +1,24 @@
+{
+  "name": "sample-app",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "cd ../.. && jest --selectProjects sample-app"
+  },
+  "dependencies": {
+    "@aws-sdk/client-appsync": "^3.535.0",
+    "aws-amplify": "^6.0.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "@types/react": "^18.2.56",
+    "@types/react-dom": "^18.2.19",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.4.2",
+    "vite": "^5.1.4"
+  }
+}

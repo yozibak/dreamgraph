@@ -1,0 +1,32 @@
+{
+  "name": "fullstack-sam",
+  "version": "0.0.1",
+  "description": "blueprint for fullstack project with aws sam",
+  "author": "Katsumi Yoshida",
+  "license": "ISC",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "eslint": "eslint",
+    "sync": "npx syncpack list",
+    "lint": "eslint **/src/**/*.ts",
+    "test": "jest",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.5",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.28",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.0",
+    "husky": "^8.0.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "prettier": "^3.2.5",
+    "prettier-2": "npm:prettier@^2.8.8",
+    "syncpack": "^11.2.1",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}

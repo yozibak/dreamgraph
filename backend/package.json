@@ -1,0 +1,10 @@
+{
+  "name": "backend",
+  "scripts": {
+    "build": "sam build",
+    "host": "sam build && sam local start-api --env-vars local/env.json -p 8080"
+  },
+  "devDependencies": {
+    "esbuild": "0.20.2"
+  }
+}
