@@ -1,12 +1,12 @@
 import type { Config } from 'jest'
 
 const RootConfig: Config = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   transform: {
-    '^.+\\.(ts|tsx)?$': 'ts-jest',
+    '^.+\\.(ts|tsx)?$': ['ts-jest', { useESM: true }],
   },
   moduleNameMapper: {
-    '^src/(.*)': '<rootDir>/src/$1',
+    "uuid": require.resolve('uuid')
   },
   testMatch: ['<rootDir>/src/**/*.test(.ts|.tsx)'],
   prettierPath: require.resolve('prettier-2'),
@@ -39,8 +39,8 @@ const JestConfig: Config = {
   projects: [
     {
       ...RootConfig,
-      displayName: 'sample-app',
-      rootDir: './frontend/sample-app',
+      displayName: 'frontend',
+      rootDir: './frontend/app',
       testEnvironment: 'jsdom',
     },
   ],
