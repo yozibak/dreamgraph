@@ -37,18 +37,11 @@ const JestConfig: Config = {
   },
   coverageDirectory: '.jest/coverage',
   projects: [
-    // frontend
     {
       ...RootConfig,
       displayName: 'sample-app',
       rootDir: './frontend/sample-app',
       testEnvironment: 'jsdom',
-    },
-    // backend
-    {
-      ...RootConfig,
-      displayName: 'sample-api',
-      rootDir: './backend/sample-api',
     },
   ],
 }

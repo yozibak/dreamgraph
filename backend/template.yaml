@@ -1,67 +1,55 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  backend
+  serverless chat backend
 Transform:
   - AWS::Serverless-2016-10-31
 
 Resources:
-  SampleTable:
-    Type: AWS::Serverless::SimpleTable
+  GraphQLApi:
+    Type: AWS::AppSync::GraphQLApi
     Properties:
-      PrimaryKey:
-        Name: createdAt
-        Type: String
-      ProvisionedThroughput:
-        ReadCapacityUnits: 2
-        WriteCapacityUnits: 2
+      Name: my another chat appsync api
+      AuthenticationType: API_KEY
 
-  HelloWorldGraphQLApi:
-    Type: AWS::Serverless::GraphQLApi
+  GraphQLApiKey:
+    Type: AWS::AppSync::ApiKey
     Properties:
-      SchemaUri: ./graphql/schema.graphql
-      Auth:
-        Type: API_KEY
-      ApiKeys:
-        MyApiKey:
-          Description: my api key
-      DataSources:
-        DynamoDb:
-          Notes:
-            TableName: !Ref SampleTable
-            TableArn: !GetAtt SampleTable.Arn
-      Functions:
-        getNotes:
-          Runtime:
-            Name: APPSYNC_JS
-            Version: 1.0.0
-          DataSource: Notes
-          CodeUri: ./graphql/getNotes.js
-        addNote:
-          Runtime:
-            Name: APPSYNC_JS
-            Version: 1.0.0
-          DataSource: Notes
-          CodeUri: ./graphql/addNote.js
-      Resolvers:
-        Query:
-          getNotes:
-            Runtime:
-              Name: APPSYNC_JS
-              Version: 1.0.0
-            Pipeline:
-              - getNotes
-        Mutation:
-          addNote:
-            Runtime:
-              Name: APPSYNC_JS
-              Version: 1.0.0
-            Pipeline:
-              - addNote
+      ApiId: !GetAtt GraphQLApi.ApiId
+
+  ForwardMessageDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: ForwardMessageDataSource
+      Description: message forwarding datasource for subscription
+      Type: NONE
+
+  MutationSendMessage:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: sendMessage
+      DataSourceName: !GetAtt ForwardMessageDataSource.Name
+      Runtime:
+        Name: APPSYNC_JS
+        RuntimeVersion: 1.0.0
+      CodeS3Location: ./graphql/forwardMessage.js
+
+  Schema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      DefinitionS3Location: ./graphql/schema.graphql
 
 Outputs:
-  HelloWorldGraphQLApi:
-    Description: HelloWorldGraphQLApi endpoint URL for Prod environment
-    Value: !GetAtt HelloWorldGraphQLApi.GraphQLUrl
-  HelloWorldGraphQLApiMyApiKey:
-    Description: API Key for HelloWorldGraphQLApi
-    Value: !GetAtt HelloWorldGraphQLApiMyApiKey.ApiKey
+  GraphQLApiId:
+    Description: Api ID
+    Value: !GetAtt GraphQLApi.ApiId
+  GraphQLApiEndpoint:
+    Description: Api url
+    Value: !GetAtt GraphQLApi.GraphQLUrl
+  GraphQLApiKey:
+    Description: Api key
+    Value: !GetAtt GraphQLApiKey.ApiKey

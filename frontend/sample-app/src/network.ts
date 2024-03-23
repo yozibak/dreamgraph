@@ -1,7 +1,6 @@
-import 'vite/client'
 import { Amplify } from 'aws-amplify'
-import { GraphQLResult, generateClient } from 'aws-amplify/api'
-import { Note } from './types'
+import { generateClient, GraphQLSubscription } from 'aws-amplify/api'
+import { useEffect } from 'react'
 
 const { VITE_API_ENDPOINT, VITE_API_KEY } = import.meta.env
 
@@ -18,29 +17,52 @@ Amplify.configure({
 
 const client = generateClient()
 
-export const fetchNotes = async () => {
-  const result = (await client.graphql({
-    query: `
-      query GetNotes {
-        getNotes(number: 10) {
-          content
-          createdAt
-        }
-      }
-    `,
-  })) as GraphQLResult<{ getNotes: Note[] }>
-  return result.data.getNotes
+export type Message = {
+  username: string
+  text: string
 }
 
-export const createNote = async (content: string) => {
+export const useChatRoom = (handleMessage: (mes: Message) => void) => {
+  useEffect(() => {
+    console.log('sub..')
+    const subscription = client
+      .graphql<GraphQLSubscription<{ subscribeChatRoom: Message }>>({
+        query: `
+        subscription MySubscription {
+          subscribeChatRoom(roomID: "room1") {
+            username
+            text
+            roomID
+          }
+        }    
+      `,
+      })
+      .subscribe({
+        next: (value) => {
+          console.log(value)
+          handleMessage(value.data.subscribeChatRoom)
+        },
+        error: (e) => {
+          console.warn(e)
+        },
+      })
+    return () => {
+      subscription && subscription.unsubscribe()
+    }
+  }, [handleMessage])
+}
+
+export const sendMessage = async (content: string) => {
+  console.log('sendMessage')
   await client.graphql({
     query: `
       mutation MyMutation {
-        addNote(content: "${content}") {
-          content
-          createdAt
+        sendMessage(text: "${content}", roomID: "room1", username: "yozibak") {
+          text
+          roomID
+          username
         }
-      }
+      }    
     `,
   })
 }

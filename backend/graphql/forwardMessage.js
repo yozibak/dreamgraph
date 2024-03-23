@@ -1,9 +1,9 @@
 export function request(ctx) {
   return {
-    operation: 'Scan',
+    payload: ctx.args,
   }
 }
 
 export function response(ctx) {
-  return ctx.result.items
+  return ctx.result
 }

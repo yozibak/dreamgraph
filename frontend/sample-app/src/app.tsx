@@ -1,29 +1,19 @@
-import { useEffect, useState } from 'react'
-import { createNote, fetchNotes } from './network'
-import { Note } from './types'
+import { useState } from 'react'
+import { Message, sendMessage, useChatRoom } from './network'
 
 export default () => {
-  const [notes, setNotes] = useState<Note[]>([])
-  useEffect(() => {
-    let mount = true
-    async function init() {
-      const data = await fetchNotes()
-      if (mount) {
-        setNotes(data)
-      }
-    }
-    init()
-    return () => {
-      mount = false
-    }
-  }, [])
+  const [messages, setMessages] = useState<Message[]>([])
+
+  useChatRoom((mes) => setMessages([...messages, mes]))
 
   return (
     <>
-      <h1>hello world</h1>
+      <h1>chat room</h1>
       <ul>
-        {notes.map((note) => (
-          <li key={note.createdAt}>{note.content}</li>
+        {messages.map((mes, i) => (
+          <li key={i}>
+            {mes.username}: {mes.text}
+          </li>
         ))}
       </ul>
       <NoteForm />
@@ -37,7 +27,7 @@ const NoteForm = () => {
     <form
       onSubmit={async (e) => {
         e.preventDefault()
-        await createNote(content)
+        await sendMessage(content)
       }}
     >
       <input

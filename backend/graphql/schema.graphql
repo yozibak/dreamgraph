@@ -1,17 +1,13 @@
-schema {
-  query: Query
-  mutation: Mutation
+type Message {
+  roomID: String!
+  username: String!
+  text: String!
 }
-
 type Mutation {
-  addNote(content: String!): Note
+  sendMessage(text: String!, roomID: String!, username: String!): Message
 }
-
-type Query {
-  getNotes(number: Int): [Note!]!
+type Subscription {
+  subscribeChatRoom(roomID: String!): Message
+  @aws_subscribe(mutations: ["sendMessage"])
 }
-
-type Note {
-  createdAt: String!
-  content: String!
-}
+type Query {_: String}
