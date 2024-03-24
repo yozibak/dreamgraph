@@ -1,7 +1,7 @@
 {
-  "name": "fullstack-sam",
+  "name": "serverless-chat",
   "version": "0.0.1",
-  "description": "blueprint for fullstack project with aws sam",
+  "description": "serverless chat application",
   "author": "Katsumi Yoshida",
   "license": "ISC",
   "scripts": {
@@ -28,5 +28,12 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 100
   }
 }
