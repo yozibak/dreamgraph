@@ -35,13 +35,13 @@ Resources:
       Runtime:
         Name: APPSYNC_JS
         RuntimeVersion: 1.0.0
-      CodeS3Location: ./graphql/forwardMessage.js
+      CodeS3Location: ./backend/graphql/forwardMessage.js
 
   Schema:
     Type: AWS::AppSync::GraphQLSchema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      DefinitionS3Location: ./graphql/schema.graphql
+      DefinitionS3Location: ./backend/graphql/schema.graphql
 
   WebContentBucket:
     Type: AWS::S3::Bucket
