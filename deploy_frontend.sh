@@ -53,9 +53,9 @@ invalidation_id=$(
         --output text
     )
 
-aws cloudfront wait invalidation-completed \
-    --distribution-id $cloudfront_distribution_id \
-    --id $invalidation_id
+# aws cloudfront wait invalidation-completed \
+#     --distribution-id $cloudfront_distribution_id \
+#     --id $invalidation_id
 
 cloudfront_domain_name=$(
     aws cloudfront list-distributions \
@@ -63,4 +63,5 @@ cloudfront_domain_name=$(
         --output text
     )
 
-echo "Invalidation is complete🎉 Visit $cloudfront_domain_name"
+echo "Invalidation is being processed...wait until invalidation is complete ☕️"
+echo "The app will be up on $cloudfront_domain_name"
