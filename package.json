@@ -10,7 +10,9 @@
     "sync": "npx syncpack list",
     "lint": "eslint **/src/**/*.ts",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "manual_deploy:backend": "sam build && sam deploy",
+    "manual_deploy:frontend": "sh ./deploy_frontend.sh"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.5",
