@@ -55,10 +55,6 @@ invalidation_id=$(
         --output text
     )
 
-# aws cloudfront wait invalidation-completed \
-#     --distribution-id $cloudfront_distribution_id \
-#     --id $invalidation_id
-
 cloudfront_domain_name=$(
     aws cloudfront list-distributions \
         --query "DistributionList.Items[?Id=='$cloudfront_distribution_id'].DomainName" \

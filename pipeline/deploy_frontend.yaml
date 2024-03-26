@@ -10,4 +10,4 @@ phases:
       - pnpm config set store-dir .pnpm-store
   build:
     commands:
-      - sh deploy_frontend.sh
+      - sh deploy_frontend.sh "${ENV}"

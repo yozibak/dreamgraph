@@ -3,11 +3,10 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.x
+      python: 3.12
     commands:
       - pip install --upgrade pip
       - pip install --upgrade awscli aws-sam-cli
   build:
     commands:
-      - sam package
-      - sam deploy --no-fail-on-empty-changeset
+      - sam deploy --config-env "${ENV}"
