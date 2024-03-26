@@ -4,11 +4,22 @@ Description: >-
 Transform:
   - AWS::Serverless-2016-10-31
 
+Parameters:
+  AppName:
+    Type: String
+    Default: ServerlessChat
+  Env:
+    Type: String
+    AllowedValues:
+      - Dev
+      - Test
+      - Prod
+
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
     Properties:
-      Name: my another chat appsync api
+      Name: !Sub ${AppName}-Api-${Env}
       AuthenticationType: API_KEY
 
   GraphQLApiKey:
@@ -20,7 +31,7 @@ Resources:
     Type: AWS::AppSync::DataSource
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: ForwardMessageDataSource
+      Name: !Sub ${AppName}ForwardMessageDataSource${Env}
       Description: message forwarding datasource for subscription
       Type: NONE
 
@@ -62,16 +73,12 @@ Resources:
             Resource: !Join ['', ['arn:aws:s3:::', !Ref WebContentBucket, /*]]
             Condition:
               StringEquals:
-                AWS:SourceArn:
-                  !Join [
-                    '',
-                    [
-                      'arn:aws:cloudfront::',
-                      !Ref 'AWS::AccountId',
-                      ':distribution/',
-                      !Ref CloudFrontDistribution,
-                    ],
-                  ]
+                AWS:SourceArn: !Join
+                  - ''
+                  - - 'arn:aws:cloudfront::'
+                    - !Ref 'AWS::AccountId'
+                    - ':distribution/'
+                    - !Ref CloudFrontDistribution
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
@@ -116,20 +123,20 @@ Resources:
   CloudFrontCachePolicy:
     Type: AWS::CloudFront::CachePolicy
     Properties:
-      CachePolicyConfig: 
+      CachePolicyConfig:
         Comment: Default cache policy for S3 distribution
         DefaultTTL: 86400
         MaxTTL: 31536000
         MinTTL: 1
-        Name: S3DistributionCachePolicy
-        ParametersInCacheKeyAndForwardedToOrigin: 
-          CookiesConfig: 
+        Name: !Sub ${AppName}-S3DistributionCachePolicy-${Env}
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
             CookieBehavior: none
           EnableAcceptEncodingBrotli: true
           EnableAcceptEncodingGzip: true
           HeadersConfig:
             HeaderBehavior: none
-          QueryStringsConfig: 
+          QueryStringsConfig:
             QueryStringBehavior: none
 
 Outputs:

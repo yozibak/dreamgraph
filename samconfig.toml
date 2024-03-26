@@ -1,10 +1,8 @@
-# More information about the configuration file can be found here:
-# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-config.html
 version = 0.1
 
 [default]
 [default.global.parameters]
-stack_name = "serverless-chat"
+resolve_s3 = true
 
 [default.build.parameters]
 cached = true
@@ -15,21 +13,30 @@ lint = true
 
 [default.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
-confirm_changeset = true
-resolve_s3 = true
-stack_name = "serverless-chat"
-s3_prefix = "serverless-chat"
+confirm_changeset = false
+fail_on_empty_changeset = false
 region = "ap-northeast-1"
-image_repositories = []
 
 [default.package.parameters]
 resolve_s3 = true
 
-[default.sync.parameters]
-watch = true
+[dev]
+[dev.deploy.parameters]
+resolve_s3 = true
+s3_prefix = "serverless-chat-dev"
+stack_name = "serverless-chat-dev"
+parameter_overrides = "Env=Dev"
 
-[default.local_start_api.parameters]
-warm_containers = "EAGER"
+[test]
+[test.deploy.parameters]
+resolve_s3 = true
+s3_prefix = "serverless-chat-test"
+stack_name = "serverless-chat-test"
+parameter_overrides = "Env=Test"
 
-[default.local_start_lambda.parameters]
-warm_containers = "EAGER"
+[prod]
+[prod.deploy.parameters]
+resolve_s3 = true
+s3_prefix = "serverless-chat-prod"
+stack_name = "serverless-chat-prod"
+parameter_overrides = "Env=Prod"
