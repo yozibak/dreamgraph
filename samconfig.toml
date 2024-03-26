@@ -1,5 +1,6 @@
 version = 0.1
 
+[dev]
 [dev.validate.parameters]
 lint = true
 [dev.build.parameters]
@@ -17,36 +18,30 @@ resolve_s3 = true
 s3_prefix = "serverless-chat-dev"
 stack_name = "serverless-chat-dev"
 
-[test.validate.parameters]
-lint = true
-[test.build.parameters]
-cached = true
-[test.package.parameters]
+[test]
+[test.global.parameters]
 resolve_s3 = true
+
 [test.deploy.parameters]
-capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 fail_on_empty_changeset = false
 region = "ap-northeast-1"
 
+template = "template-test.yaml"
 parameter_overrides = "Env=Test"
-resolve_s3 = true
 s3_prefix = "serverless-chat-test"
 stack_name = "serverless-chat-test"
 
-[prod.validate.parameters]
-lint = true
-[prod.build.parameters]
-cached = true
-[prod.package.parameters]
+[prod]
+[prod.global.parameters]
 resolve_s3 = true
+
 [prod.deploy.parameters]
-capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 fail_on_empty_changeset = false
 region = "ap-northeast-1"
 
+template = "template-prod.yaml"
 parameter_overrides = "Env=Prod"
-resolve_s3 = true
 s3_prefix = "serverless-chat-prod"
 stack_name = "serverless-chat-prod"

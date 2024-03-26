@@ -2,11 +2,8 @@ version: 0.2
 
 phases:
   install:
-    runtime-versions:
-      python: 3.12
     commands:
-      - pip install --upgrade pip
-      - pip install --upgrade awscli aws-sam-cli
+      - sam --version
   build:
     commands:
       - sam build --use-container
@@ -17,4 +14,5 @@ artifacts:
   files:
     - template-test.yaml
     - template-prod.yaml
+    - samconfig.toml
     - pipeline/*
