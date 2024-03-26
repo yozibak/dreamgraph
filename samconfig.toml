@@ -1,42 +1,52 @@
 version = 0.1
 
-[default]
-[default.global.parameters]
-resolve_s3 = true
-
-[default.build.parameters]
-cached = true
-parallel = true
-
-[default.validate.parameters]
+[dev.validate.parameters]
 lint = true
-
-[default.deploy.parameters]
+[dev.build.parameters]
+cached = true
+[dev.package.parameters]
+resolve_s3 = true
+[dev.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 fail_on_empty_changeset = false
 region = "ap-northeast-1"
 
-[default.package.parameters]
-resolve_s3 = true
-
-[dev]
-[dev.deploy.parameters]
+parameter_overrides = "Env=Dev"
 resolve_s3 = true
 s3_prefix = "serverless-chat-dev"
 stack_name = "serverless-chat-dev"
-parameter_overrides = "Env=Dev"
 
-[test]
+[test.validate.parameters]
+lint = true
+[test.build.parameters]
+cached = true
+[test.package.parameters]
+resolve_s3 = true
 [test.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+fail_on_empty_changeset = false
+region = "ap-northeast-1"
+
+parameter_overrides = "Env=Test"
 resolve_s3 = true
 s3_prefix = "serverless-chat-test"
 stack_name = "serverless-chat-test"
-parameter_overrides = "Env=Test"
 
-[prod]
+[prod.validate.parameters]
+lint = true
+[prod.build.parameters]
+cached = true
+[prod.package.parameters]
+resolve_s3 = true
 [prod.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+fail_on_empty_changeset = false
+region = "ap-northeast-1"
+
+parameter_overrides = "Env=Prod"
 resolve_s3 = true
 s3_prefix = "serverless-chat-prod"
 stack_name = "serverless-chat-prod"
-parameter_overrides = "Env=Prod"
