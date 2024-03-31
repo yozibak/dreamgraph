@@ -45,3 +45,12 @@ template = "template-prod.yaml"
 parameter_overrides = "Env=Prod"
 s3_prefix = "serverless-chat-prod"
 stack_name = "serverless-chat-prod"
+
+[pipeline]
+[pipeline.deploy.parameters]
+confirm_changeset = false
+region = "ap-northeast-1"
+template = "pipeline/template.yaml"
+stack_name = "serverless-chat-pipeline"
+capabilities = "CAPABILITY_NAMED_IAM"
+resolve_s3 = true

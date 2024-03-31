@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: serverless chat pipeline resources
+
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  AppName:
+    Type: String
+    Default: ServerlessChat
+
+Resources:
+  BuildStackRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AppName}-BuildStackRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+  BuildStackRolePolicy:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./iam_policy.yaml
+      Parameters:
+        AppName: !Ref AppName
+        RoleName: !Ref BuildStackRole
+        CodeBuildProjectName: ServerlessChatBuildStack
+
+  DeployStackRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AppName}-DeployStackRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+  DeployStackRolePolicy:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./iam_policy.yaml
+      Parameters:
+        AppName: !Ref AppName
+        RoleName: !Ref DeployStackRole
+        CodeBuildProjectName: ServerlessChatDeployStack
+
+  DeployFrontEndRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AppName}-DeployFrontEndRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess
+        - arn:aws:iam::aws:policy/CloudFrontFullAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+  DeployFrontEndRolePolicy:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./iam_policy.yaml
+      Parameters:
+        AppName: !Ref AppName
+        RoleName: !Ref DeployFrontEndRole
+        CodeBuildProjectName: ServerlessChatDeployFrontEnd
