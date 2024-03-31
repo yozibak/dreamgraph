@@ -1,56 +1,55 @@
 version = 0.1
 
 [dev]
+[dev.global.parameters]
+region = "ap-northeast-1"
+resolve_s3 = true
+s3_prefix = "serverless-chat-dev"
+stack_name = "serverless-chat-dev"
 [dev.validate.parameters]
 lint = true
 [dev.build.parameters]
 cached = true
-[dev.package.parameters]
-resolve_s3 = true
 [dev.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 fail_on_empty_changeset = false
-region = "ap-northeast-1"
 
 parameter_overrides = "Env=Dev"
-resolve_s3 = true
-s3_prefix = "serverless-chat-dev"
-stack_name = "serverless-chat-dev"
 
 [test]
 [test.global.parameters]
+region = "ap-northeast-1"
 resolve_s3 = true
+s3_prefix = "serverless-chat-test"
+stack_name = "serverless-chat-test"
 
 [test.deploy.parameters]
 confirm_changeset = false
 fail_on_empty_changeset = false
-region = "ap-northeast-1"
 
-template = "template-test.yaml"
 parameter_overrides = "Env=Test"
-s3_prefix = "serverless-chat-test"
-stack_name = "serverless-chat-test"
+template = "template-test.yaml"
 
 [prod]
 [prod.global.parameters]
+region = "ap-northeast-1"
 resolve_s3 = true
+s3_prefix = "serverless-chat-prod"
+stack_name = "serverless-chat-prod"
 
 [prod.deploy.parameters]
 confirm_changeset = false
 fail_on_empty_changeset = false
-region = "ap-northeast-1"
 
-template = "template-prod.yaml"
 parameter_overrides = "Env=Prod"
-s3_prefix = "serverless-chat-prod"
-stack_name = "serverless-chat-prod"
+template = "template-prod.yaml"
 
 [pipeline]
 [pipeline.deploy.parameters]
+capabilities = "CAPABILITY_NAMED_IAM"
 confirm_changeset = false
 region = "ap-northeast-1"
-template = "pipeline/template.yaml"
-stack_name = "serverless-chat-pipeline"
-capabilities = "CAPABILITY_NAMED_IAM"
 resolve_s3 = true
+stack_name = "serverless-chat-pipeline"
+template = "pipeline/template.yaml"
