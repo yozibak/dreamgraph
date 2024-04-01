@@ -7,8 +7,8 @@ phases:
   build:
     commands:
       - . pipeline/assume-role.sh "${ENV_PIPELINE_EXECUTION_ROLE}" deploy
-      - sam deploy --config-env test
-        --template template-test.yaml
+      - sam deploy --config-env "${ENV}"
+        --template "template-${ENV}.yaml"
         --capabilities CAPABILITY_IAM
         --role-arn "${ENV_CLOUDFORMATION_EXECUTION_ROLE}"
         --s3-bucket="${ArtifactsBucket}"

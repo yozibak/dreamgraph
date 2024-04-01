@@ -10,7 +10,7 @@ Parameters:
     Default: ServerlessChat
   ConnectionArn:
     Type: String
-    AllowedPattern: "^arn:aws:codestar-connections+"
+    AllowedPattern: '.+'
   FullRepositoryId:
     Type: String
     Default: yozibak/serverless-chat
@@ -74,6 +74,7 @@ Resources:
                 Resource:
                   - !GetAtt CodeBuildProjectBuildStack.Arn
                   - !GetAtt CodeBuildProjectDeployStack.Arn
+                  - !GetAtt CodeBuildProjectDeployFrontEnd.Arn
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -118,17 +119,19 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: sts:AssumeRole
-                Resource: '*'
-                Condition:
-                  StringEquals:
-                    aws:ResourceTag/Role: pipeline-execution-role
+                Resource:
+                  - !GetAtt PipelineExecutionRole.Arn
+                  - !GetAtt PipelineFrontEndDeployRole.Arn
+                # Condition:
+                #   StringEquals:
+                #     aws:ResourceTag/Role: pipeline-execution-role
   PipelineExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
       RoleName: !Sub ${AppName}-PipelineExecutionRole
-      Tags:
-        - Key: Role
-          Value: pipeline-execution-role
+      # Tags:
+      #   - Key: Role
+      #     Value: pipeline-execution-role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -197,8 +200,11 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: cloudformation.amazonaws.com
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:PrincipalTag/Role: aws-sam-pipeline-codebuild-service-role
       Policies:
         - PolicyName: GrantS3FullAccess
           PolicyDocument:
@@ -293,7 +299,7 @@ Resources:
 
         - Name: Build
           Actions:
-            - Name: CodeBuild
+            - Name: BuildStack
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -319,7 +325,8 @@ Resources:
                 EnvironmentVariables: !Sub |
                   [
                     {"name": "ENV_PIPELINE_EXECUTION_ROLE", "value": "${PipelineExecutionRole.Arn}"},
-                    {"name": "ENV_CLOUDFORMATION_EXECUTION_ROLE", "value": "${PipelineCloudFormationExecutionRole.Arn}"}
+                    {"name": "ENV_CLOUDFORMATION_EXECUTION_ROLE", "value": "${PipelineCloudFormationExecutionRole.Arn}"},
+                    {"name": "ENV", "value": "test"}
                   ]
               InputArtifacts:
                 - Name: BuildArtifactAsZip
@@ -332,6 +339,45 @@ Resources:
                 Version: '1'
               Configuration:
                 ProjectName: !Ref CodeBuildProjectDeployFrontEnd
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name": "ENV", "value": "test"}
+                  ]
+              InputArtifacts:
+                - Name: SourceCodeAsZip
+              RunOrder: 2
+
+        - Name: DeployProd
+          Actions:
+            - Name: DeployStack
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuildProjectDeployStack
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name": "ENV_PIPELINE_EXECUTION_ROLE", "value": "${PipelineExecutionRole.Arn}"},
+                    {"name": "ENV_CLOUDFORMATION_EXECUTION_ROLE", "value": "${PipelineCloudFormationExecutionRole.Arn}"},
+                    {"name": "ENV", "value": "prod"}
+                  ]
+              InputArtifacts:
+                - Name: BuildArtifactAsZip
+              RunOrder: 1
+            - Name: DeployFrontEnd
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuildProjectDeployFrontEnd
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name": "ENV", "value": "prod"}
+                  ]
               InputArtifacts:
                 - Name: SourceCodeAsZip
               RunOrder: 2
@@ -348,6 +394,8 @@ Resources:
         PrivilegedMode: true
         EnvironmentVariables:
           - Name: TESTING_PIPELINE_EXECUTION_ROLE
+            Value: !GetAtt PipelineExecutionRole.Arn
+          - Name: PROD_PIPELINE_EXECUTION_ROLE
             Value: !GetAtt PipelineExecutionRole.Arn
           - Name: ARTIFACTS_BUCKET
             Value: !Ref ArtifactsBucket

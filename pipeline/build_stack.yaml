@@ -10,12 +10,12 @@ phases:
       - . pipeline/assume-role.sh "${TESTING_PIPELINE_EXECUTION_ROLE}" test-package
       - echo "${ARTIFACTS_BUCKET}"
       - sam package --config-env test --output-template-file template-test.yaml --s3-bucket="${ARTIFACTS_BUCKET}"
-      # - . pipeline/assume-role.sh "${PROD_PIPELINE_EXECUTION_ROLE}" prod-package
-      # - sam package --config-env prod --output-template-file template-prod.yaml
+      - . pipeline/assume-role.sh "${PROD_PIPELINE_EXECUTION_ROLE}" prod-package
+      - sam package --config-env prod --output-template-file template-prod.yaml --s3-bucket="${ARTIFACTS_BUCKET}"
 
 artifacts:
   files:
     - template-test.yaml
-    # - template-prod.yaml
+    - template-prod.yaml
     - samconfig.toml
     - pipeline/*
