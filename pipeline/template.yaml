@@ -51,7 +51,7 @@ Resources:
                 Resource:
                   # - !Sub 'arn:aws:s3:::${PipelineArtifactsBucket}/*'
                   - !Sub arn:aws:s3:::codepipeline-${AWS::Region}-*
-        - PolicyName: AssumeStagePipExecutionRoles
+        - PolicyName: AssumeStagePipeExecutionRoles
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -65,6 +65,9 @@ Resources:
     Type: 'AWS::IAM::Role'
     Properties:
       RoleName: !Sub ${AppName}-PipelineExecutionRole
+      Tags:
+        - Key: Role
+          Value: pipeline-execution-role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

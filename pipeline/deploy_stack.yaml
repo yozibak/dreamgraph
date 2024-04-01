@@ -11,3 +11,4 @@ phases:
         --template template-test.yaml
         --capabilities CAPABILITY_IAM
         --role-arn "${ENV_CLOUDFORMATION_EXECUTION_ROLE}"
+        --s3-bucket="${ArtifactsBucket}"
