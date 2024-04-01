@@ -6,4 +6,8 @@ phases:
       - sam --version
   build:
     commands:
-      - sam deploy --config-env test --template template-test.yaml --capabilities CAPABILITY_IAM
+      - . pipeline/assume-role.sh "${ENV_PIPELINE_EXECUTION_ROLE}" deploy
+      - sam deploy --config-env test
+        --template template-test.yaml
+        --capabilities CAPABILITY_IAM
+        --role-arn "${ENV_CLOUDFORMATION_EXECUTION_ROLE}"
