@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: serverless chat pipeline IAM resources
+Parameters:
+  AppName:
+    Type: String
+    Default: ServerlessChat
+  RoleName:
+    Type: String
+  CodeBuildProjectName:
+    Type: String
+    AllowedValues:
+      - ServerlessChatBuildStack
+      - ServerlessChatDeployStack
+      - ServerlessChatDeployFrontEnd

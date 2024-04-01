@@ -10,6 +10,7 @@ Parameters:
     Default: ServerlessChat
   ConnectionArn:
     Type: String
+    AllowedPattern: "^arn:aws:codestar-connections+"
   FullRepositoryId:
     Type: String
     Default: yozibak/serverless-chat
@@ -187,6 +188,47 @@ Resources:
               - Action: '*'
                 Resource: '*'
                 Effect: Allow
+  PipelineFrontEndDeployRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub ${AppName}-PipelineFrontEndDeployRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: GrantS3FullAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action: 's3:*'
+                Resource:
+                  - arn:aws:s3:::serverless-chat-test-webcontentbucket-*
+                  - arn:aws:s3:::serverless-chat-test-webcontentbucket-*/*
+                  - arn:aws:s3:::serverless-chat-prod-webcontentbucket-*
+                  - arn:aws:s3:::serverless-chat-prod-webcontentbucket-*/*
+                Effect: Allow
+        - PolicyName: CloudFormationGetStack
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - cloudformation:DescribeStacks
+                Resource: '*'
+                Effect: Allow
+        - PolicyName: CloudFrontInvalidate
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - cloudfront:CreateInvalidation
+                  - cloudfront:ListDistributions
+                Resource:
+                  - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*
+                Effect: Allow
 
   # S3 BUCKETS
   ArtifactsBucket:
@@ -266,7 +308,7 @@ Resources:
 
         - Name: DeployTest
           Actions:
-            - Name: DeployTest
+            - Name: DeployStack
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -282,6 +324,17 @@ Resources:
               InputArtifacts:
                 - Name: BuildArtifactAsZip
               RunOrder: 1
+            - Name: DeployFrontEnd
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuildProjectDeployFrontEnd
+              InputArtifacts:
+                - Name: SourceCodeAsZip
+              RunOrder: 2
 
   CodeBuildProjectBuildStack:
     Type: AWS::CodeBuild::Project
@@ -319,6 +372,25 @@ Resources:
       Source:
         Type: CODEPIPELINE
         BuildSpec: !Sub pipeline/deploy_stack.yaml
+
+  CodeBuildProjectDeployFrontEnd:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
+        EnvironmentVariables:
+          - Name: ARTIFACTS_BUCKET
+            Value: !Ref ArtifactsBucket
+          - Name: FRONTEND_DEPLOY_ROLE
+            Value: !GetAtt PipelineFrontEndDeployRole.Arn
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: !Sub pipeline/deploy_frontend.yaml
 
 Outputs:
   ArtifactsBucket:

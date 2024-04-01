@@ -10,4 +10,5 @@ phases:
       - pnpm config set store-dir .pnpm-store
   build:
     commands:
+      - . pipeline/assume-role.sh "${FRONTEND_DEPLOY_ROLE}" test-deploy-frontend
       - sh deploy_frontend.sh "${ENV}"
