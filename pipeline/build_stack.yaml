@@ -8,8 +8,8 @@ phases:
     commands:
       - sam build --use-container
       - . pipeline/assume-role.sh "${TESTING_PIPELINE_EXECUTION_ROLE}" test-package
-      - echo "${ArtifactsBucket}"
-      - sam package --config-env test --output-template-file template-test.yaml --s3-bucket=${ArtifactsBucket}
+      - echo "${ARTIFACTS_BUCKET}"
+      - sam package --config-env test --output-template-file template-test.yaml --s3-bucket="${ARTIFACTS_BUCKET}"
       # - . pipeline/assume-role.sh "${PROD_PIPELINE_EXECUTION_ROLE}" prod-package
       # - sam package --config-env prod --output-template-file template-prod.yaml
 
