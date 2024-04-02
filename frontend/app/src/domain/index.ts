@@ -2,11 +2,12 @@ import { createContext } from 'react'
 import { getLocationParam, useChatRoom } from './chatroom'
 import { useMessage } from './message'
 
-export const DomainContext = createContext({} as ReturnType<typeof useDomain>)
+export type DomainStore = ReturnType<typeof useDomain>
+export const DomainContext = createContext({} as DomainStore)
 
 export const useDomain = () => {
-  const initialParam = getLocationParam()
-  const { roomID, username, enterChatRoom } = useChatRoom(initialParam)
+  const invitedRoom = getLocationParam()
+  const { roomID, username, enterChatRoom } = useChatRoom(invitedRoom)
   const { messages, sendMessage } = useMessage(roomID, username)
   return {
     messages,
@@ -14,5 +15,6 @@ export const useDomain = () => {
     username,
     roomID,
     enterChatRoom,
+    invitedRoom,
   }
 }

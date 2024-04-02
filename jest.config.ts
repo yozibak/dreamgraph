@@ -11,7 +11,6 @@ const RootConfig: Config = {
   },
   testMatch: ['<rootDir>/src/**/*.test(.ts|.tsx)'],
   prettierPath: require.resolve('prettier-2'),
-  setupFiles: ['../../.jest/globalSetup.ts'],
 }
 
 const JestConfig: Config = {
