@@ -11,7 +11,7 @@
     "lint": "eslint **/src/**/*.ts",
     "test": "jest",
     "prepare": "husky install",
-    "deploy:dev": "sam build && sam deploy --config-env dev && sh ./deploy_frontend.sh dev",
+    "deploy:dev": "sam build && sam deploy --config-env dev",
     "deploy:pipeline": "sam deploy --template pipeline/template.yaml --config-env pipeline"
   },
   "devDependencies": {

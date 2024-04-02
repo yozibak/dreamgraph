@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react'
+import { MessageThread } from '../components/message'
 import { ChatRoomContext } from '../domain'
-import { Message } from '../types'
 
 export const Chat = () => {
   const { messages } = useContext(ChatRoomContext)
@@ -9,24 +9,6 @@ export const Chat = () => {
       <MessageThread messages={messages} />
       <MessageForm />
     </>
-  )
-}
-
-const MessageThread = ({ messages }: { messages: Message[] }) => {
-  return (
-    <div>
-      {messages.map((mes, i) => (
-        <MessageItem key={i} message={mes} />
-      ))}
-    </div>
-  )
-}
-
-const MessageItem = ({ message }: { message: Message }) => {
-  return (
-    <div>
-      {message.username}: {message.text}
-    </div>
   )
 }
 

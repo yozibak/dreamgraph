@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react'
-import { sendMessageToApi, startSubscription } from './network'
-import { Message } from './types'
+import { sendMessageToApi, startSubscription } from '../network'
+import { Message } from '../types'
 
 export const ChatRoomContext = createContext({} as ReturnType<typeof useChatRoom>)
 

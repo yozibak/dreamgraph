@@ -1,1 +1,1 @@
-export const Header = ({roomID}: {roomID: string}) => <h1>chat room {roomID}</h1>
+export const Header = ({ roomID }: { roomID: string }) => <h1>chat room {roomID}</h1>

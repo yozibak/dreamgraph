@@ -90,6 +90,9 @@ importers:
       vite:
         specifier: ^5.1.4
         version: 5.1.6(@types/node@20.11.28)
+      vite-plugin-environment:
+        specifier: ^1.1.3
+        version: 1.1.3(vite@5.1.6)
 
 packages:
 
@@ -6243,6 +6246,14 @@ packages:
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
       builtins: 5.0.1
+    dev: true
+
+  /vite-plugin-environment@1.1.3(vite@5.1.6):
+    resolution: {integrity: sha512-9LBhB0lx+2lXVBEWxFZC+WO7PKEyE/ykJ7EPWCq95NEcCpblxamTbs5Dm3DLBGzwODpJMEnzQywJU8fw6XGGGA==}
+    peerDependencies:
+      vite: '>= 2.7'
+    dependencies:
+      vite: 5.1.6(@types/node@20.11.28)
     dev: true
 
   /vite@5.1.6(@types/node@20.11.28):
