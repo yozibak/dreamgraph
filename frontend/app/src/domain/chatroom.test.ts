@@ -1,5 +1,6 @@
-import { act, renderHook } from "@testing-library/react";
-import { useChatRoom } from "./chatroom";
+import { act, renderHook } from '@testing-library/react'
+import { useChatRoom } from './chatroom'
+import * as chatroom from './chatroom'
 
 describe(`${useChatRoom.name}`, () => {
   it(`should let the user set the chat room id if user is the host`, () => {
@@ -11,7 +12,8 @@ describe(`${useChatRoom.name}`, () => {
     expect(result.current.roomID).toBe('yozibak-chat-room')
   })
   it(`should let the user enter the chat room if provided`, () => {
-    const { result } = renderHook(() => useChatRoom('yozibak-chat-room'))
+    jest.spyOn(chatroom, 'getInvitedRoom').mockReturnValue('yozibak-chat-room')
+    const { result } = renderHook(() => useChatRoom())
     expect(result.current.roomID).toBe('yozibak-chat-room')
     act(() => {
       result.current.enterChatRoom('another-user')

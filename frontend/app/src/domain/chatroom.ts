@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
-export const useChatRoom = (initialRoomId?: string) => {
+export const useChatRoom = () => {
   const [username, setUsername] = useState('')
-  const [roomID, setRoomID] = useState(initialRoomId)
+  const [roomID, setRoomID] = useState(getInvitedRoom())
 
   const enterChatRoom = (username: string) => {
     if (!roomID) {
@@ -10,6 +10,7 @@ export const useChatRoom = (initialRoomId?: string) => {
     }
     setUsername(username)
   }
+
   return {
     roomID,
     username,
@@ -17,7 +18,12 @@ export const useChatRoom = (initialRoomId?: string) => {
   }
 }
 
-export const getLocationParam = () => {
-  if (!window.location.pathname) return
-  return window.location.pathname.slice(1)
+export const getInvitedRoom = () => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const roomID = urlParams.get('roomID')
+  return roomID || undefined
+}
+
+export const getInvitationLink = (roomID: string) => {
+  return `${window.location.origin}?roomID=${roomID}`
 }

@@ -7,8 +7,8 @@ export const Entrance = () => {
   return (
     <div>
       {roomID
-        ? `Welcome! Let's host a chat room`
-        : `Welcome to ${roomID}, enter your username to start`}
+        ? `Welcome to ${roomID}, enter your username to start`
+        : `Welcome! Let's host a chat room`}
       <UserNameForm />
     </div>
   )
