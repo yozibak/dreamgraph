@@ -1,8 +1,8 @@
 import { useContext, useState } from 'react'
-import { ChatRoomContext } from '../domain'
+import { DomainContext } from '../domain'
 
 export const Welcome = () => {
-  const { roomID } = useContext(ChatRoomContext)
+  const { roomID } = useContext(DomainContext)
   return (
     <>
       {roomID ? (
@@ -16,16 +16,12 @@ export const Welcome = () => {
 
 export const UserNameForm = () => {
   const [name, setName] = useState('')
-  const { roomID, setUsername, hostChatRoom } = useContext(ChatRoomContext)
+  const { enterChatRoom } = useContext(DomainContext)
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        if (roomID) {
-          setUsername(name)
-        } else {
-          hostChatRoom(name)
-        }
+        enterChatRoom(name)
       }}
     >
       <input onChange={(e) => setName(e.target.value)} value={name} placeholder="who are you?" />

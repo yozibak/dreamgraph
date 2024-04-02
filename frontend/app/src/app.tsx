@@ -1,17 +1,17 @@
 import { Header } from './components/header'
-import { ChatRoomContext, useChatRoom } from './domain'
+import { DomainContext, useDomain } from './domain'
 import { Chat } from './view/chat'
 import { UserNameForm, Welcome } from './view/welcome'
 
 export default () => {
-  const chatroom = useChatRoom()
+  const domain = useDomain()
   return (
     <>
-      <ChatRoomContext.Provider value={chatroom}>
-        <Header roomID={chatroom.roomID} />
-        {chatroom.roomID && chatroom.username ? <Chat /> : <Welcome />}
-        {chatroom.username === '' ? <UserNameForm /> : <></>}
-      </ChatRoomContext.Provider>
+      <DomainContext.Provider value={domain}>
+        {domain.roomID ? <Header roomID={domain.roomID} /> : <></>}
+        {domain.roomID && domain.username ? <Chat /> : <Welcome />}
+        {domain.username === '' ? <UserNameForm /> : <></>}
+      </DomainContext.Provider>
     </>
   )
 }

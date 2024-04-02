@@ -1,9 +1,9 @@
 import { useContext, useState } from 'react'
 import { MessageThread } from '../components/message'
-import { ChatRoomContext } from '../domain'
+import { DomainContext } from '../domain'
 
 export const Chat = () => {
-  const { messages } = useContext(ChatRoomContext)
+  const { messages } = useContext(DomainContext)
   return (
     <>
       <MessageThread messages={messages} />
@@ -14,7 +14,7 @@ export const Chat = () => {
 
 const MessageForm = () => {
   const [content, setContent] = useState('')
-  const { sendMessage } = useContext(ChatRoomContext)
+  const { sendMessage } = useContext(DomainContext)
   return (
     <form
       onSubmit={(e) => {
