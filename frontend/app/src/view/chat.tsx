@@ -9,11 +9,11 @@ export const Chat = () => {
   const { messages, roomID } = useContext(DomainContext)
   if (!roomID) return <></>
   return (
-    <>
+    <div className='chat'>
+      <Invitation invitationLink={getInvitationLink(roomID)} />
       <MessageThread messages={messages} />
       <MessageForm />
-      <Invitation invitationLink={getInvitationLink(roomID)} />
-    </>
+    </div>
   )
 }
 

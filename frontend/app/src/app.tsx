@@ -1,4 +1,5 @@
-import { Header } from './components/header'
+import './index.css'
+import { Container } from './components/container'
 import { DomainContext, useDomain } from './domain'
 import { getView } from './view'
 
@@ -8,8 +9,9 @@ export default () => {
   return (
     <>
       <DomainContext.Provider value={domain}>
-        <Header roomID={domain.roomID} />
-        {view}
+        <Container roomID={domain.roomID}>
+          {view}
+        </Container>
       </DomainContext.Provider>
     </>
   )

@@ -4,9 +4,8 @@ export const Invitation = ({ invitationLink }: { invitationLink: string }) => {
     alert('copied the invitation link 😎')
   }
   return (
-    <div>
-      <div>INVITATION LINK: {invitationLink}</div>
-      <button onClick={copyLink}>copy</button>
+    <div onClick={copyLink} style={{fontSize: '0.88rem', fontStyle: 'italic'}}>
+      <span style={{cursor: 'pointer'}}>🔗 INVITATION LINK: {invitationLink}</span>
     </div>
   )
 }

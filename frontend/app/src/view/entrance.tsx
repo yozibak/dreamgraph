@@ -5,7 +5,7 @@ import { DomainContext } from '../domain'
 export const Entrance = () => {
   const { roomID } = useContext(DomainContext)
   return (
-    <div>
+    <div className='entrance'>
       {roomID
         ? `Welcome to ${roomID}, enter your username to start`
         : `Welcome! Let's host a chat room`}
