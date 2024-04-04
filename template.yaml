@@ -14,6 +14,10 @@ Parameters:
       - Dev
       - Test
       - Prod
+  ApiKeyExpires:
+    Type: Number
+    Description: AppSync API key expiration date (in seconds) since epoch
+    Default: 1743756531 # 2025-04-04
 
 Resources:
   GraphQLApi:
@@ -26,6 +30,7 @@ Resources:
     Type: AWS::AppSync::ApiKey
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
+      Expires: !Ref ApiKeyExpires
 
   ForwardMessageDataSource:
     Type: AWS::AppSync::DataSource
