@@ -122,16 +122,10 @@ Resources:
                 Resource:
                   - !GetAtt PipelineExecutionRole.Arn
                   - !GetAtt PipelineFrontEndDeployRole.Arn
-                # Condition:
-                #   StringEquals:
-                #     aws:ResourceTag/Role: pipeline-execution-role
   PipelineExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
       RoleName: !Sub ${AppName}-PipelineExecutionRole
-      # Tags:
-      #   - Key: Role
-      #     Value: pipeline-execution-role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

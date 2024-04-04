@@ -7,7 +7,7 @@ export const MessageThread = ({ messages }: { messages: Message[] }) => {
     if (thread.current) {
       thread.current.scrollIntoView(false)
     }
-  }, [messages])
+  }, [thread, messages])
   return (
     <div className="message-thread">
       <div ref={thread}>

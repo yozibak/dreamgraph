@@ -11,7 +11,7 @@ describe(`${useChatRoom.name}`, () => {
     expect(result.current.username).toBe('yozibak')
     expect(result.current.roomID).toBe('yozibak-chat-room')
   })
-  it(`should let the user enter the chat room if provided`, () => {
+  it(`should let the user enter the chat room if room id is provided`, () => {
     jest.spyOn(chatroom, 'getInvitedRoom').mockReturnValue('yozibak-chat-room')
     const { result } = renderHook(() => useChatRoom())
     expect(result.current.roomID).toBe('yozibak-chat-room')

@@ -42,7 +42,6 @@ const JestConfig: Config = {
       displayName: 'frontend',
       rootDir: './frontend/app',
       testEnvironment: 'jsdom',
-      setupFilesAfterEnv: ['<rootDir>/src/__test__/setup.ts'],
     },
   ],
 }

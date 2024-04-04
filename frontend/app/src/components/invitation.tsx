@@ -1,11 +1,15 @@
 export const Invitation = ({ invitationLink }: { invitationLink: string }) => {
-  const copyLink = async () => {
-    await navigator.clipboard.writeText(invitationLink)
-    alert('copied the invitation link 😎')
-  }
   return (
-    <div onClick={copyLink} style={{fontSize: '0.88rem', fontStyle: 'italic'}}>
-      <span style={{cursor: 'pointer'}}>🔗 INVITATION LINK: {invitationLink}</span>
+    <div
+      onClick={() => copyToClipboard(invitationLink)}
+      style={{ fontSize: '0.88rem', fontStyle: 'italic' }}
+    >
+      <span style={{ cursor: 'pointer' }}>🔗 INVITATION LINK: {invitationLink}</span>
     </div>
   )
+}
+
+const copyToClipboard = async (link: string) => {
+  await navigator.clipboard.writeText(link)
+  alert('copied the invitation link 😎')
 }
