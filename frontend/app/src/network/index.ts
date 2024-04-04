@@ -17,6 +17,7 @@ export const startSubscription = (roomID: string, onData: (mes: Message) => void
     })
     .subscribe({
       next: (value) => onData(value.data.subscribeChatRoom),
+      // eslint-disable-next-line no-console
       error: (e) => console.warn(e),
     })
   return subscription
