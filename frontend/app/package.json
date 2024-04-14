@@ -4,7 +4,6 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
-
     "test": "cd ../.. && jest --selectProjects frontend"
   },
   "dependencies": {
@@ -14,8 +13,10 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.43.1",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
+    "@types/node": "^20.11.28",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",
     "@vitejs/plugin-react": "^4.2.1",
