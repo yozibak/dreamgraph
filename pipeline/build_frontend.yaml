@@ -11,4 +11,12 @@ phases:
   build:
     commands:
       - . pipeline/assume-role.sh "${FRONTEND_DEPLOY_ROLE}" "${ENV}-deploy-frontend"
-      - sh deploy_frontend.sh "${ENV}"
+      - sh pipeline/build_frontend.sh "${ENV}"
+
+artifacts:
+  base-directory: frontend/app
+  files: '**/*'
+  exclude-paths:
+    - .env
+    - node_modules
+    - src

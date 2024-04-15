@@ -306,9 +306,10 @@ Resources:
               OutputArtifacts:
                 - Name: BuildArtifactAsZip
 
-        - Name: DeployTest
+        - Name: Test
           Actions:
             - Name: DeployStack
+              RunOrder: 1
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -324,8 +325,36 @@ Resources:
                   ]
               InputArtifacts:
                 - Name: BuildArtifactAsZip
-              RunOrder: 1
+            - Name: BuildFrontEnd
+              RunOrder: 2
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuildProjectBuildFrontEnd
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name": "ENV", "value": "test"}
+                  ]
+              InputArtifacts:
+                - Name: SourceCodeAsZip
+              OutputArtifacts:
+                - Name: FrontEndBuildAsZip
+            - Name: TestApplication
+              RunOrder: 3
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuildProjectTest
+              InputArtifacts:
+                - Name: FrontEndBuildAsZip
             - Name: DeployFrontEnd
+              RunOrder: 4
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -338,43 +367,43 @@ Resources:
                     {"name": "ENV", "value": "test"}
                   ]
               InputArtifacts:
-                - Name: SourceCodeAsZip
-              RunOrder: 2
+                - Name: FrontEndBuildAsZip
 
-        - Name: DeployProd
-          Actions:
-            - Name: DeployStack
-              ActionTypeId:
-                Category: Build
-                Owner: AWS
-                Provider: CodeBuild
-                Version: '1'
-              Configuration:
-                ProjectName: !Ref CodeBuildProjectDeployStack
-                EnvironmentVariables: !Sub |
-                  [
-                    {"name": "ENV_PIPELINE_EXECUTION_ROLE", "value": "${PipelineExecutionRole.Arn}"},
-                    {"name": "ENV_CLOUDFORMATION_EXECUTION_ROLE", "value": "${PipelineCloudFormationExecutionRole.Arn}"},
-                    {"name": "ENV", "value": "prod"}
-                  ]
-              InputArtifacts:
-                - Name: BuildArtifactAsZip
-              RunOrder: 1
-            - Name: DeployFrontEnd
-              ActionTypeId:
-                Category: Build
-                Owner: AWS
-                Provider: CodeBuild
-                Version: '1'
-              Configuration:
-                ProjectName: !Ref CodeBuildProjectDeployFrontEnd
-                EnvironmentVariables: !Sub |
-                  [
-                    {"name": "ENV", "value": "prod"}
-                  ]
-              InputArtifacts:
-                - Name: SourceCodeAsZip
-              RunOrder: 2
+
+        # - Name: DeployProd
+        #   Actions:
+        #     - Name: DeployStack
+        #       ActionTypeId:
+        #         Category: Build
+        #         Owner: AWS
+        #         Provider: CodeBuild
+        #         Version: '1'
+        #       Configuration:
+        #         ProjectName: !Ref CodeBuildProjectDeployStack
+        #         EnvironmentVariables: !Sub |
+        #           [
+        #             {"name": "ENV_PIPELINE_EXECUTION_ROLE", "value": "${PipelineExecutionRole.Arn}"},
+        #             {"name": "ENV_CLOUDFORMATION_EXECUTION_ROLE", "value": "${PipelineCloudFormationExecutionRole.Arn}"},
+        #             {"name": "ENV", "value": "prod"}
+        #           ]
+        #       InputArtifacts:
+        #         - Name: BuildArtifactAsZip
+        #       RunOrder: 1
+        #     - Name: DeployFrontEnd
+        #       ActionTypeId:
+        #         Category: Build
+        #         Owner: AWS
+        #         Provider: CodeBuild
+        #         Version: '1'
+        #       Configuration:
+        #         ProjectName: !Ref CodeBuildProjectDeployFrontEnd
+        #         EnvironmentVariables: !Sub |
+        #           [
+        #             {"name": "ENV", "value": "prod"}
+        #           ]
+        #       InputArtifacts:
+        #         - Name: SourceCodeAsZip
+        #       RunOrder: 2
 
   CodeBuildProjectBuildStack:
     Type: AWS::CodeBuild::Project
@@ -415,7 +444,7 @@ Resources:
         Type: CODEPIPELINE
         BuildSpec: !Sub pipeline/deploy_stack.yaml
 
-  CodeBuildProjectDeployFrontEnd:
+  CodeBuildProjectBuildFrontEnd:
     Type: AWS::CodeBuild::Project
     Properties:
       Artifacts:
@@ -427,6 +456,40 @@ Resources:
         EnvironmentVariables:
           - Name: ARTIFACTS_BUCKET
             Value: !Ref ArtifactsBucket
+          - Name: FRONTEND_DEPLOY_ROLE
+            Value: !GetAtt PipelineFrontEndDeployRole.Arn
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: !Sub pipeline/build_frontend.yaml
+
+  CodeBuildProjectTest:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: CI
+            Value: true
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: !Sub pipeline/test_application.yaml
+
+  CodeBuildProjectDeployFrontEnd:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
+        EnvironmentVariables:
           - Name: FRONTEND_DEPLOY_ROLE
             Value: !GetAtt PipelineFrontEndDeployRole.Arn
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn

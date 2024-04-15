@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18.x
+  build:
+    commands:
+      - ls
+      - cd frontend/app
+      - ls
+      - npm i
+      - npx --yes playwright install --with-deps chromium
+      - PLAYWRIGHT_JUNIT_OUTPUT_NAME=results.xml npx playwright test --reporter=junit
+
+reports:
+  test-reports:
+    base-directory: frontend/app
+    files:
+      - results.xml
