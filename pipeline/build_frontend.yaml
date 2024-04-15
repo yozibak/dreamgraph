@@ -17,6 +17,7 @@ artifacts:
   files:
     - frontend/app/**/*
     - pipeline/*
+    - tsconfig.json
   exclude-paths:
     - '**/.env'
     - '**/node_modules'
