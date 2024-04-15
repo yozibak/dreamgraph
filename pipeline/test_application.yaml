@@ -13,8 +13,8 @@ phases:
       - npx --yes playwright install --with-deps chromium
       - PLAYWRIGHT_JUNIT_OUTPUT_NAME=results.xml npx playwright test --reporter=junit
 
-reports:
-  test-reports:
-    base-directory: frontend/app
-    files:
-      - results.xml
+# reports:
+#   test-reports:
+#     base-directory: frontend/app
+#     files:
+#       - results.xml

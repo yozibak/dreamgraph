@@ -343,7 +343,7 @@ Resources:
               InputArtifacts:
                 - Name: SourceCodeAsZip
               OutputArtifacts:
-                - Name: FrontEndBuildAsZip
+                - Name: TestFrontEndBuildAsZip
             - Name: TestApplication
               RunOrder: 3
               ActionTypeId:
@@ -354,7 +354,7 @@ Resources:
               Configuration:
                 ProjectName: !Ref CodeBuildProjectTest
               InputArtifacts:
-                - Name: FrontEndBuildAsZip
+                - Name: TestFrontEndBuildAsZip
             - Name: DeployFrontEnd
               RunOrder: 4
               ActionTypeId:
@@ -369,43 +369,59 @@ Resources:
                     {"name": "ENV", "value": "test"}
                   ]
               InputArtifacts:
-                - Name: FrontEndBuildAsZip
+                - Name: TestFrontEndBuildAsZip
 
-
-        # - Name: DeployProd
-        #   Actions:
-        #     - Name: DeployStack
-        #       ActionTypeId:
-        #         Category: Build
-        #         Owner: AWS
-        #         Provider: CodeBuild
-        #         Version: '1'
-        #       Configuration:
-        #         ProjectName: !Ref CodeBuildProjectDeployStack
-        #         EnvironmentVariables: !Sub |
-        #           [
-        #             {"name": "ENV_PIPELINE_EXECUTION_ROLE", "value": "${PipelineExecutionRole.Arn}"},
-        #             {"name": "ENV_CLOUDFORMATION_EXECUTION_ROLE", "value": "${PipelineCloudFormationExecutionRole.Arn}"},
-        #             {"name": "ENV", "value": "prod"}
-        #           ]
-        #       InputArtifacts:
-        #         - Name: BuildArtifactAsZip
-        #       RunOrder: 1
-        #     - Name: DeployFrontEnd
-        #       ActionTypeId:
-        #         Category: Build
-        #         Owner: AWS
-        #         Provider: CodeBuild
-        #         Version: '1'
-        #       Configuration:
-        #         ProjectName: !Ref CodeBuildProjectDeployFrontEnd
-        #         EnvironmentVariables: !Sub |
-        #           [
-        #             {"name": "ENV", "value": "prod"}
-        #           ]
-        #       InputArtifacts:
-        #         - Name: SourceCodeAsZip
-        #       RunOrder: 2
+        - Name: Deploy
+          Actions:
+            - Name: DeployStack
+              RunOrder: 1
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuildProjectDeployStack
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name": "ENV_PIPELINE_EXECUTION_ROLE", "value": "${PipelineExecutionRole.Arn}"},
+                    {"name": "ENV_CLOUDFORMATION_EXECUTION_ROLE", "value": "${PipelineCloudFormationExecutionRole.Arn}"},
+                    {"name": "ENV", "value": "prod"}
+                  ]
+              InputArtifacts:
+                - Name: BuildArtifactAsZip
+            - Name: BuildFrontEnd
+              RunOrder: 2
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuildProjectBuildFrontEnd
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name": "ENV", "value": "prod"}
+                  ]
+              InputArtifacts:
+                - Name: SourceCodeAsZip
+              OutputArtifacts:
+                - Name: ProdFrontEndBuildAsZip
+            - Name: DeployFrontEnd
+              RunOrder: 3
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuildProjectDeployFrontEnd
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name": "ENV", "value": "prod"}
+                  ]
+              InputArtifacts:
+                - Name: ProdFrontEndBuildAsZip
 
   CodeBuildProjectBuildStack:
     Type: AWS::CodeBuild::Project
