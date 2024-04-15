@@ -4,4 +4,4 @@ phases:
   build:
     commands:
       - . pipeline/assume-role.sh "${FRONTEND_DEPLOY_ROLE}" "${ENV}-deploy-frontend"
-      - sh deploy_frontend.sh "${ENV}"
+      - sh pipeline/deploy_frontend.sh "${ENV}"
