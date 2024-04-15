@@ -115,6 +115,19 @@ Resources:
                   - s3:PutObject
                 Resource:
                   - !Sub '${ArtifactsBucket.Arn}/*'
+        - PolicyName: CodeBuildReport
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - codebuild:CreateReportGroup
+                  - codebuild:CreateReport
+                  - codebuild:UpdateReport
+                  - codebuild:BatchPutTestCases
+                  - codebuild:BatchPutCodeCoverages
+                Resource:
+                  - !Sub 'arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:report-group/*'
         - PolicyName: AssumeStagePipeExecutionRoles
           PolicyDocument:
             Version: '2012-10-17'
