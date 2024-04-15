@@ -74,6 +74,8 @@ Resources:
                 Resource:
                   - !GetAtt CodeBuildProjectBuildStack.Arn
                   - !GetAtt CodeBuildProjectDeployStack.Arn
+                  - !GetAtt CodeBuildProjectBuildFrontEnd.Arn
+                  - !GetAtt CodeBuildProjectTest.Arn
                   - !GetAtt CodeBuildProjectDeployFrontEnd.Arn
   CodeBuildServiceRole:
     Type: AWS::IAM::Role

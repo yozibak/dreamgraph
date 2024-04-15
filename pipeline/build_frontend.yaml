@@ -14,9 +14,10 @@ phases:
       - sh pipeline/build_frontend.sh "${ENV}"
 
 artifacts:
-  base-directory: frontend/app
-  files: '**/*'
+  files:
+    - frontend/app/**/*
+    - pipeline/*
   exclude-paths:
-    - .env
-    - node_modules
-    - src
+    - '**/.env'
+    - '**/node_modules'
+    - '**/src'
