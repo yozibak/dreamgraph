@@ -3,12 +3,12 @@ import { defineConfig } from 'vite'
 import EnvironmentPlugin from 'vite-plugin-environment'
 
 export default defineConfig({
-  plugins: [react(), EnvironmentPlugin(['VITE_API_ENDPOINT', 'VITE_API_KEY'])],
+  plugins: [react(), EnvironmentPlugin(['API_ENDPOINT', 'USER_POOL_CLIENT_ID', 'USER_POOL_ID'])],
   server: {
     host: '127.0.0.1',
     port: 3000,
   },
   preview: {
     port: 3000,
-  }
+  },
 })

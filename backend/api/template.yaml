@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  AppName:
+    Type: String
+  Env:
+    Type: String
+    AllowedValues:
+      - Dev
+      - Test
+      - Prod
+  UserPoolId:
+    Type: String
+
+Resources:
+  HelloFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs20.x
+      CodeUri: ./lambda
+
+  GraphQLAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: !Sub ${AppName}-${Env}-graphql-api
+      SchemaUri: ./schema.graphql
+      Auth:
+        Type: AMAZON_COGNITO_USER_POOLS
+        UserPool:
+          UserPoolId: !Ref UserPoolId
+          DefaultAction: ALLOW
+          AwsRegion: !Ref AWS::Region
+      DataSources:
+        Lambda:
+          HelloDataSource:
+            FunctionArn: !GetAtt HelloFunction.Arn
+      Functions:
+        invokeLambda:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: HelloDataSource
+          CodeUri: ./functions/invokeLambda.js
+      Resolvers:
+        Mutation:
+          addPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - invokeLambda
+        Query:
+          getPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - invokeLambda
+
+Outputs:
+  ApiEndpoint:
+    Description: AppSync API
+    Value: !GetAtt GraphQLAPI.GraphQLUrl

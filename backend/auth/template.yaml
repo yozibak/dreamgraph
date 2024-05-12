@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  AppName:
+    Type: String
+  Env:
+    Type: String
+    AllowedValues:
+      - Dev
+      - Test
+      - Prod
+
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${AppName}-${Env}-user-pool
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: false
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: false
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId:
+        Ref: UserPool
+      ClientName: !Sub ${AppName}-${Env}-user-pool-client
+
+Outputs:
+  UserPoolId:
+    Value: !Ref UserPool
+    Export:
+      Name: !Sub ${AppName}-${Env}-user-pool-id
+  UserPoolClientId:
+    Value: !Ref UserPoolClient

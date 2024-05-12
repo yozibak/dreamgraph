@@ -1,0 +1,11 @@
+type Post {
+  content: String!
+}
+
+type Mutation {
+  addPost(content: String!): Post!
+}
+
+type Query {
+  getPost(id: String): Post!
+}

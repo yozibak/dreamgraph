@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  AppName:
+    Type: String
+    Default: DreamGraph
+  Env:
+    Type: String
+    AllowedValues:
+      - Dev
+      - Test
+      - Prod
+
+Resources:
+  Auth:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./auth/template.yaml
+      Parameters:
+        AppName: !Ref AppName
+        Env: !Ref Env
+  Api:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./api/template.yaml
+      Parameters:
+        AppName: !Ref AppName
+        Env: !Ref Env
+        UserPoolId: !GetAtt Auth.Outputs.UserPoolId
+
+Outputs:
+  UserPoolId:
+    Value: !GetAtt Auth.Outputs.UserPoolId
+  UserPoolClientId:
+    Value: !GetAtt Auth.Outputs.UserPoolClientId
+  ApiEndpoint:
+    Value: !GetAtt Api.Outputs.ApiEndpoint
