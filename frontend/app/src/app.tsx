@@ -1,18 +1,26 @@
-import './index.css'
-import { Container } from './components/container'
-import { DomainContext, useDomain } from './domain'
-import { getView } from './view'
+import { Authenticator } from '@aws-amplify/ui-react'
+import '@aws-amplify/ui-react/styles.css'
+import { AuthUser } from 'aws-amplify/auth'
+// import { Dreams } from './dreams'
 
-export default () => {
-  const domain = useDomain()
-  const view = getView(domain)
+const App = () => {
   return (
     <>
-      <DomainContext.Provider value={domain}>
-        <Container roomID={domain.roomID}>
-          {view}
-        </Container>
-      </DomainContext.Provider>
+      <div>dream app</div>
+      <Authenticator loginMechanisms={['email']}>{(props) => <Welcome {...props} />}</Authenticator>
     </>
   )
 }
+
+const Welcome: React.FC<{ user?: AuthUser; signOut?: () => void }> = ({ user, signOut }) => {
+  if (!user) return <></>
+  return (
+    <div>
+      <div>Welcome, {user.username}</div>
+      {/* <Dreams /> */}
+      <button onClick={signOut}>Sign out</button>
+    </div>
+  )
+}
+
+export default App

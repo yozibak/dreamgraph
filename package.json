@@ -15,9 +15,9 @@
     "deploy:frontend": "sh pipeline/build_frontend.sh dev && sh pipeline/deploy_frontend.sh dev"
   },
   "devDependencies": {
-    "@types/eslint": "^8.56.5",
+    "@types/eslint": "^8.56.10",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.28",
+    "@types/node": "^20.12.11",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.0",
@@ -29,7 +29,7 @@
     "syncpack": "^11.2.1",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.5"
   },
   "prettier": {
     "trailingComma": "es5",

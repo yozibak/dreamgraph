@@ -1,6 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './app'
+import { configureAWS } from './network/client'
+
+configureAWS()
 
 const root = document.getElementById('root')
 if (root) {
