@@ -1,9 +1,10 @@
 {
   "name": "resolvers",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild --bundle --target=esnext --platform=node --format=esm --external:@aws-appsync/utils --outdir=build src/*.ts"
   },
   "devDependencies": {
-    
+    "esbuild": "^0.21.2"
   }
 }
