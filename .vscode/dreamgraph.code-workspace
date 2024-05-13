@@ -1,18 +1,19 @@
 {
   "folders": [
     {
-      "path": "../"
-    }
+      "path": "../",
+    },
   ],
   "settings": {
     "eslint.enable": true,
     "eslint.lintTask.enable": true,
+    "eslint.experimental.useFlatConfig": true,
     "search.exclude": {
       "**/node_modules": true,
       "**/coverage": true,
-      "**/dist": true
+      "**/dist": true,
     },
     "typescript.preferences.importModuleSpecifier": "relative",
-    "typescript.tsdk": "node_modules/typescript/lib"
-  }
+    "typescript.tsdk": "node_modules/typescript/lib",
+  },
 }

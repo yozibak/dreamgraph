@@ -14,6 +14,7 @@ export const sendSayHello = async () => {
     })) as { data: { sayHello: Message } }
     return result.data.sayHello.content
   } catch (e) {
+
     console.log(e)
   }
 }
