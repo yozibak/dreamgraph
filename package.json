@@ -9,7 +9,7 @@
     "preinstall": "npx only-allow pnpm",
     "eslint": "eslint",
     "sync": "npx syncpack list",
-    "lint": "eslint **/src/**/*.ts",
+    "lint": "eslint .",
     "test": "jest",
     "prepare": "husky install",
     "deploy:backend": "sam build && sam deploy --config-env dev",

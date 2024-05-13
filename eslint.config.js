@@ -1,6 +1,7 @@
-import eslint from '@eslint/js'
-import tseslint from 'typescript-eslint'
 import appsync from '@aws-appsync/eslint-plugin'
+import eslint from '@eslint/js'
+import tsParser from '@typescript-eslint/parser'
+import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -16,8 +17,19 @@ export default tseslint.config(
     },
   },
   {
+    files: ['backend/api/resolvers/src/**/*.js'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaFeatures: { modules: true },
+        ecmaVersion: 2018,
+        project: './tsconfig.json',
+      },
+    },
     plugins: { '@aws-appsync': appsync },
-    files: ['backend/**/*.js'],
-    rules: appsync.configs.base.rules,
+    rules: appsync.configs.recommended.rules,
+  },
+  {
+    ignores: ['.aws-sam/*'],
   }
 )
