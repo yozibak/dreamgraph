@@ -29,6 +29,13 @@ Resources:
         AppName: !Ref AppName
         Env: !Ref Env
         UserPoolId: !GetAtt Auth.Outputs.UserPoolId
+  DB:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./db/template.yaml
+      Parameters:
+        AppName: !Ref AppName
+        Env: !Ref Env
 
 Outputs:
   UserPoolId:
@@ -37,3 +44,5 @@ Outputs:
     Value: !GetAtt Auth.Outputs.UserPoolClientId
   ApiEndpoint:
     Value: !GetAtt Api.Outputs.ApiEndpoint
+  ProjectTableName:
+    Value: !GetAtt DB.Outputs.ProjectTableName
