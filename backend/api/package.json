@@ -1,0 +1,16 @@
+{
+  "name": "resolvers",
+  "scripts": {
+    "test": "cd ../.. && jest --selectProjects backend",
+    "prebuild": "echo '--build start--' && rm -rf build",
+    "build": "esbuild --bundle --sourcemap=inline --sources-content=false --target=esnext --platform=node --format=esm --external:@aws-appsync/utils --outdir=build src/**/*.ts",
+    "postbuild": "echo 'build complete'"
+  },
+  "devDependencies": {
+    "@aws-appsync/utils": "^1.7.0",
+    "esbuild": "^0.21.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-appsync": "^3.574.0"
+  }
+}

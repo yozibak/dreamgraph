@@ -20,7 +20,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs20.x
-      CodeUri: ./lambda
+      CodeUri: ./build/lambda
 
   GraphQLAPI:
     Type: AWS::Serverless::GraphQLApi
@@ -43,7 +43,7 @@ Resources:
             Name: APPSYNC_JS
             Version: 1.0.0
           DataSource: HelloDataSource
-          CodeUri: ./functions/invokeLambda.js
+          CodeUri: ./resolvers/build/invokeLambda.js
       Resolvers:
         Mutation:
           addPost:

@@ -43,6 +43,12 @@ const JestConfig: Config = {
       rootDir: './frontend/app',
       testEnvironment: 'jsdom',
     },
+    {
+      ...RootConfig,
+      testMatch: ['<rootDir>/test/**/*.test.ts'],
+      displayName: 'backend',
+      rootDir: './backend/api',
+    },
   ],
 }
 

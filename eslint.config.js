@@ -7,7 +7,7 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['frontend/**/*.ts'],
+    files: ['**/*.ts', '**/*.tsx'],
     rules: {
       '@typescript-eslint/no-empty-function': 'warn',
       '@typescript-eslint/no-non-null-assertion': 'off',
@@ -17,7 +17,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['backend/api/resolvers/src/**/*.js'],
+    files: ['backend/api/src/resolvers/*.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -27,7 +27,7 @@ export default tseslint.config(
       },
     },
     plugins: { '@aws-appsync': appsync },
-    rules: appsync.configs.recommended.rules,
+    rules: { ...appsync.configs.recommended.rules, '@typescript-eslint/no-unused-vars': 'warn' },
   },
   {
     ignores: ['.aws-sam/*'],
