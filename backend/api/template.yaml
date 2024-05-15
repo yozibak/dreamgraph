@@ -17,12 +17,18 @@ Parameters:
     Type: String
 
 Resources:
-  HelloFunction:
+  LambdaHandler:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
       Runtime: nodejs20.x
       CodeUri: ./build/lambda
+      Environment:
+        Variables:
+          PROJECT_TABLE: !Ref ProjectTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProjectTableName
 
   GraphQLAPI:
     Type: AWS::Serverless::GraphQLApi
@@ -37,8 +43,8 @@ Resources:
           AwsRegion: !Ref AWS::Region
       DataSources:
         Lambda:
-          HelloDataSource:
-            FunctionArn: !GetAtt HelloFunction.Arn
+          LambdaHandler:
+            FunctionArn: !GetAtt LambdaHandler.Arn
         DynamoDb:
           ProjectTable:
             TableName: !Ref ProjectTableName
@@ -65,8 +71,14 @@ Resources:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
+          DataSource: LambdaHandler
+          CodeUri: ./build/resolvers/invokeLambda.js
+        listProjects:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
           DataSource: ProjectTable
-          CodeUri: ./build/resolvers/deleteProject.js
+          CodeUri: ./build/resolvers/listProjects.js
       Resolvers:
         Mutation:
           createProject:
@@ -96,6 +108,12 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - getProject
+          listProjects:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - listProjects
 
 Outputs:
   ApiEndpoint:

@@ -1,22 +1,26 @@
 type Project {
-  projectId: String!
+  projectId: ID!
   title: String!
+  unlocks: [ID!]!
 }
 
 input CreateProjectInput {
   title: String!
+  unlocks: [ID!]
 }
 
 input UpdateProjectInput {
   title: String
+  unlocks: [ID!]
 }
 
 type Mutation {
   createProject(input: CreateProjectInput!): Project!
-  updateProject(projectId: String!, input: UpdateProjectInput!): Project!
-  deleteProject(projectId: String!): Boolean
+  updateProject(projectId: ID!, input: UpdateProjectInput!): Project!
+  deleteProject(projectId: ID!): Boolean
 }
 
 type Query {
-  getProject(projectId: String!): Project!
+  getProject(projectId: ID!): Project!
+  listProjects(unlocks: ID): [Project!]!
 }

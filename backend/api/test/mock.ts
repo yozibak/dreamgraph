@@ -1,6 +1,6 @@
 import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 
-export type TestContext = Omit<Context, 'info'|'identity'> & {
+export type TestContext = Omit<Context, 'info' | 'identity'> & {
   identity: AppSyncIdentityCognito
 }
 
@@ -30,5 +30,5 @@ export const createUserRequestMock = (override: Partial<TestContext> = {}): Test
     headers: undefined,
     domainName: '',
   },
-  ...override
+  ...override,
 })

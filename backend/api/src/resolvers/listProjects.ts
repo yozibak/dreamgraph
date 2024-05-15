@@ -2,16 +2,16 @@ import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 import * as ddb from '@aws-appsync/utils/dynamodb'
 import { ProjectRecord } from '../types'
 
-type GetProjectArgs = {
-  projectId: string
+type ListProjectsArgs = {
+  unlocks?: string
 }
 
-export function request(ctx: Context<GetProjectArgs>) {
-  const projectId = ctx.arguments.projectId || ctx.stash.projectId
+export function request(ctx: Context<ListProjectsArgs>) {
   const userId = (ctx.identity as AppSyncIdentityCognito).username
-  return ddb.get({ key: { projectId, userId } })
+  return ddb.query({ query: { userId: { eq: userId } } })
 }
 
 export function response(ctx: Context): ProjectRecord {
-  return ctx.result
+  const projects = ctx.result.items
+  return projects
 }

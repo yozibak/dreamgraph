@@ -45,9 +45,16 @@ const JestConfig: Config = {
     },
     {
       ...RootConfig,
-      testMatch: ['<rootDir>/test/**/*.test.ts'],
-      displayName: 'backend',
+      testMatch: ['<rootDir>/test/resolvers/*.test.ts'],
+      displayName: 'resolvers',
       rootDir: './backend/api',
+    },
+    {
+      ...RootConfig,
+      testMatch: ['<rootDir>/test/lambda/*.test.ts'],
+      displayName: 'lambda',
+      rootDir: './backend/api',
+      setupFiles: ['<rootDir>/test/lambda/setup.ts'],
     },
   ],
 }

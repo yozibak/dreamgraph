@@ -20,7 +20,7 @@ export const evaluateResolver = async (
     })
   )
   if (response.error) {
-    return response.error
+    throw response.error
   }
   return JSON.parse(response.evaluationResult)
 }

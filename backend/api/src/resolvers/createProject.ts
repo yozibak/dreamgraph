@@ -1,9 +1,9 @@
 import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 import * as ddb from '@aws-appsync/utils/dynamodb'
-import { Project, ProjectDynamoKey } from '../types'
+import { ProjectRecord, ProjectDynamoKey } from '../types'
 
 type CreateProjectArgs = {
-  input: Partial<Omit<Project, 'projectId'>>
+  input: Partial<Omit<ProjectRecord, 'projectId'>>
 }
 
 export function request(ctx: Context<CreateProjectArgs>) {
@@ -13,9 +13,13 @@ export function request(ctx: Context<CreateProjectArgs>) {
     userId: (ctx.identity as AppSyncIdentityCognito).sub,
   }
   ctx.stash.projectId = projectId
-  return ddb.put({ key, item: ctx.arguments.input })
+  const item = {
+    unlocks: [],
+    ...ctx.arguments.input
+  }
+  return ddb.put({ key, item })
 }
 
-export function response(ctx: Context): Project {
+export function response(ctx: Context): ProjectRecord {
   return ctx.result
 }

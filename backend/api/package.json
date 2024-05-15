@@ -1,16 +1,19 @@
 {
   "name": "resolvers",
   "scripts": {
-    "test": "cd ../.. && jest --selectProjects backend",
-    "prebuild": "echo '--build start--' && rm -rf build",
-    "build": "esbuild --bundle --sourcemap=inline --sources-content=false --target=esnext --platform=node --format=esm --external:@aws-appsync/utils --outdir=build src/**/*.ts",
-    "postbuild": "echo 'build complete'"
+    "build": "node build.mjs",
+    "test:resolvers": "cd ../.. && jest --selectProjects resolvers",
+    "test:lambda": "PROJECT_TABLE=LocalTest && cd ../.. && jest --selectProjects lambda"
   },
   "devDependencies": {
     "@aws-appsync/utils": "^1.7.0",
-    "esbuild": "^0.21.2"
+    "@types/aws-lambda": "^8.10.137",
+    "esbuild": "^0.21.2",
+    "glob": "^10.3.15"
   },
   "dependencies": {
-    "@aws-sdk/client-appsync": "^3.574.0"
+    "@aws-sdk/client-appsync": "^3.574.0",
+    "@aws-sdk/client-dynamodb": "^3.576.0",
+    "@aws-sdk/util-dynamodb": "^3.576.0"
   }
 }
