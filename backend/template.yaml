@@ -29,6 +29,7 @@ Resources:
         AppName: !Ref AppName
         Env: !Ref Env
         UserPoolId: !GetAtt Auth.Outputs.UserPoolId
+        ProjectTableName: !GetAtt DB.Outputs.ProjectTableName
   DB:
     Type: AWS::Serverless::Application
     Properties:

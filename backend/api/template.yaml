@@ -13,6 +13,8 @@ Parameters:
       - Prod
   UserPoolId:
     Type: String
+  ProjectTableName:
+    Type: String
 
 Resources:
   HelloFunction:
@@ -37,28 +39,63 @@ Resources:
         Lambda:
           HelloDataSource:
             FunctionArn: !GetAtt HelloFunction.Arn
+        DynamoDb:
+          ProjectTable:
+            TableName: !Ref ProjectTableName
       Functions:
-        invokeLambda:
+        getProject:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
-          DataSource: HelloDataSource
-          CodeUri: ./resolvers/build/invokeLambda.js
+          DataSource: ProjectTable
+          CodeUri: ./build/resolvers/getProject.js
+        createProject:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: ProjectTable
+          CodeUri: ./build/resolvers/createProject.js
+        updateProject:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: ProjectTable
+          CodeUri: ./build/resolvers/updateProject.js
+        deleteProject:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: ProjectTable
+          CodeUri: ./build/resolvers/deleteProject.js
       Resolvers:
         Mutation:
-          addPost:
+          createProject:
             Runtime:
               Name: APPSYNC_JS
               Version: 1.0.0
             Pipeline:
-              - invokeLambda
+              - createProject
+              - getProject
+          updateProject:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - updateProject
+              - getProject
+          deleteProject:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - deleteProject
         Query:
-          getPost:
+          getProject:
             Runtime:
               Name: APPSYNC_JS
               Version: 1.0.0
             Pipeline:
-              - invokeLambda
+              - getProject
 
 Outputs:
   ApiEndpoint:

@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "test": "jest",
     "prepare": "husky install",
-    "deploy:backend": "sam build && sam deploy --config-env dev",
+    "validate": "sh validate.sh",
+    "deploy:backend": "sam deploy --config-env dev",
     "deploy:frontend": "sh pipeline/build_frontend.sh dev && sh pipeline/deploy_frontend.sh dev"
   },
   "devDependencies": {

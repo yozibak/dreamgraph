@@ -1,11 +1,22 @@
-type Post {
-  content: String!
+type Project {
+  projectId: String!
+  title: String!
+}
+
+input CreateProjectInput {
+  title: String!
+}
+
+input UpdateProjectInput {
+  title: String
 }
 
 type Mutation {
-  addPost(content: String!): Post!
+  createProject(input: CreateProjectInput!): Project!
+  updateProject(projectId: String!, input: UpdateProjectInput!): Project!
+  deleteProject(projectId: String!): Boolean
 }
 
 type Query {
-  getPost(id: String): Post!
+  getProject(projectId: String!): Project!
 }

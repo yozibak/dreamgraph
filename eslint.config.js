@@ -30,6 +30,6 @@ export default tseslint.config(
     rules: { ...appsync.configs.recommended.rules, '@typescript-eslint/no-unused-vars': 'warn' },
   },
   {
-    ignores: ['.aws-sam/*'],
+    ignores: ['.aws-sam/*', '**/build/**/*'],
   }
 )
