@@ -1,5 +1,5 @@
 {
-  "name": "chatroom-app",
+  "name": "dreamgraph",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
