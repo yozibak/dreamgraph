@@ -1,0 +1,7 @@
+{
+  "name": "common",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "cd ../.. && jest --selectProjects common"
+  }
+}

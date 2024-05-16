@@ -5,8 +5,8 @@ import {
   PutItemCommand,
   QueryCommand,
 } from '@aws-sdk/client-dynamodb'
-import { ProjectRecord } from '../types'
-import { unmarshall, marshall } from '@aws-sdk/util-dynamodb'
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
+import { ProjectData, removeUnlockProject } from 'common'
 
 const { PROJECT_TABLE } = process.env
 
@@ -36,14 +36,13 @@ export const queryProjectsByUnlockId = async (userId: string, unlockPjId: string
   })
   const result = await client.send(command)
   const projects = result.Items.map((item) => unmarshall(item))
-  return projects as unknown as ProjectRecord[]
+  return projects as unknown as ProjectData[]
 }
 
-export const removeProjectUnlockItem = async (pj: ProjectRecord, removedPj: string) => {
-  pj.unlocks = pj.unlocks.slice().filter((pid) => pid !== removedPj)
+export const removeProjectUnlockItem = async (pj: ProjectData, removedPj: string) => {
   const command = new PutItemCommand({
     TableName: PROJECT_TABLE,
-    Item: marshall(pj),
+    Item: marshall(removeUnlockProject(pj, removedPj)),
   })
   await client.send(command)
 }
@@ -57,5 +56,5 @@ export const getProject = async (userId: string, projectId: string) => {
     },
   })
   const result = await client.send(command)
-  return unmarshall(result.Item) as unknown as ProjectRecord
+  return unmarshall(result.Item) as unknown as ProjectData
 }

@@ -56,6 +56,12 @@ const JestConfig: Config = {
       rootDir: './backend/api',
       setupFiles: ['<rootDir>/test/lambda/setup.ts'],
     },
+    {
+      ...RootConfig,
+      testMatch: ['<rootDir>/src/**/*.test.ts'],
+      displayName: 'common',
+      rootDir: './common/domain',
+    },
   ],
 }
 

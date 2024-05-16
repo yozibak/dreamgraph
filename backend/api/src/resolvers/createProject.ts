@@ -1,25 +1,25 @@
 import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 import * as ddb from '@aws-appsync/utils/dynamodb'
-import { ProjectRecord, ProjectDynamoKey } from '../types'
+import { ProjectData } from 'common'
 
 type CreateProjectArgs = {
-  input: Partial<Omit<ProjectRecord, 'projectId'>>
+  input: Partial<ProjectData>
 }
 
 export function request(ctx: Context<CreateProjectArgs>) {
   const projectId = util.autoId()
-  const key: ProjectDynamoKey = {
+  const key = {
     projectId: projectId,
     userId: (ctx.identity as AppSyncIdentityCognito).sub,
   }
   ctx.stash.projectId = projectId
   const item = {
     unlocks: [],
-    ...ctx.arguments.input
+    ...ctx.arguments.input,
   }
   return ddb.put({ key, item })
 }
 
-export function response(ctx: Context): ProjectRecord {
+export function response(ctx: Context) {
   return ctx.result
 }

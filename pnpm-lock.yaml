@@ -74,6 +74,9 @@ importers:
       '@aws-sdk/util-dynamodb':
         specifier: ^3.576.0
         version: 3.576.0(@aws-sdk/client-dynamodb@3.576.0)
+      common:
+        specifier: workspace:^
+        version: link:../../common/domain
     devDependencies:
       '@aws-appsync/utils':
         specifier: ^1.7.0
@@ -88,6 +91,8 @@ importers:
         specifier: ^10.3.15
         version: 10.3.15
 
+  common/domain: {}
+
   frontend/app:
     dependencies:
       '@aws-amplify/ui-react':
@@ -96,6 +101,9 @@ importers:
       aws-amplify:
         specifier: ^6.3.0
         version: 6.3.0
+      common:
+        specifier: workspace:^
+        version: link:../../common/domain
       react:
         specifier: ^18.2.0
         version: 18.2.0

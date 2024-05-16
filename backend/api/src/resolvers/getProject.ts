@@ -1,6 +1,5 @@
 import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 import * as ddb from '@aws-appsync/utils/dynamodb'
-import { ProjectRecord } from '../types'
 
 type GetProjectArgs = {
   projectId: string
@@ -12,6 +11,6 @@ export function request(ctx: Context<GetProjectArgs>) {
   return ddb.get({ key: { projectId, userId } })
 }
 
-export function response(ctx: Context): ProjectRecord {
+export function response(ctx: Context) {
   return ctx.result
 }
