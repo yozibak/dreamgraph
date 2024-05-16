@@ -1,5 +1,4 @@
 import { useContext, useState } from 'react'
-
 import { ProjectsContext, useProjects } from './store/projects'
 import { CreateProjectInput } from 'common'
 
@@ -25,7 +24,7 @@ export const List = () => {
           <b>{project.title}</b>
           <span>⇨ {searchProject(project.unlocks[0])?.title}</span>
           <button onClick={() => removeProject(project.projectId)}>🗑️</button>
-          <button onClick={() => editProject({...project, title: 'edited'})}>edit</button>
+          <button onClick={() => editProject({ ...project, title: 'edited' })}>edit</button>
         </li>
       ))}
     </ul>
