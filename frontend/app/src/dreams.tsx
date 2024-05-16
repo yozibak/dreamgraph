@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import { ProjectsContext, useProjects } from './store/projects'
 import { CreateProjectInput } from 'common'
+import { Graph, makeGraphNetwork } from 'graph'
 
 export const Dreams = () => {
   const context = useProjects()
@@ -10,6 +11,7 @@ export const Dreams = () => {
         <h1>My graph</h1>
         <List />
         <AddForm />
+        <GraphNetwork />
       </div>
     </ProjectsContext.Provider>
   )
@@ -64,5 +66,21 @@ export const AddForm = () => {
       </label>
       <input type="submit" value="Submit" />
     </form>
+  )
+}
+
+const network = makeGraphNetwork(
+  [
+    { id: '1', label: 'Project 1' },
+    { id: '2', label: 'Project 2' },
+  ],
+  [{ from: '1', to: '2' }]
+)
+
+export const GraphNetwork = () => {
+  return (
+    <div className="w-dvw h-dvh fixed top-0">
+      <Graph network={network} options={{}} />
+    </div>
   )
 }
