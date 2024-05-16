@@ -1,10 +1,5 @@
-import {
-  CreateTableCommand,
-  DeleteTableCommand,
-  GetItemCommand,
-  PutItemCommand,
-} from '@aws-sdk/client-dynamodb'
-import { client, getProject, queryProjects, removeProjectUnlockItem } from '../../src/lambda/db'
+import { CreateTableCommand, DeleteTableCommand, PutItemCommand } from '@aws-sdk/client-dynamodb'
+import { client, getProject, queryProjectsByUnlockId, removeProjectUnlockItem } from '../../src/lambda/db'
 
 const TableName = 'LocalTest'
 
@@ -55,7 +50,12 @@ const prepMinimumGraph = async () => {
   await client.send(
     new PutItemCommand({
       TableName,
-      Item: { userId: { S: 'userId' }, projectId: { S: 'pj-1' }, unlocks: { L: [{ S: 'pj-3' }] } },
+      Item: {
+        userId: { S: 'userId' },
+        projectId: { S: 'pj-1' },
+        title: { S: 'pj-1' },
+        unlocks: { L: [{ S: 'pj-3' }] },
+      },
     })
   )
   await client.send(
@@ -64,15 +64,16 @@ const prepMinimumGraph = async () => {
       Item: {
         userId: { S: 'userId' },
         projectId: { S: 'pj-2' },
+        title: { S: 'pj-2' },
         unlocks: { L: [{ S: 'pj-3' }, { S: 'pj-1' }] },
       },
     })
   )
 }
 
-test(`${queryProjects.name}`, async () => {
+test(`${queryProjectsByUnlockId.name}`, async () => {
   await prepMinimumGraph()
-  const result = await queryProjects('userId', 'pj-3')
+  const result = await queryProjectsByUnlockId('userId', 'pj-3')
   expect(result.length).toBe(2)
   result.forEach((r) => {
     expect(r.unlocks.includes('pj-3')).toBe(true)
@@ -87,4 +88,5 @@ test(`${removeProjectUnlockItem.name}`, async () => {
   const result = await getProject('userId', 'pj-2')
   expect(result.unlocks.includes('pj-3')).toBe(false)
   expect(result.unlocks.includes('pj-1')).toBe(true)
+  expect(result.title).toBe('pj-2')
 })

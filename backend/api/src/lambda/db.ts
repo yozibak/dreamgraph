@@ -6,7 +6,7 @@ import {
   QueryCommand,
 } from '@aws-sdk/client-dynamodb'
 import { ProjectRecord } from '../types'
-import { unmarshall } from '@aws-sdk/util-dynamodb'
+import { unmarshall, marshall } from '@aws-sdk/util-dynamodb'
 
 const { PROJECT_TABLE } = process.env
 
@@ -24,7 +24,7 @@ export const deleteProject = async (userId: string, projectId: string) => {
   return true
 }
 
-export const queryProjects = async (userId: string, unlockPjId: string) => {
+export const queryProjectsByUnlockId = async (userId: string, unlockPjId: string) => {
   const command = new QueryCommand({
     TableName: PROJECT_TABLE,
     KeyConditionExpression: 'userId = :userId',
@@ -39,6 +39,15 @@ export const queryProjects = async (userId: string, unlockPjId: string) => {
   return projects as unknown as ProjectRecord[]
 }
 
+export const removeProjectUnlockItem = async (pj: ProjectRecord, removedPj: string) => {
+  pj.unlocks = pj.unlocks.slice().filter((pid) => pid !== removedPj)
+  const command = new PutItemCommand({
+    TableName: PROJECT_TABLE,
+    Item: marshall(pj),
+  })
+  await client.send(command)
+}
+
 export const getProject = async (userId: string, projectId: string) => {
   const command = new GetItemCommand({
     TableName: PROJECT_TABLE,
@@ -49,16 +58,4 @@ export const getProject = async (userId: string, projectId: string) => {
   })
   const result = await client.send(command)
   return unmarshall(result.Item) as unknown as ProjectRecord
-}
-
-export const removeProjectUnlockItem = async (pj: ProjectRecord, removedPj: string) => {
-  const command = new PutItemCommand({
-    TableName: PROJECT_TABLE,
-    Item: {
-      userId: { S: pj.userId },
-      projectId: { S: pj.projectId },
-      unlocks: { L: pj.unlocks.filter((pid) => pid !== removedPj).map((pid) => ({ S: pid })) },
-    },
-  })
-  await client.send(command)
 }

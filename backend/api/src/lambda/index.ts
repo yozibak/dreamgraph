@@ -1,5 +1,5 @@
 import type { Handler } from 'aws-lambda'
-import { deleteProject, queryProjects, removeProjectUnlockItem } from './db'
+import { deleteProject, queryProjectsByUnlockId, removeProjectUnlockItem } from './db'
 
 export const handler: Handler = async (event) => {
   switch (event.info.fieldName) {
@@ -12,7 +12,7 @@ export const handler: Handler = async (event) => {
 
 const deleteWithRelations = async (userId: string, deletePjId: string) => {
   await deleteProject(userId, deletePjId)
-  const relatedProjects = await queryProjects(userId, deletePjId)
+  const relatedProjects = await queryProjectsByUnlockId(userId, deletePjId)
   for (const pj of relatedProjects) {
     await removeProjectUnlockItem(pj, deletePjId)
   }
