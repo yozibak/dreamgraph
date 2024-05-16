@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
-import { CreateProjectArgs } from './network'
+
 import { ProjectsContext, useProjects } from './store/projects'
+import { CreateProjectInput } from 'common'
 
 export const Dreams = () => {
   const context = useProjects()
@@ -16,7 +17,7 @@ export const Dreams = () => {
 }
 
 export const List = () => {
-  const { projects, searchProject, removeProject } = useContext(ProjectsContext)
+  const { projects, searchProject, removeProject, editProject } = useContext(ProjectsContext)
   return (
     <ul>
       {projects.map((project) => (
@@ -24,6 +25,7 @@ export const List = () => {
           <b>{project.title}</b>
           <span>⇨ {searchProject(project.unlocks[0])?.title}</span>
           <button onClick={() => removeProject(project.projectId)}>🗑️</button>
+          <button onClick={() => editProject({...project, title: 'edited'})}>edit</button>
         </li>
       ))}
     </ul>
@@ -32,7 +34,7 @@ export const List = () => {
 
 export const AddForm = () => {
   const { addProject, projects } = useContext(ProjectsContext)
-  const [formState, setFormState] = useState<CreateProjectArgs>({ title: '', unlocks: [] })
+  const [formState, setFormState] = useState<CreateProjectInput>({ title: '', unlocks: [] })
   const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormState({ ...formState, [e.target.name]: e.target.value })
   }

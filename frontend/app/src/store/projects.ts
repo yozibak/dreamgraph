@@ -1,19 +1,13 @@
+import { CreateProjectInput, UpdateProjectInput } from 'common'
 import { createContext, useEffect, useState } from 'react'
-import {
-  CreateProjectArgs,
-  UpdateProjectArgs,
-  createProject,
-  deleteProject,
-  listProjects,
-  updateProject,
-} from '../network'
-import { ProjectRecord } from '../types'
+import { createProject, deleteProject, listProjects, updateProject } from '../network'
+import { Project } from '../types'
 
 export type ProjectStore = ReturnType<typeof useProjects>
 export const ProjectsContext = createContext({} as ProjectStore)
 
 export const useProjects = () => {
-  const [projects, setProjects] = useState<ProjectRecord[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
 
   const fetchProjects = async () => {
     const pjs = await listProjects()
@@ -25,18 +19,17 @@ export const useProjects = () => {
     fetchProjects()
   }, [projects, fetchProjects])
 
-  const addProject = async (pj: CreateProjectArgs) => {
+  const addProject = async (pj: CreateProjectInput) => {
     await createProject(pj)
     await fetchProjects()
   }
 
-  const editProject = async (pj: UpdateProjectArgs) => {
+  const editProject = async (pj: UpdateProjectInput) => {
     await updateProject(pj)
     await fetchProjects()
   }
 
   const removeProject = async (projectId: string) => {
-    console.log('removeProject', projectId) 
     await deleteProject(projectId)
     await fetchProjects()
   }
@@ -50,6 +43,6 @@ export const useProjects = () => {
     addProject,
     editProject,
     removeProject,
-    searchProject
+    searchProject,
   }
 }

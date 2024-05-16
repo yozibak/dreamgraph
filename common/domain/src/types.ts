@@ -21,6 +21,7 @@ export type CreateProjectInput = {
 }
 
 export type UpdateProjectInput = {
+  projectId: string
   title: string
   unlocks: string[]
 }

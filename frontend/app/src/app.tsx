@@ -11,7 +11,7 @@ const App = () => {
   )
 }
 
-const Welcome: React.FC<{ user?: AuthUser; signOut?: () => void }> = ({ user, signOut }) => {
+const Welcome: React.FC<{ user?: AuthUser; signOut?: () => void }> = ({ signOut }) => {
   return (
     <div>
       <button onClick={signOut}>Sign out</button>

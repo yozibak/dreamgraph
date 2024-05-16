@@ -3,17 +3,16 @@ import * as ddb from '@aws-appsync/utils/dynamodb'
 import { ProjectDynamoKey, UpdateProjectInput } from 'common'
 
 type PutProjectArgs = {
-  projectId: string
   input: UpdateProjectInput
 }
 
 export function request(ctx: Context<PutProjectArgs>) {
-  const projectId = ctx.arguments.projectId
+  const { projectId, ...rest } = ctx.arguments.input
   const key: ProjectDynamoKey = {
     projectId: projectId,
     userId: (ctx.identity as AppSyncIdentityCognito).sub,
   }
-  return ddb.update({ key, update: ctx.arguments.input })
+  return ddb.update({ key, update: rest })
 }
 
 export function response(ctx: Context) {

@@ -1,13 +1,14 @@
 import { GraphQLResult } from 'aws-amplify/api'
-import { ProjectRecord } from '../types'
+import { Project } from '../types'
 import { graphqlClient } from './client'
 import { CreateProject, DeleteProject, ListProjects, UpdateProject } from './queries'
+import { CreateProjectInput, UpdateProjectInput } from 'common'
 
 export const listProjects = async () => {
   try {
     const result = (await graphqlClient.graphql({
       query: ListProjects,
-    })) as GraphQLResult<{ listProjects: ProjectRecord[] }>
+    })) as GraphQLResult<{ listProjects: Project[] }>
     return result.data.listProjects
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -15,14 +16,12 @@ export const listProjects = async () => {
   }
 }
 
-export type CreateProjectArgs = Omit<ProjectRecord, 'projectId'>
-
-export const createProject = async (pj: CreateProjectArgs) => {
+export const createProject = async (pj: CreateProjectInput) => {
   try {
     const result = (await graphqlClient.graphql({
       query: CreateProject,
       variables: pj,
-    })) as GraphQLResult<{ createProject: ProjectRecord }>
+    })) as GraphQLResult<{ createProject: Project }>
     return result.data.createProject
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -43,14 +42,12 @@ export const deleteProject = async (projectId: string) => {
   }
 }
 
-export type UpdateProjectArgs = Partial<ProjectRecord> & { projectId: string }
-
-export const updateProject = async (pj: UpdateProjectArgs) => {
+export const updateProject = async (pj: UpdateProjectInput) => {
   try {
     const result = (await graphqlClient.graphql({
       query: UpdateProject,
       variables: pj,
-    })) as GraphQLResult<{ updateProject: ProjectRecord }>
+    })) as GraphQLResult<{ updateProject: Project }>
     return result.data.updateProject
   } catch (e) {
     // eslint-disable-next-line no-console

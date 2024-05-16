@@ -10,13 +10,14 @@ input CreateProjectInput {
 }
 
 input UpdateProjectInput {
+  projectId: ID!
   title: String
   unlocks: [ID!]
 }
 
 type Mutation {
   createProject(input: CreateProjectInput!): Project!
-  updateProject(projectId: ID!, input: UpdateProjectInput!): Project!
+  updateProject(input: UpdateProjectInput!): Project!
   deleteProject(projectId: ID!): Boolean
 }
 

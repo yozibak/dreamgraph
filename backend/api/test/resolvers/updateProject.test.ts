@@ -4,8 +4,8 @@ import { createUserRequestMock } from '../mock'
 test('update project', async () => {
   const context = createUserRequestMock({
     arguments: {
-      projectId: 'my-project-foo-id',
       input: {
+        projectId: 'my-project-foo-id',
         title: 'my-project-foo',
       },
     },
@@ -14,7 +14,7 @@ test('update project', async () => {
   expect(result).toMatchObject({
     operation: 'UpdateItem',
     key: {
-      projectId: { S: context.arguments.projectId },
+      projectId: { S: context.arguments.input.projectId },
       userId: { S: context.identity.username },
     },
     update: {
