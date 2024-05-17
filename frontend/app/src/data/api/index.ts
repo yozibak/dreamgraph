@@ -1,5 +1,5 @@
 import { GraphQLResult } from 'aws-amplify/api'
-import { Project } from '../types'
+import { Project } from '../../types'
 import { graphqlClient } from './client'
 import { CreateProject, DeleteProject, ListProjects, UpdateProject } from './queries'
 import { CreateProjectInput, UpdateProjectInput } from 'common'

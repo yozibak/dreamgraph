@@ -5,6 +5,8 @@ import { generateEdgeId, includeEdgeId } from './edge'
 import { Interaction, setInteractions } from './interaction'
 import { EdgeItem, NodeItem } from './types'
 
+export type GraphNetwork = ReturnType<typeof makeGraphNetwork>
+
 export const makeGraphNetwork = <N extends NodeItem, E extends EdgeItem>(
   initialNodes: N[],
   initialEdges: E[]

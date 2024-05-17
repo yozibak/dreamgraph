@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './app'
 import './index.css'
-import { configureAWS } from './network/client'
+import { configureAWS } from './data/api/client'
 
 configureAWS()
 

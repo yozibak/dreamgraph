@@ -2,7 +2,7 @@ import { Authenticator } from '@aws-amplify/ui-react'
 import '@aws-amplify/ui-react/styles.css'
 import { AuthUser } from 'aws-amplify/auth'
 import { PropsWithChildren } from 'react'
-import { Dreams } from './dreams'
+import { Dreams } from './ui'
 
 const App = () => {
   return (

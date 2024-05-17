@@ -1,10 +1,9 @@
 import { CreateProjectInput, UpdateProjectInput } from 'common'
-import { createContext, useEffect, useState } from 'react'
-import { createProject, deleteProject, listProjects, updateProject } from '../network'
-import { Project } from '../types'
+import { useEffect, useState } from 'react'
+import { Project } from '../../types'
+import { createProject, deleteProject, listProjects, updateProject } from '../api'
 
 export type ProjectStore = ReturnType<typeof useProjects>
-export const ProjectsContext = createContext({} as ProjectStore)
 
 export const useProjects = () => {
   const [projects, setProjects] = useState<Project[]>([])
