@@ -33,3 +33,13 @@ export const UpdateProject = /* GraphQL */ `
     }
   }
 `
+
+export const GetProject = /* GraphQL */ `
+  query MyQuery($projectId: ID!) {
+    getProject(projectId: $projectId) {
+      projectId
+      title
+      unlocks
+    }
+  }
+`

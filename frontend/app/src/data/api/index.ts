@@ -1,7 +1,7 @@
 import { GraphQLResult } from 'aws-amplify/api'
 import { Project } from '../../types'
 import { graphqlClient } from './client'
-import { CreateProject, DeleteProject, ListProjects, UpdateProject } from './queries'
+import { CreateProject, DeleteProject, GetProject, ListProjects, UpdateProject } from './queries'
 import { CreateProjectInput, UpdateProjectInput } from 'common'
 
 export const listProjects = async () => {
@@ -49,6 +49,19 @@ export const updateProject = async (pj: UpdateProjectInput) => {
       variables: pj,
     })) as GraphQLResult<{ updateProject: Project }>
     return result.data.updateProject
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e)
+  }
+}
+
+export const getProject = async (projectId: string) => {
+  try {
+    const result = (await graphqlClient.graphql({
+      query: GetProject,
+      variables: { projectId },
+    })) as GraphQLResult<{ getProject: Project }>
+    return result.data.getProject
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e)
