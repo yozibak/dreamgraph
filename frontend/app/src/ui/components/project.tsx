@@ -17,6 +17,7 @@ const ProjectDetail: React.FC<{ selectedProject: Project }> = ({ selectedProject
       <div className="min-w-96 bg-gray-200 p-4" style={{ width: '33vw' }}>
         <Title title={selectedProject.title} />
         <Unlocks unlocks={selectedProject.unlocks} />
+        <Delete />
       </div>
     </CenterBottom>
   )
@@ -78,6 +79,15 @@ const Unlocks: React.FC<{ unlocks: string[] }> = ({ unlocks }) => {
         ))}
       </select>
     </div>
+  )
+}
+
+const Delete: React.FC = () => {
+  const { removeProject } = useContext(AppContext)
+  return (
+    <button onClick={removeProject} className="text-red-400">
+      Delete this project
+    </button>
   )
 }
 

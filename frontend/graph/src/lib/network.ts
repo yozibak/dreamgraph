@@ -54,5 +54,11 @@ export const makeGraphNetwork = <N extends NodeItem, E extends EdgeItem>(
         filter: condition,
       })
     },
+    removeEdgesByNode: (nodeId: string) => {
+      const rmEdges = edges.get({
+        filter: (e) => e.from === nodeId || e.to === nodeId,
+      })
+      edges.remove(rmEdges)
+    }
   }
 }

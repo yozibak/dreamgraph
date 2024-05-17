@@ -1,7 +1,7 @@
 import { UpdateProjectInput } from 'common'
 import { EdgeItem, NodeItem, makeGraphNetwork } from 'graph'
 import { createContext, useEffect, useState } from 'react'
-import { createProject, deleteProject, getProject, listProjects, updateProject } from '../data/api'
+import { createProject, getProject, listProjects, updateProject, deleteProject } from '../data/api'
 import { Project } from '../types'
 import { convertProjectIntoNode, convertProjectsIntoNetworkData } from './network'
 
@@ -84,6 +84,16 @@ export const useAppState = () => {
     }
   }
 
+  async function removeProject() {
+    if (!selectedProject) return
+    const result = await deleteProject(selectedProject.projectId)
+    if (result) {
+      setSelectedProject(undefined)
+      network.removeNode(selectedProject.projectId)
+      network.removeEdgesByNode(selectedProject.projectId)
+    }
+  }
+
   return {
     addProject,
     selectProject,
@@ -91,6 +101,7 @@ export const useAppState = () => {
     editProjectTitle,
     addProjectUnlocks,
     removeProjectUnlocks,
+    removeProject,
     selectedProject,
   }
 }
