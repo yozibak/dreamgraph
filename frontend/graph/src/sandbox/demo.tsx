@@ -6,8 +6,8 @@ import { options } from './options'
 // init data outside react
 const network = makeGraphNetwork(
   [
-    { id: '1', label: 'Node 1' },
-    { id: '2', label: 'Node 2' },
+    { id: '1', label: 'Node 1', title: 'Node 1' },
+    { id: '2', label: '', title: 'Node2' },
     { id: '3', label: 'Node 3' },
     { id: '4', label: 'Node 4' },
     { id: '5', label: 'Node 5' },
@@ -42,9 +42,9 @@ const DemoUse = () => {
               moveOnClick: {
                 scale: 2,
                 offset: { x: 20, y: 20 },
-                animation: { duration: 1000, easingFunction: 'easeInOutQuad' }
-              }
-            }
+                animation: { duration: 1000, easingFunction: 'easeInOutQuad' },
+              },
+            },
           }}
         />
       </div>
