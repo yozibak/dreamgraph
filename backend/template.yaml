@@ -37,6 +37,13 @@ Resources:
       Parameters:
         AppName: !Ref AppName
         Env: !Ref Env
+  Host:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./host/template.yaml
+      Parameters:
+        AppName: !Ref AppName
+        Env: !Ref Env
 
 Outputs:
   UserPoolId:
@@ -47,3 +54,9 @@ Outputs:
     Value: !GetAtt Api.Outputs.ApiEndpoint
   ProjectTableName:
     Value: !GetAtt DB.Outputs.ProjectTableName
+  WebS3BucketName:
+    Value: !GetAtt Host.Outputs.WebS3BucketName
+  CloudFrontDistributionId:
+    Value: !GetAtt Host.Outputs.CloudFrontDistributionId
+  CloudFrontDistributionDomainName:
+    Value: !GetAtt Host.Outputs.CloudFrontDistributionDomainName

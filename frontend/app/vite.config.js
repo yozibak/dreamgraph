@@ -4,6 +4,15 @@ import EnvironmentPlugin from 'vite-plugin-environment'
 
 export default defineConfig({
   plugins: [react(), EnvironmentPlugin(['API_ENDPOINT', 'USER_POOL_CLIENT_ID', 'USER_POOL_ID'])],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          aws: ['aws-amplify', '@aws-amplify/ui-react'],
+        },
+      },
+    },
+  },
   server: {
     host: '127.0.0.1',
     port: 3000,

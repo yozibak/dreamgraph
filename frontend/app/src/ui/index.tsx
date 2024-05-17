@@ -7,10 +7,8 @@ export const Dreams = () => {
   const appState = useAppState()
   return (
     <AppContext.Provider value={appState}>
-      <div className="border-black border-2">
-        <GraphNetwork />
-        <ProjectModal />
-      </div>
+      <GraphNetwork />
+      <ProjectModal />
     </AppContext.Provider>
   )
 }
@@ -18,7 +16,7 @@ export const Dreams = () => {
 export const GraphNetwork = () => {
   const { selectProject, unselectProject } = useContext(AppContext)
   return (
-    <div className="w-dvw h-dvh fixed top-0">
+    <div className="border-gray border h-full w-full">
       <Graph
         network={network}
         options={{}}

@@ -7,22 +7,26 @@ import { Dreams } from './ui'
 const App = () => {
   return (
     <Container>
-      <Authenticator loginMechanisms={['email']}>{(props) => <Welcome {...props} />}</Authenticator>
+      <Authenticator loginMechanisms={['email']}>{(props) => <Authenticated {...props} />}</Authenticator>
     </Container>
   )
 }
 
 const Container: React.FC<PropsWithChildren> = ({ children }) => (
-  <div className="p-8 h-dvh w-dvw text-gray-800">{children}</div>
+  <div className="h-dvh w-dvw text-gray-800 ">{children}</div>
 )
 
-const Welcome: React.FC<{ user?: AuthUser; signOut?: () => void }> = ({ signOut }) => {
+const Authenticated: React.FC<{ user?: AuthUser; signOut?: () => void }> = ({ signOut }) => {
   return (
-    <div>
-      <button className="text-blue-800" onClick={signOut}>
-        Sign out
-      </button>
-      <Dreams />
+    <div className='h-full flex flex-col'>
+      <div className=' bg-gray-200'>
+        <button className="text-blue-800" onClick={signOut}>
+          Sign out
+        </button>
+      </div>
+      <div className='grow'>
+        <Dreams />
+      </div>
     </div>
   )
 }

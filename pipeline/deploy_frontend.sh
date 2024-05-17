@@ -1,6 +1,6 @@
 #!/bin/bash
 
-stack_name="serverless-chat-$1"
+stack_name="dreamgraph-$1"
 
 cloudfront_distribution_id=$(
     aws cloudformation describe-stacks \
