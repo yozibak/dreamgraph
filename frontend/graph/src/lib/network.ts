@@ -48,6 +48,11 @@ export const makeGraphNetwork = <N extends NodeItem, E extends EdgeItem>(
     },
     getNodeById: (id: string) => {
       return nodes.get(id)
-    }
+    },
+    filterNodes: (condition: (node: N) => boolean) => {
+      return nodes.get({
+        filter: condition,
+      })
+    },
   }
 }

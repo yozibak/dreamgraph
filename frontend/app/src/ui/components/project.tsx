@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import { CenterBottom } from './modal'
 import { AppContext, network } from '../../domain'
 import { Project } from '../../types'
+import { NodeItem } from 'graph'
 
 export const ProjectModal: React.FC = () => {
   const { selectedProject } = useContext(AppContext)
@@ -15,8 +16,7 @@ const ProjectDetail: React.FC<{ selectedProject: Project }> = ({ selectedProject
     <CenterBottom>
       <div className="min-w-96 bg-gray-200 p-4" style={{ width: '33vw' }}>
         <Title title={selectedProject.title} />
-
-        <div>{selectedProject.unlocks.map((id) => network.getNodeById(id)?.label)}</div>
+        <Unlocks unlocks={selectedProject.unlocks} />
       </div>
     </CenterBottom>
   )
@@ -45,6 +45,39 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
     >
       <input onChange={(e) => setNetTitle(e.target.value)} value={newTitle} />
     </form>
+  )
+}
+
+const Unlocks: React.FC<{ unlocks: string[] }> = ({ unlocks }) => {
+  const { addProjectUnlocks, removeProjectUnlocks, selectedProject } = useContext(AppContext)
+  const unlockProjects = unlocks
+    .map((id) => network.getNodeById(id))
+    .filter((p): p is NodeItem => p !== null)
+  const options = network.filterNodes(
+    (n) => !unlockProjects.includes(n) && n.id !== selectedProject?.projectId
+  )
+  return (
+    <div>
+      {unlockProjects.map((pj) => (
+        <div className="flex justify-between" key={pj.id}>
+          <div>{pj.label}</div>
+          <button onClick={() => removeProjectUnlocks(pj.id)}>🗑️</button>
+        </div>
+      ))}
+      <select
+        onChange={(e) => {
+          addProjectUnlocks(e.target.value)
+        }}
+        value={''}
+      >
+        <option value="">+</option>
+        {options.map((pj) => (
+          <option key={pj.id} value={pj.id}>
+            {pj.label}
+          </option>
+        ))}
+      </select>
+    </div>
   )
 }
 
