@@ -1,15 +1,16 @@
-import { GraphNetwork, makeGraphNetwork } from 'graph'
+import { EdgeItem, NodeItem, makeGraphNetwork } from 'graph'
 import { createContext, useEffect, useState } from 'react'
-import { getProject, listProjects } from '../data/api'
-import { convertProjectsIntoNetworkData } from './network'
+import { createProject, getProject, listProjects } from '../data/api'
 import { Project } from '../types'
+import { convertProjectIntoNode, convertProjectsIntoNetworkData } from './network'
 
 export const AppContext = createContext<AppState>({} as AppState)
 
 export type AppState = ReturnType<typeof useAppState>
 
+export const network = makeGraphNetwork<NodeItem, EdgeItem>()
+
 export const useAppState = () => {
-  const [network, setNetwork] = useState<GraphNetwork>()
   const [selectedProject, setSelectedProject] = useState<Project>()
 
   useEffect(() => {
@@ -17,7 +18,8 @@ export const useAppState = () => {
       const pjs = await listProjects()
       if (pjs) {
         const { nodes, edges } = convertProjectsIntoNetworkData(pjs)
-        setNetwork(makeGraphNetwork(nodes, edges))
+        nodes.forEach((n) => network.addNode(n))
+        edges.forEach((e) => network.addEdge(e))
       }
     }
     init()
@@ -34,10 +36,18 @@ export const useAppState = () => {
     setSelectedProject(undefined)
   }
 
+  async function addProject() {
+    const pj = await createProject({ title: 'new project' })
+    if (pj) {
+      network.addNode(convertProjectIntoNode(pj))
+      setSelectedProject(pj)
+    }
+  }
+
   return {
+    addProject,
     selectProject,
     unselectProject,
     selectedProject,
-    network,
   }
 }

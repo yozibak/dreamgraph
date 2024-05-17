@@ -1,6 +1,6 @@
+import { UpdateItem } from 'vis-data/declarations/data-interface'
 import { DataSet } from 'vis-data/peer'
 import { Network, Options } from 'vis-network/peer'
-import 'vis-network/styles/vis-network.css'
 import { generateEdgeId, includeEdgeId } from './edge'
 import { Interaction, setInteractions } from './interaction'
 import { EdgeItem, NodeItem } from './types'
@@ -8,8 +8,8 @@ import { EdgeItem, NodeItem } from './types'
 export type GraphNetwork = ReturnType<typeof makeGraphNetwork>
 
 export const makeGraphNetwork = <N extends NodeItem, E extends EdgeItem>(
-  initialNodes: N[],
-  initialEdges: E[]
+  initialNodes: N[] = [],
+  initialEdges: E[] = []
 ) => {
   let _network: Network
   const nodes = new DataSet(initialNodes)
@@ -44,8 +44,7 @@ export const makeGraphNetwork = <N extends NodeItem, E extends EdgeItem>(
     },
     updateNodeLabel: (id: string, label: string) => {
       if (!nodes.get(id)) return
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      nodes.updateOnly({ id, label } as any)
+      nodes.updateOnly({ id, label } as UpdateItem<N, 'id'>)
     },
   }
 }

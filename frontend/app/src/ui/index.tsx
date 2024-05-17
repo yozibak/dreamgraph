@@ -1,5 +1,5 @@
 import { Graph } from 'graph'
-import { AppContext, useAppState } from '../domain'
+import { AppContext, network, useAppState } from '../domain'
 import { useContext } from 'react'
 import { ProjectModal } from './components/project'
 
@@ -16,8 +16,7 @@ export const Dreams = () => {
 }
 
 export const GraphNetwork = () => {
-  const { network, selectProject } = useContext(AppContext)
-  if (!network) return <div>Loading...</div>
+  const { selectProject } = useContext(AppContext)
   return (
     <div className="w-dvw h-dvh fixed top-0">
       <Graph
