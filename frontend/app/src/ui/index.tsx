@@ -16,7 +16,7 @@ export const Dreams = () => {
 }
 
 export const GraphNetwork = () => {
-  const { selectProject } = useContext(AppContext)
+  const { selectProject, unselectProject } = useContext(AppContext)
   return (
     <div className="w-dvw h-dvh fixed top-0">
       <Graph
@@ -24,6 +24,17 @@ export const GraphNetwork = () => {
         options={{}}
         interactions={{
           onClickNode: selectProject,
+          onClickBackground: unselectProject,
+          options: {
+            moveOnClick: {
+              offset: { x: 0, y: 0 },
+              scale: 1,
+              animation: {
+                duration: 500,
+                easingFunction: 'linear',
+              },
+            },
+          },
         }}
       />
     </div>

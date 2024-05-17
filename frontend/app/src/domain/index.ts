@@ -67,11 +67,11 @@ export const useAppState = () => {
     const result = await updateProject(input)
     if (result) {
       setSelectedProject(result)
-      network.addEdge({from: selectedProject.projectId, to: pjId})
+      network.addEdge({ from: selectedProject.projectId, to: pjId })
     }
   }
 
-  async function removeProjectUnlocks (rm: string) {
+  async function removeProjectUnlocks(rm: string) {
     if (!selectedProject) return
     const input: UpdateProjectInput = {
       ...selectedProject,
@@ -80,7 +80,7 @@ export const useAppState = () => {
     const result = await updateProject(input)
     if (result) {
       setSelectedProject(result)
-      network.removeEdge({from: selectedProject.projectId, to: rm})
+      network.removeEdge({ from: selectedProject.projectId, to: rm })
     }
   }
 

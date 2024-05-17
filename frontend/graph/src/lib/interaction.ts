@@ -2,6 +2,7 @@ import { Network } from 'vis-network/peer'
 
 export type Interaction = {
   onClickNode?: (clickedNodeId: string) => void
+  onClickBackground?: () => void
   options?: InteractionOptions
 }
 
@@ -11,6 +12,7 @@ export type InteractionOptions = {
 
 const DefaultInteraction: Interaction = {
   onClickNode: undefined,
+  onClickBackground: undefined,
   options: {
     moveOnClick: {
       offset: { x: 0, y: 0 },
@@ -41,6 +43,8 @@ export const setInteractions = (
           position: network.getPosition(nodes[0]),
         })
       }
+    } else {
+      interaction.onClickBackground?.()
     }
   })
 }
