@@ -12,6 +12,7 @@ export function request(ctx: Context<PutProjectArgs>) {
     projectId: projectId,
     userId: (ctx.identity as AppSyncIdentityCognito).sub,
   }
+  ctx.stash.projectId = projectId
   return ddb.update({ key, update: rest })
 }
 

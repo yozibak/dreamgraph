@@ -1,7 +1,13 @@
-type Project {
+type ProjectData {
   projectId: ID!
   title: String!
   unlocks: [ID!]!
+}
+
+type ProjectWithRelation {
+  projectId: ID!
+  title: String!
+  unlocks: [ProjectData!]!
 }
 
 input CreateProjectInput {
@@ -16,12 +22,12 @@ input UpdateProjectInput {
 }
 
 type Mutation {
-  createProject(input: CreateProjectInput!): Project!
-  updateProject(input: UpdateProjectInput!): Project!
+  createProject(input: CreateProjectInput!): ProjectData!
+  updateProject(input: UpdateProjectInput!): ProjectData!
   deleteProject(projectId: ID!): Boolean
 }
 
 type Query {
-  getProject(projectId: ID!): Project!
-  listProjects(unlocks: ID): [Project!]!
+  getProject(projectId: ID!): ProjectData!
+  listProjects(unlocks: ID): [ProjectData!]!
 }

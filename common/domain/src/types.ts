@@ -8,10 +8,7 @@ export type ProjectData = ProjectDynamoKey & {
   unlocks: string[]
 }
 
-export type ProjectWithRelation = {
-  userId: string
-  projectId: string
-  title: string
+export type ProjectWithRelation = Omit<ProjectData, 'unlocks'> & {
   unlocks: ProjectData[]
 }
 

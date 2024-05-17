@@ -1,6 +1,7 @@
+import { UpdateProjectInput } from 'common'
 import { EdgeItem, NodeItem, makeGraphNetwork } from 'graph'
 import { createContext, useEffect, useState } from 'react'
-import { createProject, getProject, listProjects } from '../data/api'
+import { createProject, getProject, listProjects, updateProject } from '../data/api'
 import { Project } from '../types'
 import { convertProjectIntoNode, convertProjectsIntoNetworkData } from './network'
 
@@ -44,10 +45,24 @@ export const useAppState = () => {
     }
   }
 
+  async function editProjectTitle(newTitle: string) {
+    if (!selectedProject) return
+    const input: UpdateProjectInput = {
+      ...selectedProject,
+      title: newTitle,
+    }
+    const result = await updateProject(input)
+    if (result) {
+      setSelectedProject(result)
+      network.updateNodeLabel(result.projectId, result.title)
+    }
+  }
+
   return {
     addProject,
     selectProject,
     unselectProject,
+    editProjectTitle,
     selectedProject,
   }
 }

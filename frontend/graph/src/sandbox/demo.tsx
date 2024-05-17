@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { makeGraphNetwork } from '../lib/data'
+import { makeGraphNetwork } from '../lib/network'
 import { Graph } from '../lib/graph'
 import { options } from './options'
 

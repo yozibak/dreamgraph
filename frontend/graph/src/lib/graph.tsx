@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Options } from 'vis-network'
 import 'vis-network/styles/vis-network.css'
-import { makeGraphNetwork } from './data'
+import { makeGraphNetwork } from './network'
 import { Interaction } from './interaction'
 
 type Props = {

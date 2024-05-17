@@ -46,5 +46,8 @@ export const makeGraphNetwork = <N extends NodeItem, E extends EdgeItem>(
       if (!nodes.get(id)) return
       nodes.updateOnly({ id, label } as UpdateItem<N, 'id'>)
     },
+    getNodeById: (id: string) => {
+      return nodes.get(id)
+    }
   }
 }
