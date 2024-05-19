@@ -1,40 +1,30 @@
-import { Graph } from 'graph'
-import { AppContext, network, useAppState } from '../domain'
-import { useContext } from 'react'
-import { ProjectModal } from './components/project'
+import { Authenticator } from '@aws-amplify/ui-react'
+import '@aws-amplify/ui-react/styles.css'
+import { DreamGraph } from './view/app'
+import { Container } from './components/layout'
+import { useEffect, useState } from 'react'
+import { Welcome } from './view/welcome'
+import { getCurrentUser } from 'aws-amplify/auth'
 
-export const Dreams = () => {
-  const appState = useAppState()
-  return (
-    <AppContext.Provider value={appState}>
-      <GraphNetwork />
-      <ProjectModal />
-    </AppContext.Provider>
-  )
+const App = () => {
+  const [welcome, setWelcome] = useState(true)
+  useEffect(() => {
+    async function checkAuth() {
+      const user = await getCurrentUser()
+      if (user) setWelcome(false)
+    }
+    checkAuth()
+  }, [welcome, setWelcome])
+
+  return welcome ? <Welcome login={() => setWelcome(false)} /> : <AuthenticatedApp />
 }
 
-export const GraphNetwork = () => {
-  const { selectProject, unselectProject } = useContext(AppContext)
-  return (
-    <div className="border-gray border h-full w-full">
-      <Graph
-        network={network}
-        options={{}}
-        interactions={{
-          onClickNode: selectProject,
-          onClickBackground: unselectProject,
-          options: {
-            moveOnClick: {
-              offset: { x: 0, y: 0 },
-              scale: 1,
-              animation: {
-                duration: 500,
-                easingFunction: 'linear',
-              },
-            },
-          },
-        }}
-      />
-    </div>
-  )
-}
+const AuthenticatedApp = () => (
+  <Container>
+    <Authenticator loginMechanisms={['email']}>
+      {(props) => <DreamGraph {...props} />}
+    </Authenticator>
+  </Container>
+)
+
+export default App

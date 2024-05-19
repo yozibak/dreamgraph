@@ -1,6 +1,34 @@
-import { Options } from 'vis-network/peer'
+import { Graph, GraphOptions } from 'graph'
+import { useContext } from 'react'
+import { AppContext, network } from '../../domain'
 
-export const options: Options = {
+export const GraphNetwork = () => {
+  const { selectProject, unselectProject } = useContext(AppContext)
+  return (
+    <div className="border-gray border h-full w-full">
+      <Graph
+        network={network}
+        options={options}
+        interactions={{
+          onClickNode: selectProject,
+          onClickBackground: unselectProject,
+          options: {
+            moveOnClick: {
+              offset: { x: 0, y: 0 },
+              scale: 1,
+              animation: {
+                duration: 500,
+                easingFunction: 'linear',
+              },
+            },
+          },
+        }}
+      />
+    </div>
+  )
+}
+
+const options: GraphOptions = {
   width: '100%',
   height: '100%',
   clickToUse: false,

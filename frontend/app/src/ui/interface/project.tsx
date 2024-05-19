@@ -1,8 +1,10 @@
-import React, { useContext, useState } from 'react'
-import { CenterBottom } from './modal'
+import { NodeItem } from 'graph'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { AppContext, network } from '../../domain'
 import { StaticProjectData } from '../../types'
-import { NodeItem } from 'graph'
+import { FloatingButton } from '../components/button'
+import { CircleWithEdge } from '../components/icon'
+import { CenterBottom } from '../components/layout'
 
 export const ProjectModal: React.FC = () => {
   const { selectedProject } = useContext(AppContext)
@@ -13,8 +15,11 @@ export const ProjectModal: React.FC = () => {
 
 const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selectedProject }) => {
   return (
-    <CenterBottom>
-      <div className="min-w-96 bg-gray-200 p-4" style={{ width: '33vw' }}>
+    <CenterBottom key={selectedProject.projectId}>
+      <div
+        className="min-w-80 bg-white opacity-90 px-4 pt-2 pb-4 rounded-md border-gray-800 border-4 shadow shadow-gray-600"
+        style={{ width: '20vw' }}
+      >
         <Title title={selectedProject.title} />
         <Unlocks unlocks={selectedProject.unlocks} />
         <Delete />
@@ -27,30 +32,54 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
   const [edit, setEdit] = useState(false)
   const [newTitle, setNetTitle] = useState(title)
   const { editProjectTitle } = useContext(AppContext)
+  const titleInput = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (title === 'new project') {
+      setEdit(true)
+    }
+  }, [title])
+  useEffect(() => {
+    if (titleInput.current) {
+      titleInput.current.focus()
+    }
+  }, [titleInput])
 
   if (!edit)
     return (
-      <div className="flex justify-between">
-        <div className="bold">{title}</div>
-        <button onClick={() => setEdit(true)}>✎</button>
+      <div className="py-2 flex">
+        <div
+          onClick={() => setEdit(true)}
+          className="inline-block font-semibold text-black  text-2xl hover:text-gray-600 leading-none"
+        >
+          {title}
+        </div>
       </div>
     )
   return (
     <form
-      className="flex justify-between"
+      className="py-2"
       onSubmit={(e) => {
         e.preventDefault()
         editProjectTitle(newTitle)
         setEdit(false)
       }}
     >
-      <input onChange={(e) => setNetTitle(e.target.value)} value={newTitle} />
+      <input
+        ref={titleInput}
+        className=" font-semibold text-black text-xl bg-gray-200 border-gray-400 px-2 py-1 min-w-44"
+        onChange={(e) => setNetTitle(e.target.value)}
+        value={newTitle}
+      />
+      <button className="mx-2" type="submit">
+        ⏎
+      </button>
     </form>
   )
 }
 
 const Unlocks: React.FC<{ unlocks: string[] }> = ({ unlocks }) => {
-  const { addProjectUnlocks, removeProjectUnlocks, selectedProject } = useContext(AppContext)
+  const { addProjectUnlocks, removeProjectUnlocks, selectedProject, selectProject } =
+    useContext(AppContext)
   const unlockProjects = unlocks
     .map((id) => network.getNodeById(id))
     .filter((p): p is NodeItem => p !== null)
@@ -60,12 +89,18 @@ const Unlocks: React.FC<{ unlocks: string[] }> = ({ unlocks }) => {
   return (
     <div>
       {unlockProjects.map((pj) => (
-        <div className="flex justify-between" key={pj.id}>
-          <div>{pj.label}</div>
-          <button onClick={() => removeProjectUnlocks(pj.id)}>🗑️</button>
+        <div className="flex flex-row pt-1" key={pj.id}>
+          <CircleWithEdge />
+          <div onClick={() => selectProject(pj.id)} className="px-3 text-lg mb-px cursor-pointer">
+            {pj.label}
+          </div>
+          <button onClick={() => removeProjectUnlocks(pj.id)} className="text-red-600 text-sm">
+            remove
+          </button>
         </div>
       ))}
       <select
+        className="appearance-none py-2 text-xl"
         onChange={(e) => {
           addProjectUnlocks(e.target.value)
         }}
@@ -85,7 +120,7 @@ const Unlocks: React.FC<{ unlocks: string[] }> = ({ unlocks }) => {
 const Delete: React.FC = () => {
   const { removeProject } = useContext(AppContext)
   return (
-    <button onClick={removeProject} className="text-red-400">
+    <button onClick={removeProject} className="text-red-600 text-sm mt-2">
       Delete this project
     </button>
   )
@@ -95,9 +130,7 @@ export const AddProjectButton: React.FC = () => {
   const { addProject } = useContext(AppContext)
   return (
     <CenterBottom>
-      <button className="block w-36 bg-gray-200" onClick={addProject}>
-        Add Project
-      </button>
+      <FloatingButton onClick={addProject}>Add Project</FloatingButton>
     </CenterBottom>
   )
 }

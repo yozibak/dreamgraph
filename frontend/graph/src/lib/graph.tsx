@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
-import { Options } from 'vis-network'
+import { Options } from 'vis-network/peer'
 import 'vis-network/styles/vis-network.css'
-import { makeGraphNetwork } from './network'
 import { Interaction } from './interaction'
+import { makeGraphNetwork } from './network'
 
 type Props = {
   network: ReturnType<typeof makeGraphNetwork>

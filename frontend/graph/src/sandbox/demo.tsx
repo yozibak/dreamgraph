@@ -6,9 +6,29 @@ import { options } from './options'
 // init data outside react
 const network = makeGraphNetwork(
   [
-    { id: '1', label: 'Node 1', title: 'Node 1' },
-    { id: '2', label: '', title: 'Node2' },
-    { id: '3', label: 'Node 3' },
+    {
+      id: '1',
+      label: 'Node 1',
+      title: 'Node 1',
+      color: {
+        border: '#dc2626',
+        background: '#ffffff',
+        hover: {
+          background: '#fafafa',
+          border: '#ef4444',
+        },     
+      },
+      chosen: {
+        node: (values: any) => {
+          values.color = '#fafafa',
+          values.borderColor = '#ef4444'
+        }
+      },
+      size: 15,
+      mass: 30
+    },
+    { id: '2', label: '', title: 'Node2', size: 10 },
+    { id: '3', label: 'Node 3', size: 20 },
     { id: '4', label: 'Node 4' },
     { id: '5', label: 'Node 5' },
   ],
