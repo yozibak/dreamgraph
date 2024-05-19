@@ -1,3 +1,3 @@
 import * as Common from 'common'
 
-export type Project = Omit<Common.ProjectData, 'userId'>
+export type StaticProjectData = Omit<Common.ProjectData, 'userId'>

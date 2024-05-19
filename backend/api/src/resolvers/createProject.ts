@@ -1,6 +1,6 @@
 import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 import * as ddb from '@aws-appsync/utils/dynamodb'
-import { ProjectData } from 'common'
+import { ProjectData, DefaultStaticStatus, DefaultStaticValue } from 'common'
 
 type CreateProjectArgs = {
   input: Partial<ProjectData>
@@ -16,6 +16,8 @@ export function request(ctx: Context<CreateProjectArgs>) {
   const item = {
     unlocks: [],
     ...ctx.arguments.input,
+    staticValue: DefaultStaticValue,
+    staticStatus: DefaultStaticStatus,
   }
   return ddb.put({ key, item })
 }

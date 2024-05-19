@@ -2,7 +2,7 @@ import { UpdateProjectInput } from 'common'
 import { EdgeItem, NodeItem, makeGraphNetwork } from 'graph'
 import { createContext, useEffect, useState } from 'react'
 import { createProject, getProject, listProjects, updateProject, deleteProject } from '../data/api'
-import { Project } from '../types'
+import { StaticProjectData } from '../types'
 import { convertProjectIntoNode, convertProjectsIntoNetworkData } from './network'
 
 export const AppContext = createContext<AppState>({} as AppState)
@@ -12,7 +12,7 @@ export type AppState = ReturnType<typeof useAppState>
 export const network = makeGraphNetwork<NodeItem, EdgeItem>()
 
 export const useAppState = () => {
-  const [selectedProject, setSelectedProject] = useState<Project>()
+  const [selectedProject, setSelectedProject] = useState<StaticProjectData>()
 
   useEffect(() => {
     async function init() {

@@ -1,12 +1,12 @@
 import { CreateProjectInput, UpdateProjectInput } from 'common'
 import { useEffect, useState } from 'react'
-import { Project } from '../../types'
+import { StaticProjectData } from '../../types'
 import { createProject, deleteProject, listProjects, updateProject } from '../api'
 
 export type ProjectStore = ReturnType<typeof useProjects>
 
 export const useProjects = () => {
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<StaticProjectData[]>([])
 
   const fetchProjects = async () => {
     const pjs = await listProjects()

@@ -4,6 +4,8 @@ export const ListProjects = /* GraphQL */ `
       projectId
       title
       unlocks
+      staticStatus
+      staticValue
     }
   }
 `
@@ -14,6 +16,8 @@ export const CreateProject = /* GraphQL */ `
       projectId
       title
       unlocks
+      staticStatus
+      staticValue
     }
   }
 `
@@ -30,6 +34,8 @@ export const UpdateProject = /* GraphQL */ `
       projectId
       title
       unlocks
+      staticStatus
+      staticValue
     }
   }
 `
@@ -40,6 +46,8 @@ export const GetProject = /* GraphQL */ `
       projectId
       title
       unlocks
+      staticStatus
+      staticValue
     }
   }
 `

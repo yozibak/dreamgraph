@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { CenterBottom } from './modal'
 import { AppContext, network } from '../../domain'
-import { Project } from '../../types'
+import { StaticProjectData } from '../../types'
 import { NodeItem } from 'graph'
 
 export const ProjectModal: React.FC = () => {
@@ -11,7 +11,7 @@ export const ProjectModal: React.FC = () => {
   return <ProjectDetail selectedProject={selectedProject} />
 }
 
-const ProjectDetail: React.FC<{ selectedProject: Project }> = ({ selectedProject }) => {
+const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selectedProject }) => {
   return (
     <CenterBottom>
       <div className="min-w-96 bg-gray-200 p-4" style={{ width: '33vw' }}>

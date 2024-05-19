@@ -6,11 +6,11 @@ export type ProjectDynamoKey = {
 export type ProjectData = ProjectDynamoKey & {
   title: string
   unlocks: string[]
+  staticValue: number
+  staticStatus: StaticStatus
 }
 
-export type ProjectWithRelation = Omit<ProjectData, 'unlocks'> & {
-  unlocks: ProjectData[]
-}
+export type StaticStatus = 'normal' | 'ongoing' | 'done'
 
 export type CreateProjectInput = {
   title: string

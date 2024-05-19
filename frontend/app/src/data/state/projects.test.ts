@@ -1,10 +1,10 @@
 import { useProjects } from './projects'
 import { renderHook, waitFor } from '@testing-library/react'
 import * as api from '../api'
-import { Project } from '../../types'
+import { StaticProjectData } from '../../types'
 
 test(`hooks test`, async () => {
-  const pj: Project = {
+  const pj: StaticProjectData = {
     projectId: '',
     title: '',
     unlocks: [],

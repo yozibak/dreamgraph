@@ -1,3 +1,4 @@
+import { DefaultStaticStatus, DefaultStaticValue } from 'common'
 import { evaluateResolver } from '../evaluate'
 import { createUserRequestMock } from '../mock'
 
@@ -18,6 +19,8 @@ test('add project', async () => {
     },
     attributeValues: {
       title: { S: context.arguments.input.title },
+      staticValue: { N: DefaultStaticValue },
+      staticStatus: { S: DefaultStaticStatus },
     },
   })
 })
