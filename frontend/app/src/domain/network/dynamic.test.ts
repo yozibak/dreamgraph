@@ -1,13 +1,18 @@
 import { ProjectValue } from 'common'
-import { StaticProjectData } from '../../types'
-import { calcProjectDynamicStatus, calcProjectDynamicValue } from './dynamic'
+import { DynamicProjectData, StaticProjectData } from '../../types'
+import {
+  calcProjectDynamicStatus,
+  calcProjectDynamicValue,
+  determineUrgentProjects,
+  updateImportantNodesAsUrgent,
+} from './dynamic'
 
 const projects = [
   {
     projectId: 'pj-1',
     unlocks: ['pj-2', 'pj-3'],
     staticValue: ProjectValue.low,
-    staticStatus: 'normal'
+    staticStatus: 'normal',
   },
   {
     projectId: 'pj-2',
@@ -28,14 +33,14 @@ const projects = [
     projectId: 'pj-5',
     unlocks: ['pj-1'],
     staticValue: ProjectValue.high,
-    staticStatus: 'done'
+    staticStatus: 'done',
   },
   {
     projectId: 'pj-6',
     unlocks: [],
     staticValue: ProjectValue.high,
-    staticStatus: 'ongoing'
-  }
+    staticStatus: 'ongoing',
+  },
 ] as unknown as StaticProjectData[]
 
 const getPj = (id: string) => projects.find((p) => p.projectId === id)!
@@ -53,7 +58,6 @@ describe(`${calcProjectDynamicValue.name}`, () => {
 })
 
 describe(`${calcProjectDynamicStatus.name}`, () => {
-  
   test(`project that depends on others`, () => {
     const result = calcProjectDynamicStatus(projects[1], findPj)
     expect(result).toBe('blocked')
@@ -66,4 +70,15 @@ describe(`${calcProjectDynamicStatus.name}`, () => {
     const result = calcProjectDynamicStatus(projects[5], findPj)
     expect(result).toBe('ongoing')
   })
+})
+
+test(`${determineUrgentProjects.name}`, () => {
+  const result = determineUrgentProjects([
+    { projectId: '0', dynamicValue: 20, dynamicStatus: 'normal' },
+    { projectId: '1', dynamicValue: 10, dynamicStatus: 'normal' },
+    { projectId: '2', dynamicValue: 20, dynamicStatus: 'ongoing' },
+    { projectId: '3', dynamicValue: 30, dynamicStatus: 'blocked' },
+    { projectId: '4', dynamicValue: 40, dynamicStatus: 'done' },
+  ] as DynamicProjectData[])
+  expect(result).toEqual(['0', '1'])
 })

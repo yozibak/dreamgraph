@@ -1,4 +1,4 @@
-import { DynamicStatus, StaticProjectData } from '../../types'
+import { DynamicProjectData, DynamicStatus, StaticProjectData } from '../../types'
 
 export const calcProjectDynamicValue = (
   pj: StaticProjectData,
@@ -22,6 +22,26 @@ export const calcProjectDynamicStatus = (
 ): DynamicStatus => {
   const dependsOn = filterPjByUnlockId(pj.projectId)
   if (dependsOn.length === 0) return pj.staticStatus
-  if (dependsOn.every(p => p.staticStatus === 'done')) return pj.staticStatus
+  if (dependsOn.every((p) => p.staticStatus === 'done')) return pj.staticStatus
   return 'blocked'
+}
+
+export const updateImportantNodesAsUrgent = (pjs: DynamicProjectData[]): DynamicProjectData[] => {
+  const urgentPjs = determineUrgentProjects(pjs)
+  return pjs.map((pj) =>
+    urgentPjs.includes(pj.projectId)
+      ? {
+          ...pj,
+          dynamicStatus: 'urgent',
+        }
+      : pj
+  )
+}
+
+export const determineUrgentProjects = (pjs: DynamicProjectData[]): string[] => {
+  return pjs
+    .filter((pj) => pj.dynamicStatus === 'normal')
+    .sort((a, b) => b.dynamicValue - a.dynamicValue)
+    .slice(0, 3)
+    .map((pj) => pj.projectId)
 }

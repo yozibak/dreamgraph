@@ -1,5 +1,6 @@
 import { Options } from 'vis-network/peer'
 
+
 export const options: Options = {
   width: '100%',
   height: '100%',

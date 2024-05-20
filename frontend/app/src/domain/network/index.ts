@@ -1,5 +1,10 @@
+import { NodeColors } from '../../constants'
 import { DynamicProjectData, StaticProjectData } from '../../types'
-import { calcProjectDynamicStatus, calcProjectDynamicValue } from './dynamic'
+import {
+  calcProjectDynamicStatus,
+  calcProjectDynamicValue,
+  updateImportantNodesAsUrgent,
+} from './dynamic'
 
 export const convertProjectsIntoNetworkData = (pjs: StaticProjectData[]) => {
   const dynamicPjData = convertStaticProjects(pjs)
@@ -11,19 +16,31 @@ export const convertProjectsIntoNetworkData = (pjs: StaticProjectData[]) => {
 export const convertStaticProjects = (pjs: StaticProjectData[]): DynamicProjectData[] => {
   const getPj = (id: string) => pjs.find((pj) => pj.projectId === id)
   const filterPjByUnlockId = (id: string) => pjs.filter((pj) => pj.unlocks.includes(id))
-  return pjs.map((pj) => ({
+  const dynamicPjs = pjs.map((pj) => ({
     ...pj,
     dynamicValue: calcProjectDynamicValue(pj, getPj),
     dynamicStatus: calcProjectDynamicStatus(pj, filterPjByUnlockId),
   }))
+  return updateImportantNodesAsUrgent(dynamicPjs)
 }
 
 export const convertProjectIntoNode = (pj: DynamicProjectData) => {
+  const colors = NodeColors[pj.dynamicStatus]
   return {
     id: pj.projectId,
     label: pj.title,
-    size: 10 + pj.dynamicValue,
-    mass: 1 + pj.dynamicValue / 10,
+    size: 10 + pj.staticValue, // 10, 20, 30px
+    mass: 1 + pj.staticValue / 10, // 1 ~ 4
+    color: {
+      border: colors.normal.border,
+      background: colors.normal.background,
+    },
+    chosen: {
+      node: (values: { color: string; borderColor: string }) => {
+        values.color = colors.highlight.background
+        values.borderColor = colors.highlight.border
+      },
+    },
   }
 }
 

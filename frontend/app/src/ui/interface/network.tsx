@@ -1,6 +1,7 @@
 import { Graph, GraphOptions } from 'graph'
 import { useContext } from 'react'
 import { AppContext, network } from '../../domain'
+import { Colors } from '../../constants'
 
 export const GraphNetwork = () => {
   const { selectProject, unselectProject } = useContext(AppContext)
@@ -47,24 +48,24 @@ const options: GraphOptions = {
     borderWidthSelected: 1.2,
     chosen: {
       node: (values) => {
-        values.color = '#fafafa'
-        values.borderColor = '#a1a1aa'
+        values.color = Colors.Gray50
+        values.borderColor = Colors.Gray400
       },
       label: (values) => {
         values.mod = 'bold'
       },
     },
     color: {
-      border: '#52525b',
-      background: '#ffffff',
+      border: Colors.Gray600,
+      background: Colors.White,
       hover: {
-        border: '#a1a1aa',
-        background: '#fafafa',
+        border: Colors.Gray400,
+        background: Colors.Gray50,
       },
     },
     opacity: 1,
     font: {
-      color: 'black',
+      color: Colors.Black,
       size: 12,
       face: 'arial',
       align: 'center',
@@ -99,18 +100,6 @@ const options: GraphOptions = {
   },
   layout: {
     improvedLayout: true,
-    clusterThreshold: 150,
-    hierarchical: {
-      enabled: false,
-      levelSeparation: 150,
-      nodeSpacing: 100,
-      treeSpacing: 200,
-      blockShifting: true,
-      edgeMinimization: true,
-      parentCentralization: true,
-      direction: 'DU', // UD, DU, LR, RL
-      sortMethod: 'directed', // hubsize, directed
-      shakeTowards: 'leaves', // roots, leaves
-    },
+    clusterThreshold: 20,
   },
 }

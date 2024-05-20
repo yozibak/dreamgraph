@@ -7,4 +7,15 @@ export type DynamicProjectData = StaticProjectData & {
   dynamicValue: number
 }
 
-export type DynamicStatus = Common.StaticStatus | 'blocked'
+export type DynamicStatus = Common.StaticStatus | 'blocked' | 'urgent'
+
+export type NodeColorDefinition = {
+  normal: {
+    background: string
+    border: string
+  }
+  highlight: {
+    background: string
+    border: string
+  }
+}
