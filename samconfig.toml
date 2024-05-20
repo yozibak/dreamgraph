@@ -33,12 +33,17 @@ s3_prefix = "dreamgraph-test"
 stack_name = "dreamgraph-test"
 
 [test.deploy.parameters]
-capabilities = "CAPABILITY_AUTO_EXPAND"
+capabilities = ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"]
 confirm_changeset = false
 fail_on_empty_changeset = false
 
 parameter_overrides = "Env=Test"
-template = "template-test.yaml"
+# template = "template-test.yaml"
+
+# temporarily using manual deploy until CICD
+resolve_s3 = true
+s3_prefix = "dreamgraph-test"
+template = "backend/template.yaml"
 
 [prod]
 [prod.global.parameters]
@@ -56,8 +61,8 @@ template = "template-prod.yaml"
 
 [pipeline]
 [pipeline.deploy.parameters]
-capabilities = "CAPABILITY_NAMED_IAM"
+capabilities = ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"]
 confirm_changeset = false
-s3_prefix = "serverless-chat-prod"
-stack_name = "serverless-chat-pipeline"
+s3_prefix = "dreamgraph-pipeline"
+stack_name = "dreamgraph-pipeline"
 template = "pipeline/template.yaml"

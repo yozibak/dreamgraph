@@ -5,6 +5,7 @@ Transform:
 Parameters:
   AppName:
     Type: String
+    Default: DreamGraph
   Env:
     Type: String
     AllowedValues:
@@ -74,7 +75,7 @@ Resources:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Name: !Sub ${WebContentBucket}OAC
+        Name: !Sub '${WebContentBucket}-OAC'
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
