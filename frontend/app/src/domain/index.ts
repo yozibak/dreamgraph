@@ -79,7 +79,6 @@ export const useAppState = () => {
     }
     const result = await updateProject(input)
     if (result) {
-      setSelectedProject(result)
       network.removeEdge({ from: selectedProject.projectId, to: rm })
     }
   }
@@ -94,6 +93,18 @@ export const useAppState = () => {
     }
   }
 
+  async function updateProjectValue(value: number) {
+    if (!selectedProject) return
+    const input: UpdateProjectInput = {
+      ...selectedProject,
+      staticValue: value,
+    }
+    const result = await updateProject(input)
+    if (result) {
+      setSelectedProject(result)
+    }
+  }
+
   return {
     addProject,
     selectProject,
@@ -103,5 +114,6 @@ export const useAppState = () => {
     removeProjectUnlocks,
     removeProject,
     selectedProject,
+    updateProjectValue,
   }
 }

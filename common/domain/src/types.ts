@@ -21,4 +21,6 @@ export type UpdateProjectInput = {
   projectId: string
   title: string
   unlocks: string[]
+  staticValue: number
+  staticStatus: StaticStatus
 }

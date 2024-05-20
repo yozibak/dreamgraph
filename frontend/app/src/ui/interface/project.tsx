@@ -5,6 +5,7 @@ import { StaticProjectData } from '../../types'
 import { FloatingButton } from '../components/button'
 import { CircleWithEdge } from '../components/icon'
 import { CenterBottom } from '../components/layout'
+import { ProjectValue } from 'common'
 
 export const ProjectModal: React.FC = () => {
   const { selectedProject } = useContext(AppContext)
@@ -21,6 +22,7 @@ const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selec
         style={{ width: '20vw' }}
       >
         <Title title={selectedProject.title} />
+        <Value value={selectedProject.staticValue} />
         <Unlocks unlocks={selectedProject.unlocks} />
         <Delete />
       </div>
@@ -74,6 +76,24 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
         ⏎
       </button>
     </form>
+  )
+}
+
+const Value: React.FC<{value: number}> = ({value}) => {
+  const { updateProjectValue } = useContext(AppContext)
+
+  return (
+    <select
+    className="appearance-none py-2 text-xl"
+    onChange={(e) => {
+      updateProjectValue(Number(e.target.value))
+    }}
+    value={value}
+  >
+    <option value={ProjectValue.low}>low</option>
+    <option value={ProjectValue.mid}>mid</option>
+    <option value={ProjectValue.high}>high</option>
+  </select> 
   )
 }
 
