@@ -18,21 +18,27 @@ export const useProjects = () => {
     fetchProjects()
   }, [projects, fetchProjects])
 
-  const createProject = async (pj: CreateProjectInput) => {
-    const newPj = await api.createProject(pj)
-    await fetchProjects()
-    return newPj
+  const createProject = async (input: CreateProjectInput) => {
+    const newProject = await api.createProject(input)
+    if (newProject) {
+      setProjects([...projects, newProject])
+      return newProject
+    }
   }
 
-  const updateProject = async (pj: UpdateProjectInput) => {
-    const result = await api.updateProject(pj)
-    await fetchProjects()
-    return result
+  const updateProject = async (input: UpdateProjectInput) => {
+    const updated = await api.updateProject(input)
+    if (updated) {
+      setProjects(projects.map((pj) => (pj.projectId === updated.projectId ? updated : pj)))
+      return updated
+    }
   }
 
   const deleteProject = async (projectId: string) => {
     const result = await api.deleteProject(projectId)
-    await fetchProjects()
+    if (result) {
+      setProjects(projects.filter((pj) => pj.projectId !== projectId))
+    }
     return result
   }
 

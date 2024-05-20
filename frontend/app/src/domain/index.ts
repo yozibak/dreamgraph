@@ -6,11 +6,11 @@ import { useProjects } from '../data/store/projects'
 import { StaticProjectData } from '../types'
 import { convertProjectsIntoNetworkData } from './network'
 
+export const network = makeGraphNetwork<NodeItem, EdgeItem>()
+
 export const AppContext = createContext<AppState>({} as AppState)
 
 export type AppState = ReturnType<typeof useAppState>
-
-export const network = makeGraphNetwork<NodeItem, EdgeItem>()
 
 export const useAppState = () => {
   const { projects, createProject, deleteProject, updateProject } = useProjects()
