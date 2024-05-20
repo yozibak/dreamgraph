@@ -29,9 +29,21 @@ export const DeleteProject = /* GraphQL */ `
 `
 
 export const UpdateProject = /* GraphQL */ `
-  mutation UpdateProject($projectId: ID!, $title: String, $unlocks: [ID!], $staticValue: Int) {
+  mutation UpdateProject(
+    $projectId: ID!
+    $title: String
+    $unlocks: [ID!]
+    $staticValue: Int
+    $staticStatus: String
+  ) {
     updateProject(
-      input: { projectId: $projectId, title: $title, unlocks: $unlocks, staticValue: $staticValue }
+      input: {
+        projectId: $projectId
+        title: $title
+        unlocks: $unlocks
+        staticValue: $staticValue
+        staticStatus: $staticStatus
+      }
     ) {
       projectId
       title

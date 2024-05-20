@@ -1,4 +1,4 @@
-import { UpdateProjectInput } from 'common'
+import { StaticStatus, UpdateProjectInput } from 'common'
 import { EdgeItem, NodeItem, makeGraphNetwork } from 'graph'
 import { createContext, useEffect, useState } from 'react'
 import { createProject, getProject, listProjects, updateProject, deleteProject } from '../data/api'
@@ -105,6 +105,18 @@ export const useAppState = () => {
     }
   }
 
+  async function updateProjectStatus(status: StaticStatus) {
+    if (!selectedProject) return
+    const input: UpdateProjectInput = {
+      ...selectedProject,
+      staticStatus: status,
+    }
+    const result = await updateProject(input)
+    if (result) {
+      setSelectedProject(result)
+    }
+  }
+
   return {
     addProject,
     selectProject,
@@ -115,5 +127,6 @@ export const useAppState = () => {
     removeProject,
     selectedProject,
     updateProjectValue,
+    updateProjectStatus
   }
 }

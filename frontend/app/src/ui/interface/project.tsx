@@ -5,7 +5,7 @@ import { StaticProjectData } from '../../types'
 import { FloatingButton } from '../components/button'
 import { CircleWithEdge } from '../components/icon'
 import { CenterBottom } from '../components/layout'
-import { ProjectValue } from 'common'
+import { ProjectValue, StaticStatus } from 'common'
 
 export const ProjectModal: React.FC = () => {
   const { selectedProject } = useContext(AppContext)
@@ -23,6 +23,7 @@ const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selec
       >
         <Title title={selectedProject.title} />
         <Value value={selectedProject.staticValue} />
+        <Status status={selectedProject.staticStatus} />
         <Unlocks unlocks={selectedProject.unlocks} />
         <Delete />
       </div>
@@ -79,21 +80,42 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
   )
 }
 
-const Value: React.FC<{value: number}> = ({value}) => {
+const Value: React.FC<{ value: number }> = ({ value }) => {
   const { updateProjectValue } = useContext(AppContext)
 
   return (
     <select
-    className="appearance-none py-2 text-xl"
-    onChange={(e) => {
-      updateProjectValue(Number(e.target.value))
-    }}
-    value={value}
-  >
-    <option value={ProjectValue.low}>low</option>
-    <option value={ProjectValue.mid}>mid</option>
-    <option value={ProjectValue.high}>high</option>
-  </select> 
+      className="appearance-none py-2 text-xl"
+      onChange={(e) => {
+        updateProjectValue(Number(e.target.value))
+      }}
+      value={value}
+    >
+      <option value={ProjectValue.low}>low</option>
+      <option value={ProjectValue.mid}>mid</option>
+      <option value={ProjectValue.high}>high</option>
+    </select>
+  )
+}
+
+const Status: React.FC<{ status: StaticStatus }> = ({ status }) => {
+  const { updateProjectStatus } = useContext(AppContext)
+
+  const options: StaticStatus[] = ['normal', 'ongoing', 'done']
+  return (
+    <select
+      className="appearance-none py-2 text-xl"
+      onChange={(e) => {
+        updateProjectStatus(e.target.value as StaticStatus)
+      }}
+      value={status}
+    >
+      {options.map((s) => (
+        <option key={s} value={s}>
+          {s}
+        </option>
+      ))}
+    </select>
   )
 }
 
