@@ -6,10 +6,10 @@ import { Colors } from '../../constants'
 export const GraphNetwork = () => {
   const { selectProject, unselectProject } = useContext(AppContext)
   return (
-    <div className="border-gray border h-full w-full">
+    <div className="h-full w-full">
       <Graph
         network={network}
-        options={options}
+        options={graphOptions}
         interactions={{
           onClickNode: selectProject,
           onClickBackground: unselectProject,
@@ -29,7 +29,7 @@ export const GraphNetwork = () => {
   )
 }
 
-const options: GraphOptions = {
+export const graphOptions: GraphOptions = {
   width: '100%',
   height: '100%',
   clickToUse: false,
