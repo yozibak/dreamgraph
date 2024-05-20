@@ -77,8 +77,8 @@ const DemoUse = () => {
 const UI = () => {
   return (
     <div>
-      <button onClick={() => network.addNode({ id: '6', label: 'foo' })}>Add node</button>
-      <button onClick={() => network.addEdge({ from: '1', to: '6' })}>Add edge</button>
+      <button onClick={() => network.putNode({ id: '6', label: 'foo' })}>Add node</button>
+      <button onClick={() => network.putEdge({ from: '1', to: '6' })}>Add edge</button>
       <button onClick={() => network.removeNode('6')}>Remove node</button>
       <button onClick={() => network.removeEdge({ from: '1', to: '6' })}>Remove edge</button>
       <button onClick={() => network.updateNodeLabel('6', 'baz')}>change label</button>

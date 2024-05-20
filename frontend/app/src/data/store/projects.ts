@@ -1,7 +1,7 @@
 import { CreateProjectInput, UpdateProjectInput } from 'common'
 import { useEffect, useState } from 'react'
 import { StaticProjectData } from '../../types'
-import { createProject, deleteProject, listProjects, updateProject } from '../api'
+import * as api from '../api'
 
 export type ProjectStore = ReturnType<typeof useProjects>
 
@@ -9,7 +9,7 @@ export const useProjects = () => {
   const [projects, setProjects] = useState<StaticProjectData[]>([])
 
   const fetchProjects = async () => {
-    const pjs = await listProjects()
+    const pjs = await api.listProjects()
     pjs && setProjects(pjs)
   }
 
@@ -18,30 +18,28 @@ export const useProjects = () => {
     fetchProjects()
   }, [projects, fetchProjects])
 
-  const addProject = async (pj: CreateProjectInput) => {
-    await createProject(pj)
+  const createProject = async (pj: CreateProjectInput) => {
+    const newPj = await api.createProject(pj)
     await fetchProjects()
+    return newPj
   }
 
-  const editProject = async (pj: UpdateProjectInput) => {
-    await updateProject(pj)
+  const updateProject = async (pj: UpdateProjectInput) => {
+    const result = await api.updateProject(pj)
     await fetchProjects()
+    return result
   }
 
-  const removeProject = async (projectId: string) => {
-    await deleteProject(projectId)
+  const deleteProject = async (projectId: string) => {
+    const result = await api.deleteProject(projectId)
     await fetchProjects()
-  }
-
-  const searchProject = (projectId: string) => {
-    return projects.find((pj) => pj.projectId === projectId)
+    return result
   }
 
   return {
     projects,
-    addProject,
-    editProject,
-    removeProject,
-    searchProject,
+    createProject,
+    updateProject,
+    deleteProject,
   }
 }

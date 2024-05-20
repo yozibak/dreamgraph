@@ -1,9 +1,10 @@
 import { StaticStatus, UpdateProjectInput } from 'common'
 import { EdgeItem, NodeItem, makeGraphNetwork } from 'graph'
 import { createContext, useEffect, useState } from 'react'
-import { createProject, getProject, listProjects, updateProject, deleteProject } from '../data/api'
+import { getProject } from '../data/api'
+import { useProjects } from '../data/store/projects'
 import { StaticProjectData } from '../types'
-import { convertProjectIntoNode, convertProjectsIntoNetworkData } from './network'
+import { convertProjectsIntoNetworkData } from './network'
 
 export const AppContext = createContext<AppState>({} as AppState)
 
@@ -12,19 +13,19 @@ export type AppState = ReturnType<typeof useAppState>
 export const network = makeGraphNetwork<NodeItem, EdgeItem>()
 
 export const useAppState = () => {
+  const { projects, createProject, deleteProject, updateProject } = useProjects()
   const [selectedProject, setSelectedProject] = useState<StaticProjectData>()
 
   useEffect(() => {
     async function init() {
-      const pjs = await listProjects()
-      if (pjs) {
-        const { nodes, edges } = convertProjectsIntoNetworkData(pjs)
-        nodes.forEach((n) => network.addNode(n))
-        edges.forEach((e) => network.addEdge(e))
+      if (projects.length) {
+        const { nodes, edges } = convertProjectsIntoNetworkData(projects)
+        nodes.forEach((n) => network.putNode(n))
+        edges.forEach((e) => network.putEdge(e))
       }
     }
     init()
-  }, [])
+  }, [projects])
 
   async function selectProject(projectId: string) {
     const pj = await getProject(projectId)
@@ -40,8 +41,8 @@ export const useAppState = () => {
   async function addProject() {
     const pj = await createProject({ title: 'new project' })
     if (pj) {
-      network.addNode(convertProjectIntoNode(pj))
       setSelectedProject(pj)
+      // TODO: focus on the node
     }
   }
 
@@ -54,7 +55,6 @@ export const useAppState = () => {
     const result = await updateProject(input)
     if (result) {
       setSelectedProject(result)
-      network.updateNodeLabel(result.projectId, result.title)
     }
   }
 
@@ -67,7 +67,6 @@ export const useAppState = () => {
     const result = await updateProject(input)
     if (result) {
       setSelectedProject(result)
-      network.addEdge({ from: selectedProject.projectId, to: pjId })
     }
   }
 
@@ -87,7 +86,7 @@ export const useAppState = () => {
     if (!selectedProject) return
     const result = await deleteProject(selectedProject.projectId)
     if (result) {
-      setSelectedProject(undefined)
+      unselectProject()
       network.removeNode(selectedProject.projectId)
       network.removeEdgesByNode(selectedProject.projectId)
     }
@@ -99,10 +98,7 @@ export const useAppState = () => {
       ...selectedProject,
       staticValue: value,
     }
-    const result = await updateProject(input)
-    if (result) {
-      setSelectedProject(result)
-    }
+    await updateProject(input)
   }
 
   async function updateProjectStatus(status: StaticStatus) {
@@ -111,10 +107,7 @@ export const useAppState = () => {
       ...selectedProject,
       staticStatus: status,
     }
-    const result = await updateProject(input)
-    if (result) {
-      setSelectedProject(result)
-    }
+    await updateProject(input)
   }
 
   return {
@@ -127,6 +120,6 @@ export const useAppState = () => {
     removeProject,
     selectedProject,
     updateProjectValue,
-    updateProjectStatus
+    updateProjectStatus,
   }
 }

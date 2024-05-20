@@ -1,5 +1,8 @@
 import { DynamicProjectData, DynamicStatus, StaticProjectData } from '../../types'
 
+/**
+ * @todo should prevent circular calculation
+ */
 export const calcProjectDynamicValue = (
   pj: StaticProjectData,
   getProject: (id: string) => StaticProjectData | undefined

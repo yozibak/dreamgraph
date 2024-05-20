@@ -24,11 +24,14 @@ export const makeGraphNetwork = <N extends NodeItem, E extends EdgeItem>(
     destroy: () => {
       _network.destroy()
     },
-    addNode: (newNode: N) => {
-      if (nodes.get(newNode.id)) return
-      nodes.add(newNode)
+    putNode: (newNode: N) => {
+      if (nodes.get(newNode.id)) {
+        nodes.updateOnly(newNode as UpdateItem<N, 'id'>)
+      } else {
+        nodes.add(newNode)
+      }
     },
-    addEdge: (newEdge: E) => {
+    putEdge: (newEdge: E) => {
       const ne = includeEdgeId(newEdge)
       if (edges.get(ne.id)) return
       edges.add(ne)

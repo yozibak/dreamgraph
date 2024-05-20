@@ -4,7 +4,6 @@ import {
   calcProjectDynamicStatus,
   calcProjectDynamicValue,
   determineUrgentProjects,
-  updateImportantNodesAsUrgent,
 } from './dynamic'
 
 const projects = [
