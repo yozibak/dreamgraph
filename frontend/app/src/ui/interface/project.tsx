@@ -5,29 +5,48 @@ import { StaticProjectData } from '../../types'
 import { FloatingButton } from '../components/button'
 import { CircleWithEdge } from '../components/icon'
 import { Input, Select } from '../components/input'
-import { CenterBottom } from '../components/layout'
+import { CenterBottom, TwoColumnsGrid } from '../components/layout'
+import { Panel } from '../components/paper'
 
 export const ProjectModal: React.FC = () => {
-  const { selectedProject } = useContext(AppContext)
+  const { selectedProject, addProject } = useContext(AppContext)
 
-  if (!selectedProject) return <AddProjectButton />
-  return <ProjectDetail selectedProject={selectedProject} />
+  return (
+    <CenterBottom key={selectedProject?.projectId}>
+      {selectedProject ? (
+        <ProjectDetail selectedProject={selectedProject} />
+      ) : (
+        <FloatingButton onClick={addProject}>Add Project</FloatingButton>
+      )}
+    </CenterBottom>
+  )
 }
 
 const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selectedProject }) => {
   return (
-    <CenterBottom key={selectedProject.projectId}>
-      <div
-        className="min-w-80 bg-white opacity-90 px-4 pt-2 pb-4 rounded-md border-gray-800 border-4 shadow shadow-gray-600"
-        style={{ width: '20vw' }}
-      >
-        <Title title={selectedProject.title} />
-        <Value value={selectedProject.staticValue} />
-        <Status status={selectedProject.staticStatus} />
-        <Unlocks />
-        <Delete />
-      </div>
-    </CenterBottom>
+    <Panel className="min-w-80 p-8">
+      <TwoColumnsGrid>
+        <div className='col-span-2'>
+          <Title title={selectedProject.title} />
+        </div>
+        <div>value</div>
+        <div>
+          <Value value={selectedProject.staticValue} />
+        </div>
+        <div>status</div>
+        <div>
+          <Status status={selectedProject.staticStatus} />
+        </div>
+        <div>unlocks</div>
+        <div>
+          <Unlocks />
+          <UnlockSelect />
+        </div>
+        <div className='col-span-2'>
+          <Delete />
+        </div>
+      </TwoColumnsGrid>
+    </Panel>
   )
 }
 
@@ -45,10 +64,10 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
 
   if (!edit)
     return (
-      <div className="py-2 flex">
+      <div className="flex">
         <div
           onClick={() => setEdit(true)}
-          className="inline-block font-semibold text-black  text-2xl hover:text-gray-600 leading-none"
+          className="inline-block font-semibold text-black text-2xl hover:text-gray-600 leading-none"
         >
           {title}
         </div>
@@ -56,7 +75,7 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
     )
   return (
     <form
-      className="py-2"
+      className="2"
       onSubmit={(e) => {
         e.preventDefault()
         editProjectTitle(newTitle)
@@ -97,60 +116,50 @@ const Status: React.FC<{ status: StaticStatus }> = ({ status }) => {
 }
 
 const Unlocks: React.FC = () => {
-  const { addProjectUnlocks, removeProjectUnlocks, selectProject, unlockOptions, unlockProjects } =
-    useContext(AppContext)
-
-  if (!unlockProjects || !unlockOptions) return
-  return (
-    <div>
-      {unlockProjects.map((pj) => (
-        <div className="flex flex-row pt-1" key={pj.projectId}>
-          <CircleWithEdge />
-          <div
-            onClick={() => selectProject(pj.projectId)}
-            className="px-3 text-lg mb-px cursor-pointer"
-          >
-            {pj.title}
-          </div>
-          <button
-            onClick={() => removeProjectUnlocks(pj.projectId)}
-            className="text-red-600 text-sm"
-          >
-            remove
-          </button>
-        </div>
-      ))}
-      <Select
-        onChange={(e) => {
-          addProjectUnlocks(e.target.value)
-        }}
-        value={''}
+  const { removeProjectUnlocks, selectProject, unlockProjects } = useContext(AppContext)
+  if (!unlockProjects) return <></>
+  return unlockProjects.map((pj) => (
+    <div className="flex flex-row" key={pj.projectId}>
+      <CircleWithEdge />
+      <div
+        onClick={() => selectProject(pj.projectId)}
+        className="px-3 text-lg mb-px cursor-pointer"
       >
-        <option value="">+</option>
-        {unlockOptions.map((pj) => (
-          <option key={pj.projectId} value={pj.projectId}>
-            {pj.title}
-          </option>
-        ))}
-      </Select>
+        {pj.title}
+      </div>
+      <button onClick={() => removeProjectUnlocks(pj.projectId)} className="text-red-600 text-sm">
+        remove
+      </button>
     </div>
+  ))
+}
+
+const UnlockSelect: React.FC = () => {
+  const { addProjectUnlocks, unlockOptions } = useContext(AppContext)
+
+  if (!unlockOptions) return
+  return (
+    <Select
+      onChange={(e) => {
+        addProjectUnlocks(e.target.value)
+      }}
+      value={''}
+    >
+      <option value="">+</option>
+      {unlockOptions.map((pj) => (
+        <option key={pj.projectId} value={pj.projectId}>
+          {pj.title}
+        </option>
+      ))}
+    </Select>
   )
 }
 
 const Delete: React.FC = () => {
   const { removeProject } = useContext(AppContext)
   return (
-    <button onClick={removeProject} className="text-red-600 text-sm mt-2">
+    <button onClick={removeProject} className="text-red-600 text-sm">
       Delete this project
     </button>
-  )
-}
-
-export const AddProjectButton: React.FC = () => {
-  const { addProject } = useContext(AppContext)
-  return (
-    <CenterBottom>
-      <FloatingButton onClick={addProject}>Add Project</FloatingButton>
-    </CenterBottom>
   )
 }

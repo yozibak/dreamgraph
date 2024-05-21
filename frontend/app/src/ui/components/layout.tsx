@@ -7,3 +7,7 @@ export const CenterBottom: React.FC<PropsWithChildren> = ({ children }) => {
 export const Container: React.FC<PropsWithChildren> = ({ children }) => (
   <div className="h-dvh w-dvw text-gray-800 ">{children}</div>
 )
+
+export const TwoColumnsGrid: React.FC<PropsWithChildren> = ({ children }) => (
+  <div className="grid grid-cols-project gap-4">{children}</div>
+)

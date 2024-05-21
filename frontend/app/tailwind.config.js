@@ -8,6 +8,9 @@ export default {
       colors: {
         gray: colors.zinc
       },
+      gridTemplateColumns: {
+        'project': '4rem 1fr'
+      }
     },
   },
   plugins: [],
