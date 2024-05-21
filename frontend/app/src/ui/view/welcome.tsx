@@ -34,19 +34,30 @@ export const Welcome: React.FC<{ login: () => void; appVersion: string }> = ({
 const randomIntBetween = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1)) + min
 
+const randomEdge = (id: number): string => {
+  const to = randomIntBetween(0, 30)
+  if (to === id) return randomEdge(id)
+  return to.toString()
+}
+
 const sampleNodes = [...Array(30)].map((_, i) => ({
   id: i.toString(),
   label: ``,
   size: randomIntBetween(1, 4) * 10,
 }))
-const sampleEdges = [...Array(30)].flatMap((_, i) => [
-  { from: i.toString(), to: randomIntBetween(0, 30) },
-])
+const sampleEdges = [...Array(30)].flatMap((_, i) => [{ from: i.toString(), to: randomEdge(i) }])
 
 const sampleNetwork = makeGraphNetwork()
 
 sampleNodes.forEach((node) => sampleNetwork.putNode(node))
-sampleEdges.forEach((edge) => sampleNetwork.putEdge(edge as unknown as EdgeItem))
+const interval = setInterval(() => {
+  const edge = sampleEdges.pop()
+  if (edge) {
+    sampleNetwork.putEdge(edge as unknown as EdgeItem)
+  } else {
+    clearInterval(interval)
+  }
+}, 50)
 
 const SampleNetwork = () => (
   <div className="fixed top-0 h-full w-full opacity-50">
