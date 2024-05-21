@@ -29,9 +29,15 @@ export const Select: React.FC<PropsWithChildren<InputProps<HTMLSelectElement>>> 
   onChange,
   className,
   children,
+  value,
 }) => {
   return (
-    <select ref={ref} onChange={onChange} className={'appearance-none py-2 text-xl' + className}>
+    <select
+      ref={ref}
+      onChange={onChange}
+      className={'appearance-none py-2 text-xl' + className}
+      value={value}
+    >
       {children}
     </select>
   )

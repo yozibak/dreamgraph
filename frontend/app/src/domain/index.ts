@@ -30,18 +30,16 @@ export const useAppState = () => {
     init()
   }, [projects])
 
-  async function selectProject(projectId: string) {
+  const selectProject = async (projectId: string) => {
     const pj = await getProject(projectId)
     if (pj) {
       setSelectedProject(pj)
     }
   }
 
-  function unselectProject() {
-    setSelectedProject(undefined)
-  }
+  const unselectProject = () => setSelectedProject(undefined)
 
-  async function addProject() {
+  const addProject = async () => {
     const pj = await createProject({ title: 'new project' })
     if (pj) {
       setSelectedProject(pj)
@@ -49,43 +47,46 @@ export const useAppState = () => {
     }
   }
 
-  async function editProjectTitle(newTitle: string) {
+  const editProject = async (update: Partial<Omit<UpdateProjectInput, 'projectId'>>) => {
     if (!selectedProject) return
-    const input: UpdateProjectInput = {
-      ...selectedProject,
+    const result = await updateProject({ ...selectedProject, ...update })
+    if (result) {
+      setSelectedProject(result)
+      return result
+    }
+  }
+
+  const editProjectTitle = (newTitle: string) =>
+    editProject({
       title: newTitle,
-    }
-    const result = await updateProject(input)
-    if (result) {
-      setSelectedProject(result)
-    }
-  }
+    })
 
-  async function addProjectUnlocks(pjId: string) {
+  const updateProjectValue = (value: number) =>
+    editProject({
+      staticValue: value,
+    })
+
+  const updateProjectStatus = (status: StaticStatus) =>
+    editProject({
+      staticStatus: status,
+    })
+
+  const addProjectUnlocks = (pjId: string) => {
     if (!selectedProject) return
-    const input: UpdateProjectInput = {
-      ...selectedProject,
+    editProject({
       unlocks: [...selectedProject.unlocks, pjId],
-    }
-    const result = await updateProject(input)
-    if (result) {
-      setSelectedProject(result)
-    }
+    })
   }
 
-  async function removeProjectUnlocks(rm: string) {
+  const removeProjectUnlocks = (rm: string) => {
     if (!selectedProject) return
-    const input: UpdateProjectInput = {
-      ...selectedProject,
+    editProject({
       unlocks: selectedProject.unlocks.filter((u) => u !== rm),
-    }
-    const result = await updateProject(input)
-    if (result) {
-      network.removeEdge({ from: selectedProject.projectId, to: rm })
-    }
+    })
+    network.removeEdge({ from: selectedProject.projectId, to: rm })
   }
 
-  async function removeProject() {
+  const removeProject = async () => {
     if (!selectedProject) return
     const result = await deleteProject(selectedProject.projectId)
     if (result) {
@@ -93,24 +94,6 @@ export const useAppState = () => {
       network.removeNode(selectedProject.projectId)
       network.removeEdgesByNode(selectedProject.projectId)
     }
-  }
-
-  async function updateProjectValue(value: number) {
-    if (!selectedProject) return
-    const input: UpdateProjectInput = {
-      ...selectedProject,
-      staticValue: value,
-    }
-    await updateProject(input)
-  }
-
-  async function updateProjectStatus(status: StaticStatus) {
-    if (!selectedProject) return
-    const input: UpdateProjectInput = {
-      ...selectedProject,
-      staticStatus: status,
-    }
-    await updateProject(input)
   }
 
   return {

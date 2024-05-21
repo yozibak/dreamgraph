@@ -1,18 +1,18 @@
 import { ProjectValue, StaticStatus } from 'common'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { AppContext } from '../../domain'
-import { StaticProjectData } from '../../types'
 import { FloatingButton } from '../components/button'
 import { CircleWithEdge } from '../components/icon'
 import { Input, Select } from '../components/input'
 import { CenterBottom, TwoColumnsGrid } from '../components/layout'
 import { Panel } from '../components/paper'
+import { StaticProjectData } from '../../types'
 
 export const ProjectModal: React.FC = () => {
   const { selectedProject, addProject } = useContext(AppContext)
 
   return (
-    <CenterBottom key={selectedProject?.projectId}>
+    <CenterBottom>
       {selectedProject ? (
         <ProjectDetail selectedProject={selectedProject} />
       ) : (
@@ -23,10 +23,11 @@ export const ProjectModal: React.FC = () => {
 }
 
 const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selectedProject }) => {
+  
   return (
     <Panel className="min-w-80 p-8">
       <TwoColumnsGrid>
-        <div className='col-span-2'>
+        <div className="col-span-2">
           <Title title={selectedProject.title} />
         </div>
         <div>value</div>
@@ -42,7 +43,7 @@ const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selec
           <Unlocks />
           <UnlockSelect />
         </div>
-        <div className='col-span-2'>
+        <div className="col-span-2">
           <Delete />
         </div>
       </TwoColumnsGrid>
@@ -75,7 +76,6 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
     )
   return (
     <form
-      className="2"
       onSubmit={(e) => {
         e.preventDefault()
         editProjectTitle(newTitle)
@@ -105,7 +105,12 @@ const Status: React.FC<{ status: StaticStatus }> = ({ status }) => {
   const { updateProjectStatus } = useContext(AppContext)
   const options: StaticStatus[] = ['normal', 'ongoing', 'done']
   return (
-    <Select onChange={(e) => updateProjectStatus(e.target.value as StaticStatus)} value={status}>
+    <Select
+      onChange={(e) => {
+        updateProjectStatus(e.target.value as StaticStatus)
+      }}
+      value={status}
+    >
       {options.map((s) => (
         <option key={s} value={s}>
           {s}

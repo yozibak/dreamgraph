@@ -5,6 +5,7 @@ const RootConfig: Config = {
   transform: {
     '^.+\\.(ts|tsx)?$': 'ts-jest',
   },
+  transformIgnorePatterns: ['vis-data'],
   moduleNameMapper: {
     uuid: require.resolve('uuid'),
     rxjs: require.resolve('rxjs'),
