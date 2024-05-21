@@ -49,12 +49,12 @@ export const NodeColors: Record<DynamicStatus, NodeColorDefinition> = {
   },
   blocked: {
     normal: {
-      background: Colors.Gray400,
-      border: Colors.Gray800,
+      background: Colors.Gray50,
+      border: Colors.Gray600,
     },
     highlight: {
-      background: Colors.Gray400,
-      border: Colors.Gray600,
+      background: Colors.Gray50,
+      border: Colors.Gray400,
     },
   },
   urgent: {
