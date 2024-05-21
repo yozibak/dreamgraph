@@ -4,6 +4,7 @@ import { AppContext } from '../../domain'
 import { StaticProjectData } from '../../types'
 import { FloatingButton } from '../components/button'
 import { CircleWithEdge } from '../components/icon'
+import { Input, Select } from '../components/input'
 import { CenterBottom } from '../components/layout'
 
 export const ProjectModal: React.FC = () => {
@@ -36,14 +37,10 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
   const { editProjectTitle } = useContext(AppContext)
   const titleInput = useRef<HTMLInputElement>(null)
   useEffect(() => {
-    if (title === 'new project') {
-      setEdit(true)
-    }
+    if (title === 'new project') setEdit(true)
   }, [title])
   useEffect(() => {
-    if (titleInput.current) {
-      titleInput.current.focus()
-    }
+    if (titleInput.current) titleInput.current.focus()
   }, [titleInput])
 
   if (!edit)
@@ -66,12 +63,7 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
         setEdit(false)
       }}
     >
-      <input
-        ref={titleInput}
-        className=" font-semibold text-black text-xl bg-gray-200 border-gray-400 px-2 py-1 min-w-44"
-        onChange={(e) => setNetTitle(e.target.value)}
-        value={newTitle}
-      />
+      <Input ref={titleInput} onChange={(e) => setNetTitle(e.target.value)} value={newTitle} />
       <button className="mx-2" type="submit">
         ⏎
       </button>
@@ -81,40 +73,26 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
 
 const Value: React.FC<{ value: number }> = ({ value }) => {
   const { updateProjectValue } = useContext(AppContext)
-
   return (
-    <select
-      className="appearance-none py-2 text-xl"
-      onChange={(e) => {
-        updateProjectValue(Number(e.target.value))
-      }}
-      value={value}
-    >
+    <Select onChange={(e) => updateProjectValue(Number(e.target.value))} value={value}>
       <option value={ProjectValue.low}>low</option>
       <option value={ProjectValue.mid}>mid</option>
       <option value={ProjectValue.high}>high</option>
-    </select>
+    </Select>
   )
 }
 
 const Status: React.FC<{ status: StaticStatus }> = ({ status }) => {
   const { updateProjectStatus } = useContext(AppContext)
-
   const options: StaticStatus[] = ['normal', 'ongoing', 'done']
   return (
-    <select
-      className="appearance-none py-2 text-xl"
-      onChange={(e) => {
-        updateProjectStatus(e.target.value as StaticStatus)
-      }}
-      value={status}
-    >
+    <Select onChange={(e) => updateProjectStatus(e.target.value as StaticStatus)} value={status}>
       {options.map((s) => (
         <option key={s} value={s}>
           {s}
         </option>
       ))}
-    </select>
+    </Select>
   )
 }
 
@@ -142,8 +120,7 @@ const Unlocks: React.FC = () => {
           </button>
         </div>
       ))}
-      <select
-        className="appearance-none py-2 text-xl"
+      <Select
         onChange={(e) => {
           addProjectUnlocks(e.target.value)
         }}
@@ -155,7 +132,7 @@ const Unlocks: React.FC = () => {
             {pj.title}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   )
 }
