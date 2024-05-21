@@ -5,6 +5,7 @@ import { getProject } from '../data/api'
 import { useProjects } from '../data/store/projects'
 import { StaticProjectData } from '../types'
 import { convertProjectsIntoNetworkData } from './network'
+import { filterUnlockOptions, getUnlockProjects } from './relation'
 
 export const network = makeGraphNetwork<NodeItem, EdgeItem>()
 
@@ -15,6 +16,8 @@ export type AppState = ReturnType<typeof useAppState>
 export const useAppState = () => {
   const { projects, createProject, deleteProject, updateProject } = useProjects()
   const [selectedProject, setSelectedProject] = useState<StaticProjectData>()
+  const unlockProjects = selectedProject ? getUnlockProjects(projects, selectedProject) : undefined
+  const unlockOptions = selectedProject ? filterUnlockOptions(projects, selectedProject) : undefined
 
   useEffect(() => {
     async function init() {
@@ -121,5 +124,7 @@ export const useAppState = () => {
     selectedProject,
     updateProjectValue,
     updateProjectStatus,
+    unlockProjects,
+    unlockOptions,
   }
 }

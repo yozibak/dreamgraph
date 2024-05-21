@@ -1,11 +1,10 @@
-import { NodeItem } from 'graph'
+import { ProjectValue, StaticStatus } from 'common'
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { AppContext, network } from '../../domain'
+import { AppContext } from '../../domain'
 import { StaticProjectData } from '../../types'
 import { FloatingButton } from '../components/button'
 import { CircleWithEdge } from '../components/icon'
 import { CenterBottom } from '../components/layout'
-import { ProjectValue, StaticStatus } from 'common'
 
 export const ProjectModal: React.FC = () => {
   const { selectedProject } = useContext(AppContext)
@@ -24,7 +23,7 @@ const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selec
         <Title title={selectedProject.title} />
         <Value value={selectedProject.staticValue} />
         <Status status={selectedProject.staticStatus} />
-        <Unlocks unlocks={selectedProject.unlocks} />
+        <Unlocks />
         <Delete />
       </div>
     </CenterBottom>
@@ -119,24 +118,26 @@ const Status: React.FC<{ status: StaticStatus }> = ({ status }) => {
   )
 }
 
-const Unlocks: React.FC<{ unlocks: string[] }> = ({ unlocks }) => {
-  const { addProjectUnlocks, removeProjectUnlocks, selectedProject, selectProject } =
+const Unlocks: React.FC = () => {
+  const { addProjectUnlocks, removeProjectUnlocks, selectProject, unlockOptions, unlockProjects } =
     useContext(AppContext)
-  const unlockProjects = unlocks
-    .map((id) => network.getNodeById(id))
-    .filter((p): p is NodeItem => p !== null)
-  const options = network.filterNodes(
-    (n) => !unlockProjects.includes(n) && n.id !== selectedProject?.projectId
-  )
+
+  if (!unlockProjects || !unlockOptions) return
   return (
     <div>
       {unlockProjects.map((pj) => (
-        <div className="flex flex-row pt-1" key={pj.id}>
+        <div className="flex flex-row pt-1" key={pj.projectId}>
           <CircleWithEdge />
-          <div onClick={() => selectProject(pj.id)} className="px-3 text-lg mb-px cursor-pointer">
-            {pj.label}
+          <div
+            onClick={() => selectProject(pj.projectId)}
+            className="px-3 text-lg mb-px cursor-pointer"
+          >
+            {pj.title}
           </div>
-          <button onClick={() => removeProjectUnlocks(pj.id)} className="text-red-600 text-sm">
+          <button
+            onClick={() => removeProjectUnlocks(pj.projectId)}
+            className="text-red-600 text-sm"
+          >
             remove
           </button>
         </div>
@@ -149,9 +150,9 @@ const Unlocks: React.FC<{ unlocks: string[] }> = ({ unlocks }) => {
         value={''}
       >
         <option value="">+</option>
-        {options.map((pj) => (
-          <option key={pj.id} value={pj.id}>
-            {pj.label}
+        {unlockOptions.map((pj) => (
+          <option key={pj.projectId} value={pj.projectId}>
+            {pj.title}
           </option>
         ))}
       </select>
