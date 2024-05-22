@@ -1,4 +1,3 @@
-import { ProjectValue } from 'common'
 import { DynamicProjectData, StaticProjectData } from '../../types'
 import {
   calcProjectDynamicStatus,
@@ -10,34 +9,34 @@ const projects = [
   {
     projectId: 'pj-1',
     unlocks: ['pj-2', 'pj-3'],
-    staticValue: ProjectValue.low,
+    staticValue: 1,
     staticStatus: 'normal',
   },
   {
     projectId: 'pj-2',
     unlocks: [],
-    staticValue: ProjectValue.mid,
+    staticValue: 3,
   },
   {
     projectId: 'pj-3',
     unlocks: ['pj-4'],
-    staticValue: ProjectValue.high,
+    staticValue: 5,
   },
   {
     projectId: 'pj-4',
     unlocks: [],
-    staticValue: ProjectValue.high,
+    staticValue: 5,
   },
   {
     projectId: 'pj-5',
     unlocks: ['pj-1'],
-    staticValue: ProjectValue.high,
+    staticValue: 5,
     staticStatus: 'done',
   },
   {
     projectId: 'pj-6',
     unlocks: [],
-    staticValue: ProjectValue.high,
+    staticValue: 5,
     staticStatus: 'ongoing',
   },
 ] as unknown as StaticProjectData[]
@@ -48,11 +47,11 @@ const findPj = (id: string) => projects.filter((p) => p.unlocks.includes(id))
 describe(`${calcProjectDynamicValue.name}`, () => {
   test(`project with unlocks`, () => {
     const result = calcProjectDynamicValue(projects[0], getPj)
-    expect(result).toBe(ProjectValue.low + ProjectValue.mid + ProjectValue.high + ProjectValue.high)
+    expect(result).toBe(1 + 3 + 5 + 5)
   })
   test(`project without unlocks`, () => {
     const result = calcProjectDynamicValue(projects[1], getPj)
-    expect(result).toBe(ProjectValue.mid)
+    expect(result).toBe(3)
   })
 })
 

@@ -1,4 +1,4 @@
-import { ProjectValue, StaticStatus } from 'common'
+import { StaticStatus, StaticValue } from 'common'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { AppContext } from '../../domain'
 import { FloatingButton } from '../components/button'
@@ -23,7 +23,6 @@ export const ProjectModal: React.FC = () => {
 }
 
 const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selectedProject }) => {
-  
   return (
     <Panel className="min-w-80 p-8">
       <TwoColumnsGrid>
@@ -92,11 +91,14 @@ const Title: React.FC<{ title: string }> = ({ title }) => {
 
 const Value: React.FC<{ value: number }> = ({ value }) => {
   const { updateProjectValue } = useContext(AppContext)
+  const options: StaticValue[] = [1, 2, 3, 4, 5]
   return (
     <Select onChange={(e) => updateProjectValue(Number(e.target.value))} value={value}>
-      <option value={ProjectValue.low}>low</option>
-      <option value={ProjectValue.mid}>mid</option>
-      <option value={ProjectValue.high}>high</option>
+      {options.map((v) => (
+        <option key={v} value={v}>
+          {v}
+        </option>
+      ))}
     </Select>
   )
 }

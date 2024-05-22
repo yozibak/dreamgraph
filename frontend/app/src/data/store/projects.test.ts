@@ -8,7 +8,7 @@ const mockPj = (id: string): StaticProjectData => ({
   title: 'example',
   unlocks: [],
   staticStatus: 'normal',
-  staticValue: 10,
+  staticValue: 3,
 })
 
 test(`initial fetch`, async () => {

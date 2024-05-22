@@ -27,13 +27,12 @@ export const convertStaticProjects = (pjs: StaticProjectData[]): DynamicProjectD
 export const convertProjectIntoNode = (pj: DynamicProjectData) => {
   const colors = NodeColors[pj.dynamicStatus]
   const constrainedDynamicValue =
-    pj.dynamicStatus === 'done'
-      ? pj.staticValue
-      : (Math.min(pj.dynamicValue, 100) / 10) * pj.staticValue
+    pj.dynamicStatus === 'done' ? pj.staticValue : Math.min(pj.dynamicValue, 30) * pj.staticValue
   return {
     id: pj.projectId,
-    label: pj.title,
-    size: 10 + constrainedDynamicValue / 5, // 10 ~ 30
+    label: pj.staticStatus === 'done' ? undefined : pj.title,
+    title: pj.staticStatus !== 'done' ? undefined : pj.title,
+    size: 10 + constrainedDynamicValue / 2, // 10 ~ 80
     mass: 1 + constrainedDynamicValue / 10, // 1 ~ 10
     color: {
       border: colors.normal.border,
