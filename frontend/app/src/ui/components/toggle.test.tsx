@@ -4,7 +4,7 @@ import '@testing-library/jest-dom'
 import { act, render, screen } from '@testing-library/react'
 
 test(`${Toggle.name}`, async () => {
-  const Default = () => <div>default</div>
+  const Default = ({ cb }: { cb: () => void }) => <div onClick={cb}>default</div>
   const Alt = ({ cb }: { cb: () => void }) => {
     return (
       <input
@@ -17,7 +17,12 @@ test(`${Toggle.name}`, async () => {
     )
   }
 
-  render(<Toggle DefaultUI={Default} AltUI={({ backToDefault }) => <Alt cb={backToDefault} />} />)
+  render(
+    <Toggle
+      DefaultUI={({ toggle }) => <Default cb={toggle} />}
+      AltUI={({ toggle }) => <Alt cb={toggle} />}
+    />
+  )
 
   await act(async () => {
     await userEvent.click(screen.getByText(/default/))

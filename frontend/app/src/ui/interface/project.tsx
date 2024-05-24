@@ -1,5 +1,5 @@
 import { StaticStatus, StaticValue } from 'common'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../domain'
 import { StaticProjectData } from '../../types'
 import { FloatingButton } from '../components/button'
@@ -7,6 +7,8 @@ import { CircleWithEdge } from '../components/icon'
 import { Input, Select } from '../components/input'
 import { CenterBottom, TwoColumnsGrid } from '../components/layout'
 import { Panel } from '../components/paper'
+import { Toggle } from '../components/toggle'
+import { StatusSlider, ValueSlider } from '../compounds/slider'
 
 export const ProjectModal: React.FC = () => {
   const { selectedProject, addProject } = useContext(AppContext)
@@ -23,25 +25,43 @@ export const ProjectModal: React.FC = () => {
 }
 
 const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selectedProject }) => {
+  const { updateProjectStatus, updateProjectValue } = useContext(AppContext)
   return (
     <Panel className="min-w-80 p-8">
       <TwoColumnsGrid>
         <div className="col-span-2">
-          <Title title={selectedProject.title} />
+          <Toggle
+            DefaultUI={({ toggle }) => (
+              <ProjectTitle title={selectedProject.title} goToEdit={toggle} />
+            )}
+            AltUI={({ toggle }) => (
+              <ProjectTitleInput title={selectedProject.title} onFinish={toggle} />
+            )}
+          />
         </div>
-        <div>value</div>
+
+        <ProjectField fieldName="value" />
         <div>
-          <Value value={selectedProject.staticValue} />
+          <ValueSlider
+            onChange={(v) => updateProjectValue(v)}
+            value={selectedProject.staticValue}
+          />
         </div>
-        <div>status</div>
+
+        <ProjectField fieldName="status" />
         <div>
-          <Status status={selectedProject.staticStatus} />
+          <StatusSlider
+            onChange={(v) => updateProjectStatus(v)}
+            value={selectedProject.staticStatus}
+          />
         </div>
-        <div>unlocks</div>
+
+        <ProjectField fieldName="unlocks" />
         <div>
           <Unlocks />
           <UnlockSelect />
         </div>
+
         <div className="col-span-2">
           <Delete />
         </div>
@@ -50,75 +70,43 @@ const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selec
   )
 }
 
-const Title: React.FC<{ title: string }> = ({ title }) => {
-  const [edit, setEdit] = useState(false)
+const ProjectField: React.FC<{ fieldName: string }> = ({ fieldName }) => <div>{fieldName}</div>
+
+const ProjectTitle: React.FC<{ goToEdit: () => void; title: string }> = ({ goToEdit, title }) => {
+  useEffect(() => {
+    if (title === 'new project') goToEdit()
+  }, [title])
+  return (
+    <div className="flex">
+      <div
+        onClick={goToEdit}
+        className="inline-block font-semibold text-black text-2xl hover:text-gray-600 leading-none"
+      >
+        {title}
+      </div>
+    </div>
+  )
+}
+
+const ProjectTitleInput: React.FC<{ onFinish: () => void; title: string }> = ({
+  onFinish,
+  title,
+}) => {
   const [newTitle, setNetTitle] = useState(title)
   const { editProjectTitle } = useContext(AppContext)
-  const titleInput = useRef<HTMLInputElement>(null)
-  useEffect(() => {
-    if (title === 'new project') setEdit(true)
-  }, [title])
-  useEffect(() => {
-    if (titleInput.current) titleInput.current.focus()
-  }, [titleInput])
-
-  if (!edit)
-    return (
-      <div className="flex">
-        <div
-          onClick={() => setEdit(true)}
-          className="inline-block font-semibold text-black text-2xl hover:text-gray-600 leading-none"
-        >
-          {title}
-        </div>
-      </div>
-    )
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
         editProjectTitle(newTitle)
-        setEdit(false)
+        onFinish()
       }}
     >
-      <Input ref={titleInput} onChange={(e) => setNetTitle(e.target.value)} value={newTitle} />
+      <Input onChange={(e) => setNetTitle(e.target.value)} value={newTitle} />
       <button className="mx-2" type="submit">
         ⏎
       </button>
     </form>
-  )
-}
-
-const Value: React.FC<{ value: number }> = ({ value }) => {
-  const { updateProjectValue } = useContext(AppContext)
-  const options: StaticValue[] = [1, 2, 3, 4, 5]
-  return (
-    <Select onChange={(e) => updateProjectValue(Number(e.target.value))} value={value}>
-      {options.map((v) => (
-        <option key={v} value={v}>
-          {v}
-        </option>
-      ))}
-    </Select>
-  )
-}
-
-const Status: React.FC<{ status: StaticStatus }> = ({ status }) => {
-  const { updateProjectStatus } = useContext(AppContext)
-  const options: StaticStatus[] = ['normal', 'ongoing', 'done']
-  return (
-    <Select
-      onChange={(e) => {
-        updateProjectStatus(e.target.value as StaticStatus)
-      }}
-      value={status}
-    >
-      {options.map((s) => (
-        <option key={s} value={s}>
-          {s}
-        </option>
-      ))}
-    </Select>
   )
 }
 
