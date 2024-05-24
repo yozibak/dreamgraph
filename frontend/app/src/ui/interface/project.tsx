@@ -1,12 +1,12 @@
 import { StaticStatus, StaticValue } from 'common'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { AppContext } from '../../domain'
+import { StaticProjectData } from '../../types'
 import { FloatingButton } from '../components/button'
 import { CircleWithEdge } from '../components/icon'
 import { Input, Select } from '../components/input'
 import { CenterBottom, TwoColumnsGrid } from '../components/layout'
 import { Panel } from '../components/paper'
-import { StaticProjectData } from '../../types'
 
 export const ProjectModal: React.FC = () => {
   const { selectedProject, addProject } = useContext(AppContext)
@@ -124,7 +124,7 @@ const Status: React.FC<{ status: StaticStatus }> = ({ status }) => {
 
 const Unlocks: React.FC = () => {
   const { removeProjectUnlocks, selectProject, unlockProjects } = useContext(AppContext)
-  if (!unlockProjects) return <></>
+  if (!unlockProjects) return
   return unlockProjects.map((pj) => (
     <div className="flex flex-row" key={pj.projectId}>
       <CircleWithEdge />
