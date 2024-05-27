@@ -62,6 +62,9 @@ export const makeGraphNetwork = <N extends NodeItem, E extends EdgeItem>(
         filter: (e) => e.from === nodeId || e.to === nodeId,
       })
       edges.remove(rmEdges)
-    }
+    },
+    addEdgeMode: () => _network.addEdgeMode(),
+    addNodeMode: () => _network.addNodeMode(),
+    exitEditMode: () => _network.disableEditMode(),
   }
 }

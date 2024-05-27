@@ -1,24 +1,40 @@
-import { StaticStatus, StaticValue } from 'common'
 import React, { useContext, useEffect, useState } from 'react'
-import { AppContext } from '../../domain'
+import { AppContext } from '../../domain/project'
 import { StaticProjectData } from '../../types'
-import { FloatingButton } from '../components/button'
 import { CircleWithEdge } from '../components/icon'
 import { Input, Select } from '../components/input'
 import { CenterBottom, TwoColumnsGrid } from '../components/layout'
 import { Panel } from '../components/paper'
 import { Toggle } from '../components/toggle'
 import { StatusSlider, ValueSlider } from '../compounds/slider'
+import { Tools } from '../compounds/tools'
+import { InteractionContext } from '../../domain/interaction'
 
 export const ProjectModal: React.FC = () => {
   const { selectedProject, addProject } = useContext(AppContext)
+  const { mode, setMode } = useContext(InteractionContext)
 
   return (
     <CenterBottom>
       {selectedProject ? (
         <ProjectDetail selectedProject={selectedProject} />
       ) : (
-        <FloatingButton onClick={addProject}>Add Project</FloatingButton>
+        <Tools
+          buttons={[
+            <button
+              onClick={addProject}
+              className={`w-12 text-gray-800 ${mode === 'addNode' ? 'text-gray-400' : ''}`}
+            >
+              +
+            </button>,
+            <button
+              onClick={() => setMode('addEdge')}
+              className={`w-12 text-gray-800 ${mode === 'addEdge' ? 'text-gray-400' : ''}`}
+            >
+              ⤴
+            </button>,
+          ]}
+        />
       )}
     </CenterBottom>
   )

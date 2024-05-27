@@ -1,20 +1,19 @@
 import { StaticStatus, UpdateProjectInput } from 'common'
-import { EdgeItem, NodeItem, makeGraphNetwork } from 'graph'
 import { createContext, useEffect, useState } from 'react'
 import { getProject } from '../data/api'
-import { useProjects } from '../data/store/projects'
+import { useProjectsStore } from '../data/store/projects'
 import { StaticProjectData } from '../types'
 import { convertProjectsIntoNetworkData } from './network'
 import { filterUnlockOptions, getUnlockProjects } from './relation'
-
-export const network = makeGraphNetwork<NodeItem, EdgeItem>()
+import { network } from './network'
+import { InteractionStore, NodeConnection } from './interaction'
 
 export const AppContext = createContext<AppState>({} as AppState)
 
 export type AppState = ReturnType<typeof useAppState>
 
-export const useAppState = () => {
-  const { projects, createProject, deleteProject, updateProject } = useProjects()
+export const useAppState = ({ connection }: InteractionStore) => {
+  const { projects, createProject, deleteProject, updateProject } = useProjectsStore()
   const [selectedProject, setSelectedProject] = useState<StaticProjectData>()
   const unlockProjects = selectedProject ? getUnlockProjects(projects, selectedProject) : undefined
   const unlockOptions = selectedProject ? filterUnlockOptions(projects, selectedProject) : undefined
@@ -78,6 +77,23 @@ export const useAppState = () => {
     })
   }
 
+  const connectProjects = async ({ from, to }: NodeConnection) => {
+    const fromPj = projects.find((pj) => pj.projectId === from)
+    if (!fromPj) return
+    const options = filterUnlockOptions(projects, fromPj).map((p) => p.projectId)
+    if (!options.includes(to)) return
+    await updateProject({
+      ...fromPj,
+      unlocks: [...fromPj.unlocks, to],
+    })
+  }
+
+  useEffect(() => {
+    if (connection) {
+      connectProjects(connection)
+    }
+  }, [connection])
+
   const removeProjectUnlocks = (rm: string) => {
     if (!selectedProject) return
     editProject({
@@ -109,5 +125,6 @@ export const useAppState = () => {
     updateProjectStatus,
     unlockProjects,
     unlockOptions,
+    connectProjects,
   }
 }

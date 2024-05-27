@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react'
 import { StaticProjectData } from '../../types'
 import * as api from '../api'
 
-export type ProjectStore = ReturnType<typeof useProjects>
+export type ProjectStore = ReturnType<typeof useProjectsStore>
 
-export const useProjects = () => {
+export const useProjectsStore = () => {
   const [projects, setProjects] = useState<StaticProjectData[]>([])
 
   const fetchProjects = async () => {

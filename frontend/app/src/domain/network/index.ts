@@ -1,3 +1,4 @@
+import { EdgeItem, NodeItem, makeGraphNetwork } from 'graph'
 import { NodeColors } from '../../constants'
 import { DynamicProjectData, StaticProjectData } from '../../types'
 import {
@@ -5,6 +6,8 @@ import {
   calcProjectDynamicValue,
   updateImportantNodesAsUrgent,
 } from './dynamic'
+
+export const network = makeGraphNetwork<NodeItem, EdgeItem>()
 
 export const convertProjectsIntoNetworkData = (pjs: StaticProjectData[]) => {
   const dynamicPjData = convertStaticProjects(pjs)
@@ -30,8 +33,8 @@ export const convertProjectIntoNode = (pj: DynamicProjectData) => {
     pj.dynamicStatus === 'done' ? pj.staticValue : Math.min(pj.dynamicValue, 30) * pj.staticValue
   return {
     id: pj.projectId,
-    label: pj.staticStatus === 'done' ? undefined : pj.title,
-    title: pj.staticStatus !== 'done' ? undefined : pj.title,
+    label: pj.staticStatus === 'done' ? '' : pj.title,
+    title: pj.staticStatus !== 'done' ? '' : pj.title,
     size: 10 + constrainedDynamicValue / 2, // 10 ~ 80
     mass: 1 + constrainedDynamicValue / 10, // 1 ~ 10
     color: {
