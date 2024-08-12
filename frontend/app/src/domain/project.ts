@@ -1,22 +1,32 @@
-import { ProjectStatus, UpdateProjectInput } from 'common'
 import { createContext, useEffect, useState } from 'react'
-import { getProject } from '../data/api'
-import { useProjectsStore } from '../data/store/projects'
-import { StaticProjectData } from '../types'
-import { convertProjectsIntoNetworkData } from './network'
-import { filterUnlockOptions, getUnlockProjects } from './relation'
-import { network } from './network'
+import { makeUseCases, Project } from 'use-cases'
+import { ProjectImportance, ProjectStatus } from 'use-cases/src/project'
+import { useOfflineProjectsStore } from '../data/store/offline'
 import { InteractionStore, NodeConnection } from './interaction'
+import { convertProjectsIntoNetworkData, network } from './network'
 
 export const AppContext = createContext<AppState>({} as AppState)
 
 export type AppState = ReturnType<typeof useAppState>
 
 export const useAppState = ({ connection }: InteractionStore) => {
-  const { projects, createProject, deleteProject, updateProject } = useProjectsStore()
-  const [selectedProject, setSelectedProject] = useState<StaticProjectData>()
-  const unlockProjects = selectedProject ? getUnlockProjects(projects, selectedProject) : undefined
-  const unlockOptions = selectedProject ? filterUnlockOptions(projects, selectedProject) : undefined
+  const store = useOfflineProjectsStore()
+  const useCases = makeUseCases(store)
+
+  const [projects, setProjects] = useState<Project[]>([])
+
+  const [selectedProject, setSelectedProject] = useState<Project>()
+  const [unlockOptions, setUnlockOptions] = useState<Project[]>([])
+
+  const refresh = async () => {
+    const pjs = await useCases.fetchAllProjects()
+    setProjects(pjs)
+    console.log(pjs)
+  }
+
+  useEffect(() => {
+    refresh()
+  }, [])
 
   useEffect(() => {
     async function init() {
@@ -30,62 +40,44 @@ export const useAppState = ({ connection }: InteractionStore) => {
   }, [projects])
 
   const selectProject = async (projectId: string) => {
-    const pj = await getProject(projectId)
-    if (pj) {
-      setSelectedProject(pj)
-    }
+    const {project, availableUnlockOptions} = await useCases.getProjectDetail(projectId)
+    setSelectedProject(project)
+    setUnlockOptions(availableUnlockOptions)
   }
 
   const unselectProject = () => setSelectedProject(undefined)
 
   const addProject = async () => {
-    const pj = await createProject({ title: 'new project' })
-    if (pj) {
-      setSelectedProject(pj)
-      // TODO: focus on the node
-    }
+    const newPj = await useCases.createNewProject({ title: 'new project' })
+    refresh()
+    setSelectedProject(newPj)
   }
 
-  const editProject = async (update: Partial<Omit<UpdateProjectInput, 'projectId'>>) => {
+  const editProject = async (update: Partial<Project>) => {
     if (!selectedProject) return
-    const result = await updateProject({ ...selectedProject, ...update })
-    if (result) {
-      setSelectedProject(result)
-      return result
-    }
+    await useCases.updateProjectProperties(selectedProject, update)
   }
 
   const editProjectTitle = (newTitle: string) =>
     editProject({
       title: newTitle,
     })
-
-  const updateProjectValue = (value: number) =>
+  const updateProjectImportance = (importance: ProjectImportance) =>
     editProject({
-      staticValue: value,
+      importance,
     })
-
   const updateProjectStatus = (status: ProjectStatus) =>
     editProject({
-      staticStatus: status,
+      status,
     })
 
-  const addProjectUnlocks = (pjId: string) => {
+  const addProjectUnlocks = async (pjId: string) => {
     if (!selectedProject) return
-    editProject({
-      unlocks: [...selectedProject.unlocks, pjId],
-    })
+    await useCases.addUnlockingProjects(selectedProject, pjId)
   }
 
   const connectProjects = async ({ from, to }: NodeConnection) => {
-    const fromPj = projects.find((pj) => pj.projectId === from)
-    if (!fromPj) return
-    const options = filterUnlockOptions(projects, fromPj).map((p) => p.projectId)
-    if (!options.includes(to)) return
-    await updateProject({
-      ...fromPj,
-      unlocks: [...fromPj.unlocks, to],
-    })
+    await useCases.addUnlockingProjects(from, to)
   }
 
   useEffect(() => {
@@ -94,22 +86,18 @@ export const useAppState = ({ connection }: InteractionStore) => {
     }
   }, [connection])
 
-  const removeProjectUnlocks = (rm: string) => {
+  const removeProjectUnlocks = async (rm: string) => {
     if (!selectedProject) return
-    editProject({
-      unlocks: selectedProject.unlocks.filter((u) => u !== rm),
-    })
-    network.removeEdge({ from: selectedProject.projectId, to: rm })
+    await useCases.removeProjectUnlocks(selectedProject, rm)
+    network.removeEdge({ from: selectedProject.id, to: rm })
   }
 
   const removeProject = async () => {
     if (!selectedProject) return
-    const result = await deleteProject(selectedProject.projectId)
-    if (result) {
-      unselectProject()
-      network.removeNode(selectedProject.projectId)
-      network.removeEdgesByNode(selectedProject.projectId)
-    }
+    await useCases.deleteProject(selectedProject.id)
+    network.removeNode(selectedProject.id)
+    network.removeEdgesByNode(selectedProject.id)
+    unselectProject()
   }
 
   return {
@@ -121,10 +109,9 @@ export const useAppState = ({ connection }: InteractionStore) => {
     removeProjectUnlocks,
     removeProject,
     selectedProject,
-    updateProjectValue,
+    updateProjectValue: updateProjectImportance,
     updateProjectStatus,
-    unlockProjects,
-    unlockOptions,
     connectProjects,
+    unlockOptions
   }
 }

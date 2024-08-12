@@ -1,25 +1,43 @@
-import { CreateProjectInput, UpdateProjectInput } from 'common'
 import { useEffect, useState } from 'react'
-import { StaticProjectData } from '../../types'
+import { DataStore, makeProject } from 'use-cases'
 import * as api from '../api'
+import { Project } from 'use-cases'
+
+export type RawProjectData = Omit<Project, 'value' | 'unlocks'> & {
+  unlocks: string[]
+}
 
 export type ProjectStore = ReturnType<typeof useProjectsStore>
 
-export const useProjectsStore = () => {
-  const [projects, setProjects] = useState<StaticProjectData[]>([])
+export const useProjectsStore = (): DataStore => {
+  const [projects, setProjects] = useState<RawProjectData[]>([])
 
-  const fetchProjects = async () => {
+  const convertRawProject = (raw: RawProjectData): Project => {
+    return makeProject({
+      ...raw,
+      get unlocks() {
+        if (raw.unlocks.length === 0) return []
+        return projects.filter((pj) => raw.unlocks.includes(pj.id)).map(convertRawProject)
+      },
+    })
+  }
+
+  const initProjects = async () => {
     const pjs = await api.listProjects()
     pjs && setProjects(pjs)
+  }
+  
+  const fetchProjects = async (): Promise<Project[]> => {
+    return projects.map(convertRawProject)
   }
 
   useEffect(() => {
     if (projects.length) return
-    fetchProjects()
-  }, [projects, fetchProjects])
+    initProjects()
+  }, [projects, initProjects])
 
-  const createProject = async (input: CreateProjectInput) => {
-    const newProject = await api.createProject(input)
+  const createProject: DataStore['createProject'] = async (newPj) => {
+    const newProject = await api.createProject(newPj)
     if (newProject) {
       setProjects([...projects, newProject])
       return newProject
@@ -44,6 +62,7 @@ export const useProjectsStore = () => {
 
   return {
     projects,
+    fetchProjects,
     createProject,
     updateProject,
     deleteProject,

@@ -1,5 +1,9 @@
 export type Project = {
   /**
+   * UUID
+   */
+  id: string
+  /**
    * project description
    */
   title: string
@@ -16,7 +20,6 @@ export type Project = {
    * status of this project
    */
   status: ProjectStatus
-  
 }
 
 export type ProjectImportance = 1 | 2 | 3 | 4 | 5

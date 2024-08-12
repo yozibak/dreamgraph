@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../domain/project'
-import { StaticProjectData } from '../../types'
+import { Project } from 'use-cases'
 import { CircleWithEdge } from '../components/icon'
 import { Input, Select } from '../components/input'
 import { CenterBottom, TwoColumnsGrid } from '../components/layout'
@@ -40,7 +40,7 @@ export const ProjectModal: React.FC = () => {
   )
 }
 
-const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selectedProject }) => {
+const ProjectDetail: React.FC<{ selectedProject: Project }> = ({ selectedProject }) => {
   const { updateProjectStatus, updateProjectValue } = useContext(AppContext)
   return (
     <Panel className="min-w-80 p-8">
@@ -60,7 +60,7 @@ const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selec
         <div>
           <ValueSlider
             onChange={(v) => updateProjectValue(v)}
-            value={selectedProject.staticValue}
+            value={selectedProject.importance}
           />
         </div>
 
@@ -68,7 +68,7 @@ const ProjectDetail: React.FC<{ selectedProject: StaticProjectData }> = ({ selec
         <div>
           <StatusSlider
             onChange={(v) => updateProjectStatus(v)}
-            value={selectedProject.staticStatus}
+            value={selectedProject.status}
           />
         </div>
 
@@ -127,18 +127,18 @@ const ProjectTitleInput: React.FC<{ onFinish: () => void; title: string }> = ({
 }
 
 const Unlocks: React.FC = () => {
-  const { removeProjectUnlocks, selectProject, unlockProjects } = useContext(AppContext)
-  if (!unlockProjects) return
-  return unlockProjects.map((pj) => (
-    <div className="flex flex-row" key={pj.projectId}>
+  const { removeProjectUnlocks, selectProject, selectedProject } = useContext(AppContext)
+  if (!selectedProject) return
+  return selectedProject?.unlocks.map((pj) => (
+    <div className="flex flex-row" key={pj.id}>
       <CircleWithEdge />
       <div
-        onClick={() => selectProject(pj.projectId)}
+        onClick={() => selectProject(pj.id)}
         className="px-3 text-lg mb-px cursor-pointer"
       >
         {pj.title}
       </div>
-      <button onClick={() => removeProjectUnlocks(pj.projectId)} className="text-red-600 text-sm">
+      <button onClick={() => removeProjectUnlocks(pj.id)} className="text-red-600 text-sm">
         remove
       </button>
     </div>
@@ -158,7 +158,7 @@ const UnlockSelect: React.FC = () => {
     >
       <option value="">+</option>
       {unlockOptions.map((pj) => (
-        <option key={pj.projectId} value={pj.projectId}>
+        <option key={pj.id} value={pj.id}>
           {pj.title}
         </option>
       ))}
