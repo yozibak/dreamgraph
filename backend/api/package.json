@@ -9,7 +9,7 @@
     "@aws-sdk/client-appsync": "^3.574.0",
     "@aws-sdk/client-dynamodb": "^3.576.0",
     "@aws-sdk/util-dynamodb": "^3.576.0",
-    "common": "workspace:^"
+    "domain": "workspace:^"
   },
   "devDependencies": {
     "@aws-appsync/utils": "^1.7.0",

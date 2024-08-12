@@ -1,4 +1,4 @@
-import { StaticStatus, UpdateProjectInput } from 'common'
+import { ProjectStatus, UpdateProjectInput } from 'common'
 import { createContext, useEffect, useState } from 'react'
 import { getProject } from '../data/api'
 import { useProjectsStore } from '../data/store/projects'
@@ -65,7 +65,7 @@ export const useAppState = ({ connection }: InteractionStore) => {
       staticValue: value,
     })
 
-  const updateProjectStatus = (status: StaticStatus) =>
+  const updateProjectStatus = (status: ProjectStatus) =>
     editProject({
       staticStatus: status,
     })
