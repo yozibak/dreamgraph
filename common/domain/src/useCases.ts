@@ -7,7 +7,7 @@ import {
   doesMakeLoop,
 } from './project'
 
-export type Project = ProjectEntity & {  
+export type Project = ProjectEntity & {
   /**
    * the calculated value of completing this project
    */
@@ -29,7 +29,7 @@ export type DataStore = {
   fetchProjects: () => Promise<Project[]>
   getProject: (id: Project['id']) => Promise<Project>
   createProject: (newPj: Omit<Project, 'value'>) => Promise<Project>
-  updateProject: (updatedPj: Project) => Promise<void>
+  updateProject: (updatedPj: Project) => Promise<Project>
   deleteProject: (id: Project['id']) => Promise<void>
 }
 
@@ -57,7 +57,7 @@ export const updateProjectProperties =
       ...original,
       ...updateProps,
     }
-    void (await store.updateProject(update))
+    return await store.updateProject(update)
   }
 
 export const addUnlockingProjects =
@@ -80,7 +80,7 @@ export const removeProjectUnlocks =
     const unlockPj = await store.getProject(unlock)
     const update: Parameters<DataStore['updateProject']>[0] = {
       ...original,
-      unlocks: original.unlocks.filter(p => p !== unlockPj)
+      unlocks: original.unlocks.filter((p) => p !== unlockPj),
     }
     void (await store.updateProject(update))
   }
@@ -96,9 +96,9 @@ export const getProjectDetail = (store: DataStore) => async (id: Project['id']) 
     (other) =>
       project.id !== other.id &&
       !project.unlocks.includes(other) &&
-      !doesMakeLoop({...project, unlocks: [...project.unlocks, other]})
+      !doesMakeLoop({ ...project, unlocks: [...project.unlocks, other] })
   )
-  return { project, availableUnlockOptions}
+  return { project, availableUnlockOptions }
 }
 
 export const deleteProject = (store: DataStore) => async (project: Project | Project['id']) => {
@@ -124,5 +124,5 @@ export const makeUseCases = (store: DataStore) => ({
   getProjectDetail: getProjectDetail(store),
   deleteProject: deleteProject(store),
   addUnlockingProjects: addUnlockingProjects(store),
-  removeProjectUnlocks: removeProjectUnlocks(store)
+  removeProjectUnlocks: removeProjectUnlocks(store),
 })
