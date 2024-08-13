@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import {
   DefaultProjectImportance,
   DefaultProjectStatus,
-  Project as ProjectEntity,
+  ProjectEntity as ProjectEntity,
   calcProjectValue,
   doesMakeLoop,
 } from './project'
@@ -13,6 +13,17 @@ export type Project = ProjectEntity & {
    */
   value: number
 }
+
+export const convertEntity = (entity: ProjectEntity):Project => ({
+  id: entity.id,
+  title: entity.title,
+  status: entity.status,
+  importance: entity.importance,
+  unlocks: entity.unlocks,
+  get value() {
+    return calcProjectValue(this)
+  },
+})
 
 export const makeProject = (pj?: Partial<ProjectEntity>): Project => ({
   id: uuid(),

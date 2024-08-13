@@ -1,6 +1,6 @@
 import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 import * as ddb from '@aws-appsync/utils/dynamodb'
-import { ProjectDynamoKey, UpdateProjectInput } from 'common'
+import { ProjectDynamoKey, UpdateProjectInput } from '../types'
 
 type PutProjectArgs = {
   input: UpdateProjectInput

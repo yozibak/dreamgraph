@@ -1,6 +1,10 @@
 import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 import * as ddb from '@aws-appsync/utils/dynamodb'
-import { ProjectData, DefaultStaticStatus, DefaultStaticValue } from 'common'
+import { ProjectData } from '../types'
+
+// TODO: API shouldn't know about entity's business rules like this
+const DefaultStaticStatus = 'normal'
+const DefaultStaticValue = 3
 
 type CreateProjectArgs = {
   input: Partial<ProjectData>

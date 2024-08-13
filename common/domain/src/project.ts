@@ -1,4 +1,4 @@
-export type Project = {
+export type ProjectEntity = {
   /**
    * data persistence
    */
@@ -11,7 +11,7 @@ export type Project = {
   /**
    * projects that can be unlocked by completing this project
    */
-  unlocks: Project[]
+  unlocks: ProjectEntity[]
   /**
    * perceived importance of this project
    */
@@ -28,16 +28,16 @@ export const DefaultProjectImportance: ProjectImportance = 3
 export type ProjectStatus = 'normal' | 'ongoing' | 'done'
 export const DefaultProjectStatus: ProjectStatus = 'normal'
 
-export const calcProjectValue = (pj: Project): number => {
+export const calcProjectValue = (pj: ProjectEntity): number => {
   return pj.unlocks.map(calcProjectValue).reduce((p, c) => p + c, pj.importance)
 }
 
-export const doesMakeLoop = (pj: Project): boolean => {
-  const checkUnlocks = (unlocks: Project[]): boolean =>
+export const doesMakeLoop = (pj: ProjectEntity): boolean => {
+  const checkUnlocks = (unlocks: ProjectEntity[]): boolean =>
     unlocks.some((unlock) => unlock.id === pj.id || checkUnlocks(unlock.unlocks))
   return checkUnlocks(pj.unlocks)
 }
 
-export const connectProjects = (pj: Project, ...conn: Project[]) => {
+export const connectProjects = (pj: ProjectEntity, ...conn: ProjectEntity[]) => {
   pj.unlocks.push(...conn)
 }

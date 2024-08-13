@@ -74,9 +74,6 @@ importers:
       '@aws-sdk/util-dynamodb':
         specifier: ^3.576.0
         version: 3.576.0(@aws-sdk/client-dynamodb@3.576.0)
-      domain:
-        specifier: workspace:^
-        version: link:../../common/domain
     devDependencies:
       '@aws-appsync/utils':
         specifier: ^1.7.0
@@ -109,6 +106,9 @@ importers:
       aws-amplify:
         specifier: ^6.3.0
         version: 6.3.0
+      backend-api:
+        specifier: workspace:^
+        version: link:../../backend/api
       graph:
         specifier: workspace:^
         version: link:../graph

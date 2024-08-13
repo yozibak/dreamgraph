@@ -1,6 +1,6 @@
-import { calcProjectValue, doesMakeLoop, Project } from './project'
+import { calcProjectValue, doesMakeLoop, ProjectEntity } from './project'
 
-const createProject = ({ importance }: Pick<Project, 'importance'>): Project => {
+const createProject = ({ importance }: Pick<ProjectEntity, 'importance'>): ProjectEntity => {
   return {
     id: Math.floor(Math.random() * 10000).toString(),
     title: '',
@@ -11,22 +11,22 @@ const createProject = ({ importance }: Pick<Project, 'importance'>): Project => 
 }
 
 test(`${calcProjectValue.name}`, () => {
-  const pj1: Project = createProject({
+  const pj1: ProjectEntity = createProject({
     importance: 1,
   })
-  const pj2: Project = createProject({
+  const pj2: ProjectEntity = createProject({
     importance: 2,
   })
-  const pj3: Project = createProject({
+  const pj3: ProjectEntity = createProject({
     importance: 3,
   })
-  const pj4: Project = createProject({
+  const pj4: ProjectEntity = createProject({
     importance: 4,
   })
-  const pj5: Project = createProject({
+  const pj5: ProjectEntity = createProject({
     importance: 5,
   })
-  const pj6: Project = createProject({
+  const pj6: ProjectEntity = createProject({
     importance: 5,
   })
   pj1.unlocks.push(pj2, pj3)

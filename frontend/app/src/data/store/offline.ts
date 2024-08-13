@@ -1,7 +1,5 @@
 import { DataStore, makeProject, Project } from 'use-cases'
 
-export type ProjectStore = ReturnType<typeof makeOfflineProjectsStore>
-
 export const makeOfflineProjectsStore = (): DataStore => {
   let projects: Project[] = []
   return {

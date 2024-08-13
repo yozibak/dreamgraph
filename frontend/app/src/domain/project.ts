@@ -4,12 +4,14 @@ import { ProjectImportance, ProjectStatus } from 'use-cases/src/project'
 import { makeOfflineProjectsStore } from '../data/store/offline'
 import { InteractionStore, NodeConnection } from './interaction'
 import { convertProjectsIntoNetworkData, network } from './network'
+import { makeCloudProjectStore } from '../data/store/projects'
 
 export const AppContext = createContext<AppState>({} as AppState)
 
 export type AppState = ReturnType<typeof useAppState>
 
-const store = makeOfflineProjectsStore()
+// const store = makeOfflineProjectsStore()
+const store = makeCloudProjectStore()
 const useCases = makeUseCases(store)
 
 export const useAppState = ({ connection }: InteractionStore) => {

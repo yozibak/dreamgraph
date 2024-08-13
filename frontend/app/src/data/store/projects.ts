@@ -1,70 +1,76 @@
-import { useEffect, useState } from 'react'
-import { DataStore, makeProject } from 'use-cases'
+import { convertEntity, DataStore, makeProject } from 'use-cases'
 import * as api from '../api'
+import type { RawProjectData } from '../api'
 import { Project } from 'use-cases'
 
-export type RawProjectData = Omit<Project, 'value' | 'unlocks'> & {
-  unlocks: string[]
+const convertRawData = (raw: RawProjectData): Project => {
+  const pj: Project = convertEntity({
+    title: raw.title,
+    id: raw.projectId,
+    unlocks: [], // handle this later
+    importance: raw.staticValue,
+    status: raw.staticStatus,
+  })
+  return pj
 }
 
-export type ProjectStore = ReturnType<typeof useProjectsStore>
-
-export const useProjectsStore = (): DataStore => {
-  const [projects, setProjects] = useState<RawProjectData[]>([])
-
-  const convertRawProject = (raw: RawProjectData): Project => {
-    return makeProject({
-      ...raw,
-      get unlocks() {
-        if (raw.unlocks.length === 0) return []
-        return projects.filter((pj) => raw.unlocks.includes(pj.id)).map(convertRawProject)
-      },
+// TODO: prob more than O(N^2) ?
+const convertProjects = (rawProjects: RawProjectData[]): Project[] => {
+  const pjs = rawProjects.map(convertRawData)
+  rawProjects.forEach((raw, idx) => {
+    const pj = pjs[idx]
+    raw.unlocks.forEach((unlockId) => {
+      const unlock = pjs.find((pj) => pj.id === unlockId)
+      if (!unlock) {
+        throw Error(`could not find unlock pj`)
+      }
+      pj.unlocks.push(unlock)
     })
-  }
+  })
+  return pjs
+}
 
-  const initProjects = async () => {
-    const pjs = await api.listProjects()
-    pjs && setProjects(pjs)
-  }
-  
-  const fetchProjects = async (): Promise<Project[]> => {
-    return projects.map(convertRawProject)
-  }
-
-  useEffect(() => {
-    if (projects.length) return
-    initProjects()
-  }, [projects, initProjects])
-
-  const createProject: DataStore['createProject'] = async (newPj) => {
-    const newProject = await api.createProject(newPj)
-    if (newProject) {
-      setProjects([...projects, newProject])
-      return newProject
-    }
-  }
-
-  const updateProject = async (input: UpdateProjectInput) => {
-    const updated = await api.updateProject(input)
-    if (updated) {
-      setProjects(projects.map((pj) => (pj.projectId === updated.projectId ? updated : pj)))
-      return updated
-    }
-  }
-
-  const deleteProject = async (projectId: string) => {
-    const result = await api.deleteProject(projectId)
-    if (result) {
-      setProjects(projects.filter((pj) => pj.projectId !== projectId))
-    }
-    return result
-  }
-
+const convertToRawData = (pj: Project): RawProjectData => {
   return {
-    projects,
-    fetchProjects,
-    createProject,
-    updateProject,
-    deleteProject,
+    projectId: pj.id,
+    title: pj.title,
+    unlocks: pj.unlocks.map((p) => p.id),
+    staticValue: pj.importance,
+    staticStatus: pj.status,
+  }
+}
+
+export const makeCloudProjectStore = (): DataStore => {
+  let projects: Project[] = []
+  return {
+    getProject: async (id) => {
+      const pj = projects.find((pj) => pj.id === id)
+      if (!pj) {
+        throw Error(`could not find the project`)
+      }
+      return pj
+    },
+    fetchProjects: async () => {
+      if (!projects.length) {
+        const pjs = await api.listProjects()
+        projects = pjs ? convertProjects(pjs) : []
+      }
+      return projects
+    },
+    createProject: async (newPj) => {
+      const newProject = makeProject(newPj)
+      await api.createProject(convertToRawData(newProject))
+      projects = [...projects, newProject]
+      return newProject
+    },
+    updateProject: async (updatePj) => {
+      await api.updateProject(convertToRawData(updatePj))
+      projects = projects.map((pj) => (pj.id === updatePj.id ? updatePj : pj))
+      return updatePj
+    },
+    deleteProject: async (id) => {
+      await api.deleteProject(id)
+      projects = projects.filter((pj) => pj.id !== id)
+    },
   }
 }
