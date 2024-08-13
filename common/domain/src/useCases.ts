@@ -53,36 +53,34 @@ export const updateProjectProperties =
     updateProps: Partial<Pick<ProjectEntity, 'importance' | 'status' | 'title'>>
   ) => {
     const original = typeof project === 'string' ? await store.getProject(project) : project
-    const update: Parameters<DataStore['updateProject']>[0] = {
-      ...original,
-      ...updateProps,
-    }
-    return await store.updateProject(update)
+    Object.assign(original, updateProps)
+    return await store.updateProject(original)
   }
 
 export const addUnlockingProjects =
   (store: DataStore) => async (project: Project | Project['id'], unlock: Project['id']) => {
     const original = typeof project === 'string' ? await store.getProject(project) : project
     const unlockPj = await store.getProject(unlock)
-    const update: Parameters<DataStore['updateProject']>[0] = {
+
+    // don't touch the object unless validated
+    const ifUpdated = {
       ...original,
       unlocks: [...original.unlocks, unlockPj],
     }
-    if (update.unlocks.length && doesMakeLoop(update)) {
+    if (doesMakeLoop(ifUpdated)) {
       throw new ProjectLoopError()
     }
-    void (await store.updateProject(update))
+
+    Object.assign(original, { unlocks: [...original.unlocks, unlockPj] })
+    return await store.updateProject(original)
   }
 
 export const removeProjectUnlocks =
   (store: DataStore) => async (project: Project | Project['id'], unlock: Project['id']) => {
     const original = typeof project === 'string' ? await store.getProject(project) : project
     const unlockPj = await store.getProject(unlock)
-    const update: Parameters<DataStore['updateProject']>[0] = {
-      ...original,
-      unlocks: original.unlocks.filter((p) => p !== unlockPj),
-    }
-    void (await store.updateProject(update))
+    Object.assign(original, { unlocks: original.unlocks.filter((p) => p !== unlockPj) })
+    return await store.updateProject(original)
   }
 
 export const fetchAllProjects = (store: DataStore) => async () => {
@@ -93,10 +91,7 @@ export const getProjectDetail = (store: DataStore) => async (id: Project['id']) 
   const allProjects = await store.fetchProjects()
   const project = await store.getProject(id)
   const availableUnlockOptions = allProjects.filter(
-    (other) =>
-      project.id !== other.id &&
-      !project.unlocks.includes(other) &&
-      !doesMakeLoop({ ...project, unlocks: [...project.unlocks, other] })
+    (other) => project.id !== other.id && !project.unlocks.includes(other)
   )
   return { project, availableUnlockOptions }
 }
@@ -114,7 +109,7 @@ export const deleteProject = (store: DataStore) => async (project: Project | Pro
     }
   }
 
-  void (await store.deleteProject(target.id))
+  return await store.deleteProject(target.id)
 }
 
 export const makeUseCases = (store: DataStore) => ({

@@ -1,6 +1,6 @@
 export type Project = {
   /**
-   * UUID
+   * data persistence
    */
   id: string
   /**
@@ -34,7 +34,7 @@ export const calcProjectValue = (pj: Project): number => {
 
 export const doesMakeLoop = (pj: Project): boolean => {
   const checkUnlocks = (unlocks: Project[]): boolean =>
-    unlocks.some((unlock) => unlock === pj || checkUnlocks(unlock.unlocks))
+    unlocks.some((unlock) => unlock.id === pj.id || checkUnlocks(unlock.unlocks))
   return checkUnlocks(pj.unlocks)
 }
 

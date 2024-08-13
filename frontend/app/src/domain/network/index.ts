@@ -12,7 +12,8 @@ export const convertProjectsIntoNetworkData = (pjs: Project[]) => {
 
 export const convertProjectIntoNode = (pj: Project) => {
   const colors = NodeColors[pj.status]
-  const constrainedDynamicValue = pj.value
+  const constrainedDynamicValue =
+    pj.status === 'done' ? pj.importance : Math.min(pj.value, 30) * pj.importance
   return {
     id: pj.id,
     label: pj.status === 'done' ? '' : pj.title,

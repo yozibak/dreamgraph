@@ -2,6 +2,7 @@ import { calcProjectValue, doesMakeLoop, Project } from './project'
 
 const createProject = ({ importance }: Pick<Project, 'importance'>): Project => {
   return {
+    id: Math.floor(Math.random() * 10000).toString(),
     title: '',
     unlocks: [],
     importance,

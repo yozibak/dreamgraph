@@ -16,4 +16,17 @@
     "typescript.preferences.importModuleSpecifier": "relative",
     "typescript.tsdk": "node_modules/typescript/lib",
   },
+  "launch": {
+    "configurations": [
+      {
+        "type": "chrome",
+        "name": "Debug on port 3000",
+        "request": "launch",
+        "url": "http://localhost:3000",
+        "webRoot": "${workspaceFolder}/frontend/app",
+        "sourceMaps": true,
+        "timeout": 10000
+    }
+    ],
+  },
 }
