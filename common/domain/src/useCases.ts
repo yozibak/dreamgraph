@@ -1,55 +1,81 @@
 import { v4 as uuid } from 'uuid'
-import {
-  DefaultProjectImportance,
-  DefaultProjectStatus,
-  ProjectEntity as ProjectEntity,
-  calcProjectValue,
-  doesMakeLoop,
-} from './project'
+import { IProjectGraph, Project, ProjectOrId } from './entities'
 
-export type Project = ProjectEntity & {
-  /**
-   * the calculated value of completing this project
-   */
-  value: number
-}
-
-export const convertEntity = (entity: ProjectEntity):Project => ({
-  id: entity.id,
-  title: entity.title,
-  status: entity.status,
-  importance: entity.importance,
-  unlocks: entity.unlocks,
-  get value() {
-    return calcProjectValue(this)
-  },
+/**
+ * initialize project with default value
+ */
+export const initProject = (pj: Partial<Project>): Project => ({
+  id: pj.id ?? uuid(),
+  title: pj.title ?? 'new project',
+  status: pj.status ?? 'normal',
+  importance: pj.importance ?? 3,
+  unlocks: pj.unlocks ?? [],
 })
 
-export const makeProject = (pj?: Partial<ProjectEntity>): Project => ({
-  id: uuid(),
-  title: pj?.title ?? 'new project',
-  status: pj?.status ?? DefaultProjectStatus,
-  importance: pj?.importance ?? DefaultProjectImportance,
-  unlocks: pj?.unlocks?.map(makeProject) ?? [],
-  get value() {
-    return calcProjectValue(this)
-  },
-})
+/**
+ * project data object with related object references
+ */
+type ProjectWithRelation = Omit<Project, 'unlocks'> & { unlocks: ProjectWithRelation[] }
 
-export type DataStore = {
-  fetchProjects: () => Promise<Project[]>
-  getProject: (id: Project['id']) => Promise<Project>
-  createProject: (newPj: Omit<Project, 'value'>) => Promise<Project>
-  updateProject: (updatedPj: Project) => Promise<Project>
-  deleteProject: (id: Project['id']) => Promise<void>
-}
+export type ProjectGraph = IProjectGraph<Project>
+export const makeProjectGraph = (): ProjectGraph => {
+  const projectTable: Record<string, Project> = {}
 
-export const createNewProject =
-  (store: DataStore) =>
-  async (pj?: Partial<ProjectEntity>): Promise<Project> => {
-    const newPj = makeProject(pj)
-    return await store.createProject(newPj)
+  const _getProjectUnlockGraph = (projectId: string): ProjectWithRelation => {
+    const pj = projectTable[projectId]
+    return {
+      ...pj,
+      unlocks: pj.unlocks.map(_getProjectUnlockGraph),
+    }
   }
+
+  const id = (pjOrId: ProjectOrId): Project['id'] =>
+    typeof pjOrId === 'string' ? pjOrId : pjOrId.id
+  const pj = (pjOrId: ProjectOrId): Project =>
+    typeof pjOrId === 'string' ? projectTable[pjOrId] : pjOrId
+
+  return {
+    get projects() {
+      return Object.values(projectTable).map((pj) => pj)
+    },
+    loadProjects(projects) {
+      projects.forEach(pj => {
+        projectTable[pj.id] = pj
+      })
+    },
+    getProjectById(projectId) {
+      return projectTable[projectId]
+    },
+    insertProject(newProject) {
+      projectTable[newProject.id] = newProject
+    },
+    updateProject(update) {
+      projectTable[update.id] = update
+    },
+    removeProject(rmProjectId) {
+      delete projectTable[rmProjectId]
+    },
+    connect(from, to) {
+      pj(from).unlocks.push(id(to))
+    },
+    disconnect(from, to) {
+      const unlocks = pj(from).unlocks
+      pj(from).unlocks = unlocks.filter((u) => u !== id(to))
+    },
+    willMakeLoop(from, to) {
+      const fromId = id(from)
+      const checkUnlocks = (unlocks: ProjectWithRelation[]): boolean =>
+        unlocks.some((unlock) => unlock.id === fromId || checkUnlocks(unlock.unlocks))
+      const toPj = _getProjectUnlockGraph(id(to))
+      return checkUnlocks(toPj.unlocks)
+    },
+    valueOf(project) {
+      const calcPjValue = (pj: ProjectWithRelation): number =>
+        pj.unlocks.map(calcPjValue).reduce((p, c) => p + c, pj.importance)
+      return calcPjValue(_getProjectUnlockGraph(id(project)))
+    },
+  }
+}
 
 export class ProjectLoopError extends Error {
   constructor() {
@@ -57,78 +83,76 @@ export class ProjectLoopError extends Error {
   }
 }
 
-export const updateProjectProperties =
-  (store: DataStore) =>
-  async (
-    project: Project | Project['id'],
-    updateProps: Partial<Pick<ProjectEntity, 'importance' | 'status' | 'title'>>
-  ) => {
-    const original = typeof project === 'string' ? await store.getProject(project) : project
-    Object.assign(original, updateProps)
-    return await store.updateProject(original)
-  }
-
-export const addUnlockingProjects =
-  (store: DataStore) => async (project: Project | Project['id'], unlock: Project['id']) => {
-    const original = typeof project === 'string' ? await store.getProject(project) : project
-    const unlockPj = await store.getProject(unlock)
-
-    // don't touch the object unless validated
-    const ifUpdated = {
-      ...original,
-      unlocks: [...original.unlocks, unlockPj],
-    }
-    if (doesMakeLoop(ifUpdated)) {
-      throw new ProjectLoopError()
-    }
-
-    Object.assign(original, { unlocks: [...original.unlocks, unlockPj] })
-    return await store.updateProject(original)
-  }
-
-export const removeProjectUnlocks =
-  (store: DataStore) => async (project: Project | Project['id'], unlock: Project['id']) => {
-    const original = typeof project === 'string' ? await store.getProject(project) : project
-    const unlockPj = await store.getProject(unlock)
-    Object.assign(original, { unlocks: original.unlocks.filter((p) => p !== unlockPj) })
-    return await store.updateProject(original)
-  }
-
-export const fetchAllProjects = (store: DataStore) => async () => {
-  return await store.fetchProjects()
+export type DataStore = {
+  fetchProjects: () => Promise<Project[]>
+  createProject: (newPj: Omit<Project, 'value'>) => Promise<Project>
+  updateProject: (updatedPj: Project) => Promise<Project>
+  deleteProject: (id: Project['id']) => Promise<void>
 }
 
-export const getProjectDetail = (store: DataStore) => async (id: Project['id']) => {
-  const allProjects = await store.fetchProjects()
-  const project = await store.getProject(id)
-  const availableUnlockOptions = allProjects.filter(
-    (other) => project.id !== other.id && !project.unlocks.includes(other)
-  )
-  return { project, availableUnlockOptions }
-}
-
-export const deleteProject = (store: DataStore) => async (project: Project | Project['id']) => {
-  const target = typeof project === 'string' ? await store.getProject(project) : project
-
-  // disconnect target if present in unlocks
-  const unlockTargetProjects = (await store.fetchProjects()).filter((pj) =>
-    pj.unlocks.includes(target)
-  )
-  if (unlockTargetProjects.length) {
-    for (const pj of unlockTargetProjects) {
-      store.updateProject({ ...pj, unlocks: pj.unlocks.filter((p) => p !== target) })
-    }
+export const makeGraphUseCases = (store: DataStore) => {
+  const projectGraph: ProjectGraph = makeProjectGraph()
+  const getPj = (pjOrId: ProjectOrId) =>
+    typeof pjOrId === 'string' ? projectGraph.getProjectById(pjOrId) : pjOrId
+  return {
+    init: async () => {
+      const projects = await store.fetchProjects()
+      projectGraph.loadProjects(projects)
+    },
+    insertNewProject: async (pj: Partial<Project>) => {
+      const newPj = initProject(pj)
+      await store.createProject(newPj)
+      projectGraph.insertProject(newPj)
+    },
+    updateProjectProperties: async (
+      target: ProjectOrId,
+      updateProps: Partial<Pick<Project, 'importance' | 'status' | 'title'>>
+    ) => {
+      const original = getPj(target)
+      const update = { ...original, updateProps }
+      await store.updateProject(update)
+      projectGraph.updateProject(update)
+    },
+    addUnlockingProjects: async (target: ProjectOrId, unlock: Project['id']) => {
+      const project = getPj(target)
+      if (projectGraph.willMakeLoop(project, unlock)) {
+        throw new ProjectLoopError()
+      }
+      await store.updateProject({ ...project, unlocks: [...project.unlocks, unlock] })
+      projectGraph.connect(target, unlock)
+    },
+    removeProjectUnlocks: async (target: ProjectOrId, unlock: Project['id']) => {
+      const project = getPj(target)
+      const update = { ...project, unlocks: project.unlocks.filter((p) => p !== unlock) }
+      await store.updateProject(update)
+      projectGraph.updateProject(update)
+    },
+    deleteProject: async (target: ProjectOrId) => {
+      const project = getPj(target)
+      
+      // disconnect target if present in others' unlocks
+      const relatedPjs = projectGraph.projects.filter((pj) => pj.unlocks.includes(project.id))
+      relatedPjs.forEach((rel) => projectGraph.disconnect(rel, project))
+      await Promise.all(
+        relatedPjs.map((relatedPj) =>
+          store.updateProject({
+            ...relatedPj,
+            unlocks: relatedPj.unlocks.filter((p) => p !== project.id),
+          })
+        )
+      )
+      await store.deleteProject(project.id)
+    },
+    readAll: () => {
+      return projectGraph.projects
+    },
+    getProjectDetail: (id: Project['id']) => {
+      const allProjects = projectGraph.projects
+      const project = projectGraph.getProjectById(id)
+      const availableUnlockOptions = allProjects.filter(
+        (other) => project.id !== other.id && !project.unlocks.includes(other.id)
+      )
+      return { project, availableUnlockOptions }
+    },
   }
-
-  return await store.deleteProject(target.id)
 }
-
-export const makeUseCases = (store: DataStore) => ({
-  createNewProject: createNewProject(store),
-  updateProjectProperties: updateProjectProperties(store),
-  fetchAllProjects: fetchAllProjects(store),
-  getProjectDetail: getProjectDetail(store),
-  deleteProject: deleteProject(store),
-  addUnlockingProjects: addUnlockingProjects(store),
-  removeProjectUnlocks: removeProjectUnlocks(store),
-})
