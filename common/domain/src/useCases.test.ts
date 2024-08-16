@@ -1,5 +1,11 @@
 import { Project } from './entities'
-import { DataStore, initProject, makeGraphUseCases, makeProjectGraph } from './useCases'
+import {
+  DataStore,
+  initProject,
+  makeGraphUseCases,
+  makeProjectGraph,
+  ProjectLoopError,
+} from './useCases'
 
 describe(`ProjectGraph`, () => {
   it(`can manage project data`, () => {
@@ -52,7 +58,7 @@ describe(`ProjectGraph`, () => {
       importance: 5,
     })
     const graph = makeProjectGraph()
-    graph.loadProjects([pj1, pj2, pj3, pj4,pj5, pj6])
+    graph.loadProjects([pj1, pj2, pj3, pj4, pj5, pj6])
     graph.connect(pj1, pj2)
     graph.connect(pj1, pj3)
     graph.connect(pj3, pj4)
@@ -70,181 +76,100 @@ describe(`ProjectGraph`, () => {
 })
 
 describe(`${makeGraphUseCases.name}`, () => {
-  const storedProjects: Project[] = [
-    initProject({}),
-    initProject({}),
-    initProject({}),
-  ]
   const store = {
     createProject: jest.fn(),
-    fetchProjects: jest.fn().mockResolvedValue(storedProjects),
+    fetchProjects: jest.fn(),
     updateProject: jest.fn(),
     deleteProject: jest.fn(),
   } satisfies DataStore
-  
+
+  beforeEach(() => store.fetchProjects.mockResolvedValue([]))
   afterEach(() => jest.resetAllMocks())
 
-  test(`insert new project`, async () => {
-    const graph = makeGraphUseCases(store)
-    await graph.init()
-    expect(graph.readAll()).toEqual(storedProjects)
+  const makeStoredProjects = (n = 3) => [...new Array(n)].map(initProject)
 
-    const newProject: Project = initProject({title: 'new!'})
+  test(`init`, async () => {
+    const storedProjects = makeStoredProjects()
+    store.fetchProjects.mockResolvedValue(storedProjects)
+    const graph = makeGraphUseCases(store)
+    await graph.initialize()
+    expect(graph.readAll()).toEqual(storedProjects)
+  })
+
+  test(`insert new project`, async () => {
+    const storedProjects = makeStoredProjects()
+    store.fetchProjects.mockResolvedValue(storedProjects)
+    const graph = makeGraphUseCases(store)
+    await graph.initialize()
+
+    const newProject: Project = initProject({ title: 'new pj' })
     await graph.insertNewProject(newProject)
+
     expect(store.createProject).toHaveBeenCalledWith(newProject)
     expect(graph.readAll()).toEqual([...storedProjects, newProject])
   })
+
+  test(`update a project's properties`, async () => {
+    const graph = makeGraphUseCases(store)
+
+    const newProject: Project = initProject({ title: 'foo' })
+    await graph.insertNewProject(newProject)
+    await graph.updateProjectProperties(newProject, { title: 'bar' })
+
+    expect(store.updateProject).toHaveBeenCalledWith({ ...newProject, title: 'bar' })
+    const updated = graph.getProjectById(newProject.id)
+    expect(updated).toEqual({ ...newProject, title: 'bar' })
+  })
+
+  test(`connect unlocking project`, async () => {
+    const projects = makeStoredProjects()
+    store.fetchProjects.mockResolvedValue(projects)
+    const graph = makeGraphUseCases(store)
+    await graph.initialize()
+
+    const [p1, p2, p3] = projects
+    await graph.connectUnlockingProject(p1, p2.id)
+
+    expect(store.updateProject).toHaveBeenCalledWith({ ...p1, unlocks: [p2.id] })
+    expect(graph.getProjectById(p1.id).unlocks).toEqual([p2.id])
+
+    await graph.connectUnlockingProject(p2, p3.id)
+    expect(store.updateProject).toHaveBeenLastCalledWith({ ...p2, unlocks: [p3.id] })
+    expect(graph.getProjectById(p2.id).unlocks).toEqual([p3.id])
+
+    const connectLoop = () => graph.connectUnlockingProject(p3, p1.id)
+    await expect(connectLoop).rejects.toThrow(ProjectLoopError)
+  })
+
+  test(`remove connection`, async () => {
+    const projects = makeStoredProjects()
+    store.fetchProjects.mockResolvedValue(projects)
+    const graph = makeGraphUseCases(store)
+    await graph.initialize()
+
+    const [p1, p2] = projects
+    await graph.connectUnlockingProject(p1, p2.id)
+    await graph.disconnectProjectUnlocks(p1, p2.id)
+
+    expect(store.updateProject).toHaveBeenCalledWith({ ...p1, unlocks: [] })
+    expect(graph.getProjectById(p1.id).unlocks).toEqual([])
+  })
+
+  test(`remove project`, async () => {
+    const projects = makeStoredProjects()
+    store.fetchProjects.mockResolvedValue(projects)
+    const graph = makeGraphUseCases(store)
+    await graph.initialize()
+
+    const [p1, p2] = projects
+    await graph.connectUnlockingProject(p1, p2.id)
+
+    await graph.removeProject(p2)
+    expect(graph.readAll()).toHaveLength(2)
+    expect(graph.getProjectById(p1.id).unlocks).toEqual([])
+  })
+
+  test.todo(`read all`)
+  test.todo(`get project by id`)
+  test.todo(`get project detail`)
 })
-
-// test(`${createNewProject.name}`, async () => {
-//   const create = createNewProject(store)
-//   await create({ title: 'foo bar' })
-//   expect(store.makeProject).toHaveBeenCalledTimes(1)
-//   expect((store.makeProject as jest.Mock).mock.calls[0][0]).toMatchObject({
-//     id: expect.any(String),
-//     title: 'foo bar',
-//     importance: 3,
-//     status: 'normal',
-//     unlocks: [],
-//   })
-// })
-
-// test(`${updateProjectProperties.name}`, async () => {
-//   const update = updateProjectProperties(store)
-//   ;(store.getProject as jest.Mock).mockResolvedValue({
-//     id: '1',
-//     title: 'foo bar',
-//     importance: 3,
-//     status: 'normal',
-//     unlocks: [],
-//     value: 3,
-//   })
-//   await update('1', { title: 'baz', importance: 5 })
-//   expect(store.getProject).toHaveBeenCalled()
-//   expect(store.updateProject).toHaveBeenCalled()
-//   expect((store.updateProject as jest.Mock).mock.calls[0][0]).toMatchObject({
-//     title: 'baz',
-//     importance: 5,
-//     status: 'normal',
-//     unlocks: [],
-//   })
-// })
-
-// describe(`${addUnlockingProjects.name}`, () => {
-//   it(`can add an project to unlocks list`, async () => {
-//     const addUnlock = addUnlockingProjects(store)
-//     const pjData = [initProject({ title: 'first' }), initProject({ title: 'second' })]
-//     ;(store.getProject as jest.Mock).mockImplementation((id) => pjData.find((p) => p.id === id)!)
-//     await addUnlock(pjData[0], pjData[1].id)
-//     expect(store.updateProject).toHaveBeenCalled()
-//     expect((store.updateProject as jest.Mock).mock.calls[0][0]).toMatchObject({
-//       title: 'first',
-//       importance: 3,
-//       status: 'normal',
-//       unlocks: [pjData[1]],
-//       value: 6, // now derived from the relation
-//     })
-//   })
-//   it(`cannot add an project that makes loop`, async () => {
-//     const addUnlock = addUnlockingProjects(store)
-//     const pjData = [initProject({ title: 'first' }), initProject({ title: 'second' })]
-//     ;(store.getProject as jest.Mock).mockImplementation((id) => pjData.find((p) => p.id === id)!)
-//     pjData[1].unlocks.push(pjData[0])
-
-//     const act = async () => await addUnlock(pjData[0], pjData[1].id)
-//     expect(act).rejects.toThrow(ProjectLoopError)
-//   })
-// })
-
-// test(`${removeProjectUnlocks.name}`, async () => {
-//   const removeUnlock = removeProjectUnlocks(store)
-//   const pjData = [initProject({ title: 'first' }), initProject({ title: 'second' })]
-//   pjData[0].unlocks.push(pjData[1])
-//   jest.spyOn(store, 'getProject').mockImplementation(async (id) => pjData.find((p) => p.id === id)!)
-//   expect(pjData[0].unlocks).toHaveLength(1)
-//   expect(pjData[0].value).toBe(6)
-
-//   await removeUnlock(pjData[0], pjData[1].id)
-//   expect(store.updateProject).toHaveBeenCalledWith({
-//     id: expect.any(String),
-//     title: 'first',
-//     importance: 3,
-//     status: 'normal',
-//     unlocks: [],
-//     value: 3,
-//   })
-// })
-
-// test(`${fetchAllProjects.name}`, async () => {
-//   const fetchPjs = fetchAllProjects(store)
-//   const pjData = [initProject({ title: 'first' }), initProject({ title: 'second' })]
-//   pjData[0].unlocks.push(pjData[1])
-//   ;(store.fetchProjects as jest.Mock).mockResolvedValue(pjData)
-//   const pjs = await fetchPjs()
-//   expect(pjs).toMatchObject(pjData)
-// })
-
-// test(`${getProjectDetail.name}`, async () => {
-//   const getPj = getProjectDetail(store)
-//   const pjData = [
-//     initProject({ title: 'first' }),
-//     initProject({ title: 'second' }),
-//     initProject({ title: 'third' }),
-//   ]
-//   pjData[1].unlocks.push(pjData[2])
-//   ;(store.fetchProjects as jest.Mock).mockResolvedValue(pjData)
-//   ;(store.getProject as jest.Mock).mockImplementation((id) => pjData.find((p) => p.id === id))
-
-//   const { project, availableUnlockOptions } = await getPj(pjData[0].id)
-//   expect(project).toMatchObject(pjData[0])
-//   expect(availableUnlockOptions).toHaveLength(2)
-// })
-
-// test(`${deleteProject.name}`, async () => {
-//   const [pj1, pj2, pj3]: Project[] = [...new Array(3)].map(initProject)
-//   pj1.unlocks.push(pj2, pj3)
-//   jest.spyOn(store, 'fetchProjects').mockResolvedValue([pj1, pj2, pj3])
-
-//   const deletePj = deleteProject(store)
-//   await deletePj(pj2)
-
-//   expect(store.updateProject).toHaveBeenCalledWith({ ...pj1, unlocks: [pj3] })
-//   expect(store.deleteProject).toHaveBeenCalledWith(pj2.id)
-// })
-
-// describe(`spread operator & gettter issue`, () => {
-//   it(`can override with the concrete value`, () => {
-//     const pj1 = initProject({ title: 'first' })
-//     const pj2 = initProject({ title: 'second' })
-//     expect(pj1.value).toBe(3)
-//     expect(pj2.value).toBe(3)
-//     const newPj1: Project = {
-//       ...pj1,
-//       unlocks: [...pj1.unlocks, pj2],
-//     }
-//     expect(newPj1.value).toBe(3) // still 3
-//   })
-//   it(`can be solved with explicit getter`, () => {
-//     const pj1 = initProject({ title: 'first' })
-//     const pj2 = initProject({ title: 'second' })
-//     expect(pj1.value).toBe(3)
-//     expect(pj2.value).toBe(3)
-//     const newPj1: Project = {
-//       ...pj1,
-//       unlocks: [...pj1.unlocks, pj2],
-//       get value() {
-//         return graph.valueOf(this)
-//       },
-//     }
-//     expect(newPj1.value).toBe(6) // still 3
-//   })
-//   it(`can be solved with Object.assign`, () => {
-//     const pj1 = initProject({ title: 'first' })
-//     const pj2 = initProject({ title: 'second' })
-//     expect(pj1.value).toBe(3)
-//     expect(pj2.value).toBe(3)
-//     Object.assign(pj1, { unlocks: [...pj1.unlocks, pj2] })
-
-//     expect(pj1.value).toBe(6) // still 3
-//   })
-// })

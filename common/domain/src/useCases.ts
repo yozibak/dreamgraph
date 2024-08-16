@@ -4,12 +4,12 @@ import { IProjectGraph, Project, ProjectOrId } from './entities'
 /**
  * initialize project with default value
  */
-export const initProject = (pj: Partial<Project>): Project => ({
-  id: pj.id ?? uuid(),
-  title: pj.title ?? 'new project',
-  status: pj.status ?? 'normal',
-  importance: pj.importance ?? 3,
-  unlocks: pj.unlocks ?? [],
+export const initProject = (pj?: Partial<Project>): Project => ({
+  id: pj?.id ?? uuid(),
+  title: pj?.title ?? 'new project',
+  status: pj?.status ?? 'normal',
+  importance: pj?.importance ?? 3,
+  unlocks: pj?.unlocks ?? [],
 })
 
 /**
@@ -29,22 +29,27 @@ export const makeProjectGraph = (): ProjectGraph => {
     }
   }
 
+  const getPj = (id: Project['id']): Project => {
+    if (id in projectTable) return projectTable[id]
+    throw new Error(`could not find ${id} in the graph`)
+  }
+
   const id = (pjOrId: ProjectOrId): Project['id'] =>
     typeof pjOrId === 'string' ? pjOrId : pjOrId.id
   const pj = (pjOrId: ProjectOrId): Project =>
-    typeof pjOrId === 'string' ? projectTable[pjOrId] : pjOrId
+    typeof pjOrId === 'string' ? getPj(pjOrId) : pjOrId
 
   return {
     get projects() {
       return Object.values(projectTable).map((pj) => pj)
     },
     loadProjects(projects) {
-      projects.forEach(pj => {
+      projects.forEach((pj) => {
         projectTable[pj.id] = pj
       })
     },
     getProjectById(projectId) {
-      return projectTable[projectId]
+      return getPj(projectId) //projectTable[projectId]
     },
     insertProject(newProject) {
       projectTable[newProject.id] = newProject
@@ -86,16 +91,21 @@ export class ProjectLoopError extends Error {
 export type DataStore = {
   fetchProjects: () => Promise<Project[]>
   createProject: (newPj: Omit<Project, 'value'>) => Promise<Project>
-  updateProject: (updatedPj: Project) => Promise<Project>
+  updateProject: (updatedPj: Partial<Project> & Pick<Project, 'id'>) => Promise<Project>
   deleteProject: (id: Project['id']) => Promise<void>
 }
 
 export const makeGraphUseCases = (store: DataStore) => {
   const projectGraph: ProjectGraph = makeProjectGraph()
   const getPj = (pjOrId: ProjectOrId) =>
-    typeof pjOrId === 'string' ? projectGraph.getProjectById(pjOrId) : pjOrId
+    typeof pjOrId === 'string'
+      ? projectGraph.getProjectById(pjOrId)
+      : projectGraph.getProjectById(pjOrId.id)
   return {
-    init: async () => {
+    /**
+     * initialize the graph nodes with stored data
+     */
+    initialize: async () => {
       const projects = await store.fetchProjects()
       projectGraph.loadProjects(projects)
     },
@@ -109,11 +119,15 @@ export const makeGraphUseCases = (store: DataStore) => {
       updateProps: Partial<Pick<Project, 'importance' | 'status' | 'title'>>
     ) => {
       const original = getPj(target)
-      const update = { ...original, updateProps }
+      const update = { ...original, ...updateProps }
       await store.updateProject(update)
       projectGraph.updateProject(update)
     },
-    addUnlockingProjects: async (target: ProjectOrId, unlock: Project['id']) => {
+    /**
+     * connect projects checking potential loop caused by the connection.
+     * rejects the operation if any loop detected
+     */
+    connectUnlockingProject: async (target: ProjectOrId, unlock: Project['id']) => {
       const project = getPj(target)
       if (projectGraph.willMakeLoop(project, unlock)) {
         throw new ProjectLoopError()
@@ -121,16 +135,20 @@ export const makeGraphUseCases = (store: DataStore) => {
       await store.updateProject({ ...project, unlocks: [...project.unlocks, unlock] })
       projectGraph.connect(target, unlock)
     },
-    removeProjectUnlocks: async (target: ProjectOrId, unlock: Project['id']) => {
+    disconnectProjectUnlocks: async (target: ProjectOrId, unlock: Project['id']) => {
       const project = getPj(target)
       const update = { ...project, unlocks: project.unlocks.filter((p) => p !== unlock) }
       await store.updateProject(update)
       projectGraph.updateProject(update)
     },
-    deleteProject: async (target: ProjectOrId) => {
+    /**
+     * remove a projet from graph,
+     * also removes any connections towards the removed project
+     */
+    removeProject: async (target: ProjectOrId) => {
       const project = getPj(target)
-      
-      // disconnect target if present in others' unlocks
+
+      // disconnect target pj in others' unlocks
       const relatedPjs = projectGraph.projects.filter((pj) => pj.unlocks.includes(project.id))
       relatedPjs.forEach((rel) => projectGraph.disconnect(rel, project))
       await Promise.all(
@@ -142,9 +160,13 @@ export const makeGraphUseCases = (store: DataStore) => {
         )
       )
       await store.deleteProject(project.id)
+      projectGraph.removeProject(project.id)
     },
     readAll: () => {
       return projectGraph.projects
+    },
+    getProjectById: (id: Project['id']) => {
+      return projectGraph.getProjectById(id)
     },
     getProjectDetail: (id: Project['id']) => {
       const allProjects = projectGraph.projects
