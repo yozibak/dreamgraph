@@ -5,66 +5,59 @@ import { CreateProjectInput, ProjectData, UpdateProjectInput } from 'backend-api
 
 export type RawProjectData = Omit<ProjectData, 'userId'>
 
-export const listProjects = async () => {
-  try {
-    const result = (await graphqlClient.graphql({
-      query: ListProjects,
-    })) as GraphQLResult<{ listProjects: RawProjectData[] }>
-    return result.data.listProjects
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e)
+export class APIRequestFailedError extends Error {
+  constructor(e: unknown) {
+    super(`api call failed: ${e}`)
   }
 }
 
-export const createProject = async (pj: CreateProjectInput) => {
-  try {
-    const result = (await graphqlClient.graphql({
-      query: CreateProject,
-      variables: pj,
-    })) as GraphQLResult<{ createProject: RawProjectData }>
-    return result.data.createProject
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e)
+const apiCall =
+  <A extends unknown[], R>(call: (...args: A) => Promise<R>) =>
+  async (...args: A) => {
+    try {
+      return await call(...args)
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e)
+      throw new APIRequestFailedError(e)
+    }
   }
-}
 
-export const deleteProject = async (projectId: string) => {
-  try {
-    const result = (await graphqlClient.graphql({
-      query: DeleteProject,
-      variables: { projectId },
-    })) as GraphQLResult<{ deleteProject: boolean }>
-    return result.data.deleteProject
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e)
-  }
-}
+export const listProjects = apiCall(async () => {
+  const result = (await graphqlClient.graphql({
+    query: ListProjects,
+  })) as GraphQLResult<{ listProjects: RawProjectData[] }>
+  return result.data.listProjects
+})
 
-export const updateProject = async (pj: UpdateProjectInput) => {
-  try {
-    const result = (await graphqlClient.graphql({
-      query: UpdateProject,
-      variables: pj,
-    })) as GraphQLResult<{ updateProject: RawProjectData }>
-    return result.data.updateProject
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e)
-  }
-}
+export const createProject = apiCall(async (pj: CreateProjectInput) => {
+  const result = (await graphqlClient.graphql({
+    query: CreateProject,
+    variables: pj,
+  })) as GraphQLResult<{ createProject: RawProjectData }>
+  return result.data.createProject
+})
 
-export const getProject = async (projectId: string) => {
-  try {
-    const result = (await graphqlClient.graphql({
-      query: GetProject,
-      variables: { projectId },
-    })) as GraphQLResult<{ getProject: RawProjectData }>
-    return result.data.getProject
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e)
-  }
-}
+export const deleteProject = apiCall(async (projectId: string) => {
+  const result = (await graphqlClient.graphql({
+    query: DeleteProject,
+    variables: { projectId },
+  })) as GraphQLResult<{ deleteProject: boolean }>
+  return result.data.deleteProject
+})
+
+export const updateProject = apiCall(async (pj: UpdateProjectInput) => {
+  const result = (await graphqlClient.graphql({
+    query: UpdateProject,
+    variables: pj,
+  })) as GraphQLResult<{ updateProject: RawProjectData }>
+  return result.data.updateProject
+})
+
+export const getProject = apiCall(async (projectId: string) => {
+  const result = (await graphqlClient.graphql({
+    query: GetProject,
+    variables: { projectId },
+  })) as GraphQLResult<{ getProject: RawProjectData }>
+  return result.data.getProject
+})

@@ -31,13 +31,12 @@ export const makeProjectGraph = (): ProjectGraph => {
 
   const getPj = (id: Project['id']): Project => {
     if (id in projectTable) return projectTable[id]
-    throw new Error(`could not find ${id} in the graph`)
+    throw new ProjectNotFoundError(id)
   }
 
   const id = (pjOrId: ProjectOrId): Project['id'] =>
     typeof pjOrId === 'string' ? pjOrId : pjOrId.id
-  const pj = (pjOrId: ProjectOrId): Project =>
-    typeof pjOrId === 'string' ? getPj(pjOrId) : pjOrId
+  const pj = (pjOrId: ProjectOrId): Project => (typeof pjOrId === 'string' ? getPj(pjOrId) : pjOrId)
 
   return {
     get projects() {
@@ -49,7 +48,7 @@ export const makeProjectGraph = (): ProjectGraph => {
       })
     },
     getProjectById(projectId) {
-      return getPj(projectId) //projectTable[projectId]
+      return getPj(projectId)
     },
     insertProject(newProject) {
       projectTable[newProject.id] = newProject
@@ -82,6 +81,12 @@ export const makeProjectGraph = (): ProjectGraph => {
   }
 }
 
+export class ProjectNotFoundError extends Error {
+  constructor(projectId: Project['id']) {
+    super(`could not find ${projectId} in the graph`)
+  }
+}
+
 export class ProjectLoopError extends Error {
   constructor() {
     super(`loop detected`)
@@ -90,9 +95,18 @@ export class ProjectLoopError extends Error {
 
 export type DataStore = {
   fetchProjects: () => Promise<Project[]>
-  createProject: (newPj: Omit<Project, 'value'>) => Promise<Project>
+  createProject: (newPj: Project) => Promise<Project>
   updateProject: (updatedPj: Partial<Project> & Pick<Project, 'id'>) => Promise<Project>
   deleteProject: (id: Project['id']) => Promise<void>
+}
+
+export type ProjectDetail = {
+  project: Project
+  availableUnlockOptions: Project[]
+}
+
+export type ProjectWithValue = Project & {
+  value: number
 }
 
 export const makeGraphUseCases = (store: DataStore) => {
@@ -109,11 +123,14 @@ export const makeGraphUseCases = (store: DataStore) => {
       const projects = await store.fetchProjects()
       projectGraph.loadProjects(projects)
     },
-    insertNewProject: async (pj: Partial<Project>) => {
+
+    insertNewProject: async (pj?: Partial<Project>) => {
       const newPj = initProject(pj)
       await store.createProject(newPj)
       projectGraph.insertProject(newPj)
+      return newPj
     },
+
     updateProjectProperties: async (
       target: ProjectOrId,
       updateProps: Partial<Pick<Project, 'importance' | 'status' | 'title'>>
@@ -123,6 +140,7 @@ export const makeGraphUseCases = (store: DataStore) => {
       await store.updateProject(update)
       projectGraph.updateProject(update)
     },
+
     /**
      * connect projects checking potential loop caused by the connection.
      * rejects the operation if any loop detected
@@ -135,12 +153,14 @@ export const makeGraphUseCases = (store: DataStore) => {
       await store.updateProject({ ...project, unlocks: [...project.unlocks, unlock] })
       projectGraph.connect(target, unlock)
     },
+
     disconnectProjectUnlocks: async (target: ProjectOrId, unlock: Project['id']) => {
       const project = getPj(target)
       const update = { ...project, unlocks: project.unlocks.filter((p) => p !== unlock) }
       await store.updateProject(update)
       projectGraph.updateProject(update)
     },
+
     /**
      * remove a projet from graph,
      * also removes any connections towards the removed project
@@ -162,13 +182,19 @@ export const makeGraphUseCases = (store: DataStore) => {
       await store.deleteProject(project.id)
       projectGraph.removeProject(project.id)
     },
-    readAll: () => {
-      return projectGraph.projects
+
+    readAll: (): ProjectWithValue[] => {
+      return projectGraph.projects.map((pj) => ({
+        ...pj,
+        value: projectGraph.valueOf(pj.id),
+      }))
     },
+
     getProjectById: (id: Project['id']) => {
       return projectGraph.getProjectById(id)
     },
-    getProjectDetail: (id: Project['id']) => {
+
+    getProjectDetail: (id: Project['id']): ProjectDetail => {
       const allProjects = projectGraph.projects
       const project = projectGraph.getProjectById(id)
       const availableUnlockOptions = allProjects.filter(

@@ -1,24 +1,45 @@
-import { DataStore, makeProject, Project } from 'use-cases'
+import { DataStore, Project, ProjectNotFoundError } from 'app-domain'
+
+const exampleProjects: Project[] = [
+  {
+    id: '1',
+    title: 'first',
+    status: 'normal',
+    importance: 3,
+    unlocks: ['2', '3'],
+  },
+  {
+    id: '2',
+    title: 'second',
+    status: 'normal',
+    importance: 3,
+    unlocks: ['3'],
+  },
+  {
+    id: '3',
+    title: 'third',
+    status: 'normal',
+    importance: 3,
+    unlocks: [],
+  },
+]
 
 export const makeOfflineProjectsStore = (): DataStore => {
-  let projects: Project[] = []
+  let projects: Project[] = exampleProjects
   return {
-    getProject: async (id) => {
-      const pj = projects.find((pj) => pj.id === id)
-      if (!pj) {
-        throw Error(`could not find the project`)
-      }
-      return pj
-    },
     fetchProjects: async () => projects,
     createProject: async (newPj) => {
-      const newProject = makeProject(newPj)
-      projects = [...projects, newProject]
-      return newProject
+      projects = [...projects, newPj]
+      return newPj
     },
     updateProject: async (updatePj) => {
-      projects = projects.map((pj) => (pj.id === updatePj.id ? updatePj : pj))
-      return updatePj
+      const pj = projects.find((pj) => pj.id === updatePj.id)
+      if (!pj) {
+        throw new ProjectNotFoundError(updatePj.id)
+      }
+      const update = { ...pj, ...updatePj }
+      projects = projects.map((pj) => (pj.id === updatePj.id ? update : pj))
+      return update
     },
     deleteProject: async (id) => {
       projects = projects.filter((pj) => pj.id !== id)

@@ -1,6 +1,7 @@
+import { ProjectDetail as ProjectDetailInfo } from 'app-domain'
 import React, { useContext, useEffect, useState } from 'react'
+import { InteractionContext } from '../../domain/interaction'
 import { AppContext } from '../../domain/project'
-import { Project } from 'use-cases'
 import { CircleWithEdge } from '../components/icon'
 import { Input, Select } from '../components/input'
 import { CenterBottom, TwoColumnsGrid } from '../components/layout'
@@ -8,16 +9,15 @@ import { Panel } from '../components/paper'
 import { Toggle } from '../components/toggle'
 import { StatusSlider, ValueSlider } from '../compounds/slider'
 import { Tools } from '../compounds/tools'
-import { InteractionContext } from '../../domain/interaction'
 
 export const ProjectModal: React.FC = () => {
-  const { selectedProject, addProject } = useContext(AppContext)
+  const { selectedProjectDetail, addProject } = useContext(AppContext)
   const { mode, setMode } = useContext(InteractionContext)
 
   return (
     <CenterBottom>
-      {selectedProject ? (
-        <ProjectDetail selectedProject={selectedProject} />
+      {selectedProjectDetail ? (
+        <ProjectDetail {...selectedProjectDetail} />
       ) : (
         <Tools
           buttons={[
@@ -40,36 +40,26 @@ export const ProjectModal: React.FC = () => {
   )
 }
 
-const ProjectDetail: React.FC<{ selectedProject: Project }> = ({ selectedProject }) => {
+const ProjectDetail: React.FC<ProjectDetailInfo> = ({ project, availableUnlockOptions }) => {
   const { updateProjectStatus, updateProjectValue } = useContext(AppContext)
   return (
     <Panel className="min-w-80 p-8">
       <TwoColumnsGrid>
         <div className="col-span-2">
           <Toggle
-            DefaultUI={({ toggle }) => (
-              <ProjectTitle title={selectedProject.title} goToEdit={toggle} />
-            )}
-            AltUI={({ toggle }) => (
-              <ProjectTitleInput title={selectedProject.title} onFinish={toggle} />
-            )}
+            DefaultUI={({ toggle }) => <ProjectTitle title={project.title} goToEdit={toggle} />}
+            AltUI={({ toggle }) => <ProjectTitleInput title={project.title} onFinish={toggle} />}
           />
         </div>
 
         <ProjectField fieldName="value" />
         <div>
-          <ValueSlider
-            onChange={(v) => updateProjectValue(v)}
-            value={selectedProject.importance}
-          />
+          <ValueSlider onChange={(v) => updateProjectValue(v)} value={project.importance} />
         </div>
 
         <ProjectField fieldName="status" />
         <div>
-          <StatusSlider
-            onChange={(v) => updateProjectStatus(v)}
-            value={selectedProject.status}
-          />
+          <StatusSlider onChange={(v) => updateProjectStatus(v)} value={project.status} />
         </div>
 
         <ProjectField fieldName="unlocks" />
@@ -127,18 +117,16 @@ const ProjectTitleInput: React.FC<{ onFinish: () => void; title: string }> = ({
 }
 
 const Unlocks: React.FC = () => {
-  const { removeProjectUnlocks, selectProject, selectedProject } = useContext(AppContext)
+  const { removeProjectUnlocks, selectProject, selectedProjectDetail } = useContext(AppContext)
+  const selectedProject = selectedProjectDetail?.project
   if (!selectedProject) return
-  return selectedProject?.unlocks.map((pj) => (
-    <div className="flex flex-row" key={pj.id}>
+  return selectedProject.unlocks.map((pjId) => (
+    <div className="flex flex-row" key={pjId}>
       <CircleWithEdge />
-      <div
-        onClick={() => selectProject(pj.id)}
-        className="px-3 text-lg mb-px cursor-pointer"
-      >
-        {pj.title}
+      <div onClick={() => selectProject(pjId)} className="px-3 text-lg mb-px cursor-pointer">
+        {pjId}
       </div>
-      <button onClick={() => removeProjectUnlocks(pj.id)} className="text-red-600 text-sm">
+      <button onClick={() => removeProjectUnlocks(pjId)} className="text-red-600 text-sm">
         remove
       </button>
     </div>
@@ -146,8 +134,9 @@ const Unlocks: React.FC = () => {
 }
 
 const UnlockSelect: React.FC = () => {
-  const { addProjectUnlocks, unlockOptions } = useContext(AppContext)
+  const { addProjectUnlocks, selectedProjectDetail } = useContext(AppContext)
 
+  const unlockOptions = selectedProjectDetail?.availableUnlockOptions
   if (!unlockOptions) return
   return (
     <Select

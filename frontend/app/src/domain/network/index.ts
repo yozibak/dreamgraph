@@ -1,16 +1,16 @@
 import { EdgeItem, NodeItem, makeGraphNetwork } from 'graph'
 import { NodeColors } from '../../constants'
-import { Project } from 'use-cases'
+import { Project, ProjectWithValue } from 'app-domain'
 
 export const network = makeGraphNetwork<NodeItem, EdgeItem>()
 
-export const convertProjectsIntoNetworkData = (pjs: Project[]) => {
+export const convertProjectsIntoNetworkData = (pjs: ProjectWithValue[]) => {
   const nodes = pjs.map(convertProjectIntoNode)
   const edges = pjs.flatMap(convertProjectIntoEdge)
   return { nodes, edges }
 }
 
-export const convertProjectIntoNode = (pj: Project) => {
+export const convertProjectIntoNode = (pj: ProjectWithValue) => {
   const colors = NodeColors[pj.status]
   const constrainedDynamicValue =
     pj.status === 'done' ? pj.importance : Math.min(pj.value, 30) * pj.importance
@@ -36,6 +36,6 @@ export const convertProjectIntoNode = (pj: Project) => {
 export const convertProjectIntoEdge = (pj: Project) => {
   return pj.unlocks.map((unlock) => ({
     from: pj.id,
-    to: unlock.id,
+    to: unlock,
   }))
 }

@@ -1,7 +1,7 @@
 {
-  "name": "serverless-chat",
+  "name": "dreamgraph",
   "version": "0.0.1",
-  "description": "serverless chat application",
+  "description": "graph driven project management tool",
   "author": "Katsumi Yoshida",
   "license": "ISC",
   "type": "module",

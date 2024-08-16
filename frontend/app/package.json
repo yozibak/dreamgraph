@@ -12,7 +12,7 @@
   "dependencies": {
     "@aws-amplify/ui-react": "^6.1.9",
     "aws-amplify": "^6.3.0",
-    "use-cases": "workspace:domain@^",
+    "app-domain": "workspace:domain@^",
     "backend-api": "workspace:^",
     "graph": "workspace:^",
     "react": "^18.2.0",

@@ -1,68 +1,62 @@
+import {
+  makeGraphUseCases,
+  Project,
+  ProjectImportance,
+  ProjectStatus,
+  ProjectWithValue,
+} from 'app-domain'
 import { createContext, useEffect, useState } from 'react'
-import { makeUseCases, Project } from 'use-cases'
-import { ProjectImportance, ProjectStatus } from 'use-cases/src/project'
 import { makeOfflineProjectsStore } from '../data/store/offline'
 import { InteractionStore, NodeConnection } from './interaction'
 import { convertProjectsIntoNetworkData, network } from './network'
-import { makeCloudProjectStore } from '../data/store/projects'
 
 export const AppContext = createContext<AppState>({} as AppState)
 
 export type AppState = ReturnType<typeof useAppState>
 
-// const store = makeOfflineProjectsStore()
-const store = makeCloudProjectStore()
-const useCases = makeUseCases(store)
+const store = makeOfflineProjectsStore()
+const useCases = makeGraphUseCases(store)
 
 export const useAppState = ({ connection }: InteractionStore) => {
-  const [projects, setProjects] = useState<Project[]>([])
-  const [selectedProject, setSelectedProject] = useState<Project>()
-  const [unlockOptions, setUnlockOptions] = useState<Project[]>([])
+  const [projects, setProjects] = useState<ProjectWithValue[]>([])
+  const [selectedId, setSelected] = useState<Project['id']>()
 
-  const refresh = async () => {
-    const pjs = await useCases.fetchAllProjects()
-    setProjects(pjs)
-  }
+  // update information everytime state changes
+  const selectedProjectDetail = selectedId ? useCases.getProjectDetail(selectedId) : undefined
 
   useEffect(() => {
-    refresh()
+    async function init() {
+      await useCases.initialize()
+      setProjects(useCases.readAll())
+    }
+    init()
   }, [])
 
   useEffect(() => {
-    async function updateNetworkGraph() {
-      if (projects.length) {
-        const { nodes, edges } = convertProjectsIntoNetworkData(projects)
-        nodes.forEach((n) => network.putNode(n))
-        edges.forEach((e) => network.putEdge(e))
-      }
-    }
-    updateNetworkGraph()
+    if (!projects.length) return
+    const { nodes, edges } = convertProjectsIntoNetworkData(projects)
+    nodes.forEach((n) => network.putNode(n))
+    edges.forEach((e) => network.putEdge(e))
   }, [projects])
 
   const mutate =
-    <Args extends unknown[]>(cb: (...args: Args) => unknown) =>
+    <Args extends unknown[]>(cb: (...args: Args) => Promise<void>) =>
     async (...args: Args) => {
       await cb(...args)
-      await refresh()
+      setProjects(useCases.readAll())
     }
 
-  const selectProject = async (projectId: string) => {
-    const { project, availableUnlockOptions } = await useCases.getProjectDetail(projectId)
-    setSelectedProject(project)
-    setUnlockOptions(availableUnlockOptions)
-  }
-
-  const unselectProject = () => setSelectedProject(undefined)
+  const selectProject = setSelected
+  const unselectProject = () => setSelected(undefined)
 
   const addProject = mutate(async () => {
-    const newPj = await useCases.createNewProject({ title: 'new project' })
-    setSelectedProject(newPj)
+    const { id } = await useCases.insertNewProject()
+    setSelected(id)
   })
 
   const editProject = mutate(async (update: Partial<Project>) => {
-    if (!selectedProject) return
-    const updated = await useCases.updateProjectProperties(selectedProject, update)
-    setSelectedProject(updated)
+    if (!selectedId) return
+    await useCases.updateProjectProperties(selectedId, update)
   })
 
   const editProjectTitle = (newTitle: string) =>
@@ -79,31 +73,30 @@ export const useAppState = ({ connection }: InteractionStore) => {
     })
 
   const addProjectUnlocks = mutate(async (pjId: string) => {
-    if (!selectedProject) return
-    await useCases.addUnlockingProjects(selectedProject, pjId)
+    if (!selectedId) return
+    await useCases.connectUnlockingProject(selectedId, pjId)
   })
 
   const connectProjects = mutate(async ({ from, to }: NodeConnection) => {
-    await useCases.addUnlockingProjects(from, to)
+    await useCases.connectUnlockingProject(from, to)
   })
 
   useEffect(() => {
-    if (connection) {
-      connectProjects(connection)
-    }
+    if (!connection) return
+    connectProjects(connection)
   }, [connection])
 
   const removeProjectUnlocks = mutate(async (rm: string) => {
-    if (!selectedProject) return
-    await useCases.removeProjectUnlocks(selectedProject, rm)
-    network.removeEdge({ from: selectedProject.id, to: rm })
+    if (!selectedId) return
+    await useCases.disconnectProjectUnlocks(selectedId, rm)
+    network.removeEdge({ from: selectedId, to: rm })
   })
 
   const removeProject = mutate(async () => {
-    if (!selectedProject) return
-    await useCases.deleteProject(selectedProject.id)
-    network.removeNode(selectedProject.id)
-    network.removeEdgesByNode(selectedProject.id)
+    if (!selectedId) return
+    await useCases.removeProject(selectedId)
+    network.removeNode(selectedId)
+    network.removeEdgesByNode(selectedId)
     unselectProject()
   })
 
@@ -115,10 +108,9 @@ export const useAppState = ({ connection }: InteractionStore) => {
     addProjectUnlocks,
     removeProjectUnlocks,
     removeProject,
-    selectedProject,
+    selectedProjectDetail,
     updateProjectValue: updateProjectImportance,
     updateProjectStatus,
     connectProjects,
-    unlockOptions,
   }
 }
