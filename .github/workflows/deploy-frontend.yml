@@ -21,12 +21,10 @@ jobs:
         with:
           node-version: 20.12.1
           cache: 'pnpm'
-      - run: |
-          cd frontend/app
-          pnpm install
-          pnpm build
-      
-      - run: pnpm build
+
+      - name: build frontend
+        run: |
+          sh cicd/build_frontend.sh ${{inputs.environment}}
 
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3

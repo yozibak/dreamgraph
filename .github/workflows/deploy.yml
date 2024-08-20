@@ -15,12 +15,12 @@ permissions:
 
 jobs:
   deploy-stacks:
-    uses: ./.github/workflows/deploy-stack.yml
+    uses: ./.github/workflows/deploy-aws-stack.yml
     with:
       environment: test
 
-#   deploy-frontend:
-#     needs: deploy-stacks
-#     uses: ./.github/workflows/deploy-frontend.yml
-#     with:
-#       environment: test
+  deploy-frontend:
+    needs: deploy-stacks
+    uses: ./.github/workflows/deploy-frontend.yml
+    with:
+      environment: test

@@ -32,18 +32,14 @@ region = "ap-northeast-1"
 s3_prefix = "dreamgraph-test"
 stack_name = "dreamgraph-test"
 
+[test.package.parameters]
+template = "backend/template.yaml"
+
 [test.deploy.parameters]
 capabilities = ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"]
 confirm_changeset = false
 fail_on_empty_changeset = false
-
 parameter_overrides = "Env=Test"
-# template = "template-test.yaml"
-
-# temporarily using manual deploy until CICD
-resolve_s3 = true
-s3_prefix = "dreamgraph-test"
-template = "backend/template.yaml"
 
 [prod]
 [prod.global.parameters]
@@ -51,13 +47,14 @@ region = "ap-northeast-1"
 s3_prefix = "dreamgraph-prod"
 stack_name = "dreamgraph-prod"
 
+[prod.package.parameters]
+template = "backend/template.yaml"
+
 [prod.deploy.parameters]
 capabilities = "CAPABILITY_AUTO_EXPAND"
 confirm_changeset = false
 fail_on_empty_changeset = false
-
 parameter_overrides = "Env=Prod"
-template = "template-prod.yaml"
 
 [cicd]
 [cicd.deploy.parameters]

@@ -27,9 +27,9 @@ $user_pool_client_id=$(
 cd frontend/app
 pnpm i
 rm .env && touch .env
-echo "VITE_API_ENDPOINT=$api_endpoint" >> .env
-echo "VITE_USER_POOL_ID=$user_pool_id" >> .env
-echo "VITE_USER_POOL_CLIENT_ID=$user_pool_client_id" >> .env
+echo "API_ENDPOINT=$api_endpoint" >> .env
+echo "USER_POOL_ID=$user_pool_id" >> .env
+echo "USER_POOL_CLIENT_ID=$user_pool_client_id" >> .env
 
 pnpm build
 

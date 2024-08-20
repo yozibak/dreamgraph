@@ -15,6 +15,7 @@
     },
     "typescript.preferences.importModuleSpecifier": "relative",
     "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.tabSize": 2
   },
   "launch": {
     "configurations": [
