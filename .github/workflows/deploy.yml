@@ -1,0 +1,26 @@
+name: deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  ENV: test
+
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+
+jobs:
+  deploy-stacks:
+    uses: ./.github/workflows/deploy-stack.yml
+    with:
+      environment: test
+
+#   deploy-frontend:
+#     needs: deploy-stacks
+#     uses: ./.github/workflows/deploy-frontend.yml
+#     with:
+#       environment: test

@@ -59,10 +59,10 @@ fail_on_empty_changeset = false
 parameter_overrides = "Env=Prod"
 template = "template-prod.yaml"
 
-[pipeline]
-[pipeline.deploy.parameters]
-capabilities = ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"]
+[cicd]
+[cicd.deploy.parameters]
+capabilities = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
 confirm_changeset = false
-s3_prefix = "dreamgraph-pipeline"
-stack_name = "dreamgraph-pipeline"
-template = "pipeline/template.yaml"
+s3_prefix = "dreamgraph-cicd"
+stack_name = "dreamgraph-cicd"
+template = ".cicd/template.yaml"

@@ -1,0 +1,33 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  deploy-stacks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ vars.STACK_DEPLOY_ROLE_ARN }}
+          role-session-name: counter-stack-deploy-session
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: build stacks
+        run: |
+          sam package \
+          --config-env ${{ inputs.environment }} \
+          --output-template-file template-${{inputs.environment}}.yaml \
+          --s3-bucket="${{vars.ARTIFACTS_BUCKET}}"
+
+      - name: deploy stacks
+        run: |
+          sam deploy \
+          --config-env "${{inputs.environment}}" \
+          --template "template-${{inputs.environment}}.yaml" \
+          --capabilities CAPABILITY_IAM \
+          --role-arn "${{ vars.CF_EXEC_ROLE_ARN }}"
