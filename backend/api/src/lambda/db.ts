@@ -6,7 +6,13 @@ import {
   QueryCommand,
 } from '@aws-sdk/client-dynamodb'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
-import { ProjectData, removeUnlockProject } from 'common'
+import { ProjectData } from '../types'
+
+// TODO: consisder if this persistance logic should be handled here
+export const removeUnlockProject = (pj: ProjectData, removePjId: string):ProjectData => {
+  pj.unlocks = pj.unlocks.slice().filter(pid => pid !== removePjId)
+  return pj
+}
 
 const { PROJECT_TABLE } = process.env
 

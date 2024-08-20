@@ -1,4 +1,5 @@
-import { DynamicStatus, NodeColorDefinition } from './types'
+import { ProjectStatus } from 'use-cases/src/project'
+import { NodeColorDefinition } from './types'
 
 export const Colors = {
   Blue800: '#1e40af',
@@ -16,7 +17,7 @@ export const Colors = {
   Black: '#000000',
 } as const
 
-export const NodeColors: Record<DynamicStatus, NodeColorDefinition> = {
+export const NodeColors: Record<ProjectStatus, NodeColorDefinition> = {
   normal: {
     normal: {
       background: Colors.White,
@@ -47,24 +48,24 @@ export const NodeColors: Record<DynamicStatus, NodeColorDefinition> = {
       border: Colors.Green400,
     },
   },
-  blocked: {
-    normal: {
-      background: Colors.Gray50,
-      border: Colors.Gray600,
-    },
-    highlight: {
-      background: Colors.Gray50,
-      border: Colors.Gray400,
-    },
-  },
-  urgent: {
-    normal: {
-      background: Colors.White,
-      border: Colors.Red600,
-    },
-    highlight: {
-      background: Colors.Gray50,
-      border: Colors.Red500,
-    },
-  },
+  // blocked: {
+  //   normal: {
+  //     background: Colors.Gray50,
+  //     border: Colors.Gray600,
+  //   },
+  //   highlight: {
+  //     background: Colors.Gray50,
+  //     border: Colors.Gray400,
+  //   },
+  // },
+  // urgent: {
+  //   normal: {
+  //     background: Colors.White,
+  //     border: Colors.Red600,
+  //   },
+  //   highlight: {
+  //     background: Colors.Gray50,
+  //     border: Colors.Red500,
+  //   },
+  // },
 }

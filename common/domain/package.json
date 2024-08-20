@@ -1,7 +1,13 @@
 {
-  "name": "common",
+  "name": "domain",
   "main": "src/index.ts",
   "scripts": {
-    "test": "cd ../.. && jest --selectProjects common"
+    "test": "cd ../.. && jest --selectProjects domain"
+  },
+  "dependencies": {
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0"
   }
 }

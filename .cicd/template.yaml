@@ -1,0 +1,209 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: cicd resources
+
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  AppName:
+    Type: String
+    Default: DreamGraph
+  AppNameLowerCase:
+    Type: String
+    Default: dreamgraph
+  GitHubOrg:
+    Description: Name of GitHub organization/user (case sensitive)
+    Type: String
+    Default: yozibak
+  RepositoryName:
+    Description: Name of GitHub repository (case sensitive)
+    Type: String
+    Default: dreamgraph
+  OIDCProviderArn:
+    Description: Arn for the GitHub OIDC Provider.
+    Default: "arn:aws:iam::612925644456:oidc-provider/token.actions.githubusercontent.com"
+    Type: String
+  OIDCAudience:
+    Description: Audience supplied to configure-aws-credentials.
+    Default: "sts.amazonaws.com"
+    Type: String
+
+Conditions:
+  CreateOIDCProvider: !Equals 
+    - !Ref OIDCProviderArn
+    - ""
+
+Resources:
+  # OIDC
+  GithubOidc:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateOIDCProvider # create only once per account
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: 
+        - sts.amazonaws.com
+      ThumbprintList:
+        - ffffffffffffffffffffffffffffffffffffffff
+
+  # IAM ROLES
+  StackDeployRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub ${AppName}-StackDeployRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !If 
+                - CreateOIDCProvider
+                - !Ref GithubOidc
+                - !Ref OIDCProviderArn
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: !Ref OIDCAudience
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
+      Policies:
+        - PolicyName: StackDeployRolePermissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action: iam:PassRole
+                Effect: Allow
+                Resource: !GetAtt CloudFormationExecRole.Arn
+              - Action:
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DeleteStack
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:DescribeStacks
+                  - cloudformation:GetTemplate
+                  - cloudformation:GetTemplateSummary
+                  - cloudformation:DescribeStackResource
+                Resource: '*'
+                Effect: Allow
+              - Action:
+                  - s3:DeleteObject
+                  - s3:GetObject*
+                  - s3:PutObject*
+                  - s3:GetBucket*
+                  - s3:List*
+                Resource:
+                  - !Sub ${ArtifactsBucket.Arn}
+                  - !Sub ${ArtifactsBucket.Arn}/*
+                Effect: Allow
+
+  CloudFormationExecRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub ${AppName}-CloudFormationExecRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: GrantCloudFormationFullAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action: '*'
+                Resource: '*'
+                Effect: Allow
+
+  FrontEndDeployRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub ${AppName}-FrontEndDeployRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !If 
+                - CreateOIDCProvider
+                - !Ref GithubOidc
+                - !Ref OIDCProviderArn
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: !Ref OIDCAudience
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
+      Policies:
+        - PolicyName: GrantS3FullAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action: 's3:*'
+                Resource:
+                  - !Sub arn:aws:s3:::${AppNameLowerCase}-test-webcontentbucket-*
+                  - !Sub arn:aws:s3:::${AppNameLowerCase}-test-webcontentbucket-*/*
+                  - !Sub arn:aws:s3:::${AppNameLowerCase}-prod-webcontentbucket-*
+                  - !Sub arn:aws:s3:::${AppNameLowerCase}-prod-webcontentbucket-*/*
+                Effect: Allow
+        - PolicyName: CloudFormationGetStack
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - cloudformation:DescribeStacks
+                Resource: '*'
+                Effect: Allow
+        - PolicyName: CloudFrontInvalidate
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - cloudfront:CreateInvalidation
+                  - cloudfront:ListDistributions
+                Resource: '*'
+                Effect: Allow
+
+  # S3 BUCKETS
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+  ArtifactsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ArtifactsBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Deny
+            Action: s3:*
+            Principal: '*'
+            Resource:
+              - !GetAtt ArtifactsBucket.Arn
+              - !Sub '${ArtifactsBucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+          - Effect: Allow
+            Action: s3:*
+            Principal:
+              AWS:
+                - !GetAtt StackDeployRole.Arn
+            Resource:
+              - !GetAtt ArtifactsBucket.Arn
+              - !Sub ${ArtifactsBucket.Arn}/*
+Outputs:
+  ArtifactsBucket:
+    Value: !Ref ArtifactsBucket
+  StackDeployRole:
+    Value: !GetAtt StackDeployRole.Arn
+  CloudFormationExecRole:
+    Value: !GetAtt CloudFormationExecRole.Arn
+  FrontEndDeployRole:
+    Value: !GetAtt FrontEndDeployRole.Arn

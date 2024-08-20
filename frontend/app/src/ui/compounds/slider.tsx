@@ -1,10 +1,10 @@
-import { StaticStatus, StaticValue } from 'common'
+import { ProjectStatus, ProjectImportance } from 'common'
 import { CircleBig, CircleEdge } from '../components/icon'
 import { useState } from 'react'
 
 type SliderProps<V> = { onChange: (v: V) => void; value: V }
 
-export const StatusSlider: React.FC<SliderProps<StaticStatus>> = ({ onChange, value }) => {
+export const StatusSlider: React.FC<SliderProps<ProjectStatus>> = ({ onChange, value }) => {
   return (
     <div className="w-40">
       <div className="flex justify-between">
@@ -52,7 +52,7 @@ const CircleWithText: React.FC<{
   )
 }
 
-export const ValueSlider: React.FC<SliderProps<StaticValue>> = ({ onChange, value }) => {
+export const ValueSlider: React.FC<SliderProps<ProjectImportance>> = ({ onChange, value }) => {
   const [v, setV] = useState(value)
   return (
     <div
@@ -69,10 +69,10 @@ export const ValueSlider: React.FC<SliderProps<StaticValue>> = ({ onChange, valu
 }
 
 const ValueSliderBlock: React.FC<{
-  currentV: StaticValue
-  v: StaticValue
-  setV: (v: StaticValue) => void
-  onClick: (v: StaticValue) => void
+  currentV: ProjectImportance
+  v: ProjectImportance
+  setV: (v: ProjectImportance) => void
+  onClick: (v: ProjectImportance) => void
 }> = ({ currentV, v, setV, onClick }) => (
   <div
     onMouseEnter={() => setV(v)}

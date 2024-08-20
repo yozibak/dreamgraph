@@ -14,7 +14,7 @@ export const createUserRequestMock = (override: Partial<TestContext> = {}): Test
     },
   },
   identity: {
-    username: 'user-1',
+    username: 'johndoe',
     sub: 'user-1',
     issuer: ' https://cognito-idp.{region}.amazonaws.com/{userPoolId}',
     groups: [],

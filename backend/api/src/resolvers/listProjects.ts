@@ -1,12 +1,10 @@
 import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 import * as ddb from '@aws-appsync/utils/dynamodb'
 
-type ListProjectsArgs = {
-  unlocks?: string
-}
+type ListProjectsArgs = unknown
 
 export function request(ctx: Context<ListProjectsArgs>) {
-  const userId = (ctx.identity as AppSyncIdentityCognito).username
+  const userId = (ctx.identity as AppSyncIdentityCognito).sub
   return ddb.query({ query: { userId: { eq: userId } } })
 }
 

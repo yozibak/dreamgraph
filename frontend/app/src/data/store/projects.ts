@@ -1,51 +1,48 @@
-import { CreateProjectInput, UpdateProjectInput } from 'common'
-import { useEffect, useState } from 'react'
-import { StaticProjectData } from '../../types'
+/* eslint-disable no-console */
+import { DataStore, Project, ProjectImportance, ProjectStatus } from 'app-domain'
+import type { RawProjectData } from '../api'
 import * as api from '../api'
 
-export type ProjectStore = ReturnType<typeof useProjectsStore>
-
-export const useProjectsStore = () => {
-  const [projects, setProjects] = useState<StaticProjectData[]>([])
-
-  const fetchProjects = async () => {
-    const pjs = await api.listProjects()
-    pjs && setProjects(pjs)
+const convertRawData = (raw: RawProjectData): Project => {
+  if (raw.importance < 1 || raw.importance > 6 || !Number.isInteger(raw.importance)) {
+    console.error(`invalid importance value detected: `, raw.importance)
+    raw.importance = 3
   }
-
-  useEffect(() => {
-    if (projects.length) return
-    fetchProjects()
-  }, [projects, fetchProjects])
-
-  const createProject = async (input: CreateProjectInput) => {
-    const newProject = await api.createProject(input)
-    if (newProject) {
-      setProjects([...projects, newProject])
-      return newProject
-    }
+  if (!['normal', 'ongoing', 'done'].includes(raw.status)) {
+    console.error(`invalid status detected: `, raw.status)
+    raw.status = 'normal'
   }
-
-  const updateProject = async (input: UpdateProjectInput) => {
-    const updated = await api.updateProject(input)
-    if (updated) {
-      setProjects(projects.map((pj) => (pj.projectId === updated.projectId ? updated : pj)))
-      return updated
-    }
-  }
-
-  const deleteProject = async (projectId: string) => {
-    const result = await api.deleteProject(projectId)
-    if (result) {
-      setProjects(projects.filter((pj) => pj.projectId !== projectId))
-    }
-    return result
-  }
-
   return {
-    projects,
-    createProject,
-    updateProject,
-    deleteProject,
+    title: raw.title,
+    id: raw.projectId,
+    unlocks: raw.unlocks,
+    importance: raw.importance as ProjectImportance,
+    status: raw.status as ProjectStatus,
+  }
+}
+
+export const makeCloudProjectStore = (): DataStore => {
+  return {
+    fetchProjects: async () => {
+      const pjs = await api.listProjects()
+      return pjs.map(convertRawData)
+    },
+    createProject: async (newPj) => {
+      await api.createProject({
+        ...newPj,
+        projectId: newPj.id,
+      })
+      return newPj
+    },
+    updateProject: async (updatePj) => {
+      const updated = await api.updateProject({
+        ...updatePj,
+        projectId: updatePj.id,
+      })
+      return convertRawData(updated)
+    },
+    deleteProject: async (id) => {
+      await api.deleteProject(id)
+    },
   }
 }

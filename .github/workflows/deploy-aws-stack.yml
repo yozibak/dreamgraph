@@ -1,0 +1,48 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  deploy-stack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.12.1
+          cache: 'pnpm'
+      - run: |
+          cd backend/api
+          pnpm install
+          pnpm build
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ vars.STACK_DEPLOY_ROLE_ARN }}
+          role-session-name: counter-stack-deploy-session
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: build sam template & upload the artifacts to s3 bucket
+        run: |
+          sam package \
+          --config-env ${{ inputs.environment }} \
+          --output-template-file template-${{inputs.environment}}.yaml \
+          --s3-bucket="${{vars.ARTIFACTS_BUCKET}}"
+
+      - name: deploy aws stack
+        run: |
+          sam deploy \
+          --config-env "${{inputs.environment}}" \
+          --template "template-${{inputs.environment}}.yaml" \
+          --role-arn "${{ vars.CF_EXEC_ROLE_ARN }}"

@@ -7,7 +7,7 @@ type GetProjectArgs = {
 
 export function request(ctx: Context<GetProjectArgs>) {
   const projectId = ctx.arguments.projectId || ctx.stash.projectId
-  const userId = (ctx.identity as AppSyncIdentityCognito).username
+  const userId = (ctx.identity as AppSyncIdentityCognito).sub
   return ddb.get({ key: { projectId, userId } })
 }
 

@@ -2,21 +2,24 @@ type ProjectData {
   projectId: ID!
   title: String!
   unlocks: [ID!]!
-  staticValue: Int!
-  staticStatus: String!
+  importance: Int!
+  status: String!
 }
 
 input CreateProjectInput {
+  projectId: ID!
   title: String!
-  unlocks: [ID!]
+  unlocks: [ID!]!
+  importance: Int!
+  status: String!
 }
 
 input UpdateProjectInput {
   projectId: ID!
   title: String
   unlocks: [ID!]
-  staticValue: Int
-  staticStatus: String
+  importance: Int
+  status: String
 }
 
 type Mutation {

@@ -1,0 +1,38 @@
+on:
+    workflow_call:
+      inputs:
+        environment:
+          required: true
+          type: string
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.12.1
+          cache: 'pnpm'
+
+      - name: build frontend
+        run: |
+          sh .cicd/build_frontend.sh ${{inputs.environment}}
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ vars.FRONTEND_DEPLOY_ROLE_ARN }}
+          role-session-name: counter-app-deploy-session
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: upload the build
+        run: |
+          sh .cicd/deploy_frontend.sh ${{inputs.environment}}
