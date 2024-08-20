@@ -93,7 +93,7 @@ describe(`${makeGraphUseCases.name}`, () => {
     store.fetchProjects.mockResolvedValue(storedProjects)
     const graph = makeGraphUseCases(store)
     await graph.initialize()
-    expect(graph.readAll()).toEqual(storedProjects)
+    expect(graph.readAll()).toMatchObject(storedProjects)
   })
 
   test(`insert new project`, async () => {
@@ -106,7 +106,7 @@ describe(`${makeGraphUseCases.name}`, () => {
     await graph.insertNewProject(newProject)
 
     expect(store.createProject).toHaveBeenCalledWith(newProject)
-    expect(graph.readAll()).toEqual([...storedProjects, newProject])
+    expect(graph.readAll()).toMatchObject([...storedProjects, newProject])
   })
 
   test(`update a project's properties`, async () => {

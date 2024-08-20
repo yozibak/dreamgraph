@@ -10,6 +10,6 @@ export function request(ctx: Context<DeleteProjectsArgs>) {
   return ddb.remove({ key: { userId, projectId: ctx.arguments.projectId } })
 }
 
-export function response(ctx: Context) {
+export function response() {
   return true
 }

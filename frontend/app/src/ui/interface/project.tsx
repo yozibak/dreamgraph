@@ -40,7 +40,7 @@ export const ProjectModal: React.FC = () => {
   )
 }
 
-const ProjectDetail: React.FC<ProjectDetailInfo> = ({ project, availableUnlockOptions }) => {
+const ProjectDetail: React.FC<ProjectDetailInfo> = ({ project }) => {
   const { updateProjectStatus, updateProjectValue } = useContext(AppContext)
   return (
     <Panel className="min-w-80 p-8">

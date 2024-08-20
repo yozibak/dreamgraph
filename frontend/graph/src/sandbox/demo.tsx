@@ -19,6 +19,7 @@ const network = makeGraphNetwork(
         },     
       },
       chosen: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         node: (values: any) => {
           values.color = '#fafafa',
           values.borderColor = '#ef4444'
