@@ -51,7 +51,7 @@ stack_name = "dreamgraph-prod"
 template = "backend/template.yaml"
 
 [prod.deploy.parameters]
-capabilities = "CAPABILITY_AUTO_EXPAND"
+capabilities = ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"]
 confirm_changeset = false
 fail_on_empty_changeset = false
 parameter_overrides = "Env=Prod"
