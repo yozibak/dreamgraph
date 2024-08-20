@@ -4,20 +4,34 @@ export const ListProjects = /* GraphQL */ `
       projectId
       title
       unlocks
-      staticStatus
-      staticValue
+      status
+      importance
     }
   }
 `
 
 export const CreateProject = /* GraphQL */ `
-  mutation CreateProject($title: String!, $unlocks: [ID!] = []) {
-    createProject(input: { title: $title, unlocks: $unlocks }) {
+  mutation CreateProject(
+    $projectId: ID!,
+    $title: String!,
+    $unlocks: [ID!]!,
+    $importance: Int!,
+    $status: String!,
+  ) {
+    createProject(
+      input: {
+        projectId: $projectId
+        title: $title
+        unlocks: $unlocks
+        status: $status
+        importance: $importance
+      }
+    ) {
       projectId
       title
       unlocks
-      staticStatus
-      staticValue
+      status
+      importance
     }
   }
 `
@@ -33,23 +47,23 @@ export const UpdateProject = /* GraphQL */ `
     $projectId: ID!
     $title: String
     $unlocks: [ID!]
-    $staticValue: Int
-    $staticStatus: String
+    $importance: Int
+    $status: String
   ) {
     updateProject(
       input: {
         projectId: $projectId
         title: $title
         unlocks: $unlocks
-        staticValue: $staticValue
-        staticStatus: $staticStatus
+        importance: $importance
+        status: $status
       }
     ) {
       projectId
       title
       unlocks
-      staticStatus
-      staticValue
+      status
+      importance
     }
   }
 `
@@ -60,8 +74,8 @@ export const GetProject = /* GraphQL */ `
       projectId
       title
       unlocks
-      staticStatus
-      staticValue
+      status
+      importance
     }
   }
 `
