@@ -24,7 +24,7 @@ jobs:
 
       - name: build frontend
         run: |
-          sh cicd/build_frontend.sh ${{inputs.environment}}
+          sh .cicd/build_frontend.sh ${{inputs.environment}}
 
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -35,4 +35,4 @@ jobs:
 
       - name: upload the build
         run: |
-          sh cicd/deploy_frontend.sh ${{inputs.environment}}
+          sh .cicd/deploy_frontend.sh ${{inputs.environment}}
