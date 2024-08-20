@@ -9,10 +9,10 @@ type PutProjectArgs = {
 export function request(ctx: Context<PutProjectArgs>) {
   const { projectId, ...rest } = ctx.arguments.input
   const key: ProjectDynamoKey = {
-    projectId: projectId,
+    projectId,
     userId: (ctx.identity as AppSyncIdentityCognito).sub,
   }
-  ctx.stash.projectId = projectId
+  ctx.stash.projectId = projectId // use this in getProject
   return ddb.update({ key, update: rest })
 }
 

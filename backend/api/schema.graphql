@@ -2,8 +2,8 @@ type ProjectData {
   projectId: ID!
   title: String!
   unlocks: [ID!]!
-  staticValue: Int!
-  staticStatus: String!
+  value: Int!
+  status: String!
 }
 
 input CreateProjectInput {
@@ -15,8 +15,8 @@ input UpdateProjectInput {
   projectId: ID!
   title: String
   unlocks: [ID!]
-  staticValue: Int
-  staticStatus: String
+  value: Int
+  status: String
 }
 
 type Mutation {

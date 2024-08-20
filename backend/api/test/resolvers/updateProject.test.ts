@@ -8,6 +8,15 @@ test('update project', async () => {
         projectId: 'my-project-foo-id',
         title: 'my-project-foo',
       },
+      identity: {
+        username: 'johndoe',
+        sub: 'user-001',
+        issuer: ' https://cognito-idp.ap-northeast-1.amazonaws.com/{userPoolId}',
+        groups: [],
+        claims: {},
+        sourceIp: ['x.x.x.x'],
+        defaultAuthStrategy: 'ALLOW',
+      }
     },
   })
   const result = await evaluateResolver('updateProject', context, 'request')
@@ -15,7 +24,7 @@ test('update project', async () => {
     operation: 'UpdateItem',
     key: {
       projectId: { S: context.arguments.input.projectId },
-      userId: { S: context.identity.username },
+      userId: { S: context.identity.sub },
     },
     update: {
       expression: 'SET #expName_1 = :expValue_1',

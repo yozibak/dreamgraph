@@ -4,26 +4,19 @@ export type ProjectDynamoKey = {
   projectId: string
 }
 
-export type ProjectData = ProjectDynamoKey & {
+export type ProjectDataBody = {
   title: string
   unlocks: string[]
-  staticValue: StaticValue
-  staticStatus: StaticStatus
+  importance: number
+  status: string
 }
 
-export type StaticStatus = 'normal' | 'ongoing' | 'done'
+export type ProjectData = ProjectDynamoKey & ProjectDataBody
 
-export type StaticValue = 1 | 2 | 3 | 4 | 5
-
-export type CreateProjectInput = {
-  title: string
-  unlocks?: string[]
-}
-
-export type UpdateProjectInput = {
+export type CreateProjectInput = ProjectDataBody & {
   projectId: string
-  title: string
-  unlocks: string[]
-  staticValue: number
-  staticStatus: StaticStatus
+}
+
+export type UpdateProjectInput = Partial<ProjectDataBody> & {
+  projectId: string
 }

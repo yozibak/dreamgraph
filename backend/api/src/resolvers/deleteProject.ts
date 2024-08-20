@@ -1,16 +1,15 @@
 import { AppSyncIdentityCognito, Context } from '@aws-appsync/utils'
 import * as ddb from '@aws-appsync/utils/dynamodb'
 
-type GetProjectArgs = {
+type DeleteProjectsArgs = {
   projectId: string
 }
 
-export function request(ctx: Context<GetProjectArgs>) {
-  const projectId = ctx.arguments.projectId || ctx.stash.projectId
+export function request(ctx: Context<DeleteProjectsArgs>) {
   const userId = (ctx.identity as AppSyncIdentityCognito).sub
-  return ddb.get({ key: { projectId, userId } })
+  return ddb.remove({ key: { userId, projectId: ctx.arguments.projectId } })
 }
 
 export function response(ctx: Context) {
-  return ctx.result
+  return true
 }

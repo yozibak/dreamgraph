@@ -8,7 +8,7 @@ test('get project', async () => {
     operation: 'GetItem',
     key: {
       projectId: { S: 'my-project-id-123' },
-      userId: { S: context.identity.username },
+      userId: { S: context.identity.sub },
     },
   })
 })
@@ -22,7 +22,7 @@ test('get project from context value', async () => {
     operation: 'GetItem',
     key: {
       projectId: { S: 'my-project-id-123' },
-      userId: { S: context.identity.username },
+      userId: { S: context.identity.sub },
     },
   })
 })

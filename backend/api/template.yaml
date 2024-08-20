@@ -17,18 +17,18 @@ Parameters:
     Type: String
 
 Resources:
-  LambdaHandler:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: index.handler
-      Runtime: nodejs20.x
-      CodeUri: ./build/lambda
-      Environment:
-        Variables:
-          PROJECT_TABLE: !Ref ProjectTableName
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ProjectTableName
+  # LambdaHandler:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: index.handler
+  #     Runtime: nodejs20.x
+  #     CodeUri: ./build/lambda
+  #     Environment:
+  #       Variables:
+  #         PROJECT_TABLE: !Ref ProjectTableName
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref ProjectTableName
 
   GraphQLAPI:
     Type: AWS::Serverless::GraphQLApi
@@ -42,9 +42,9 @@ Resources:
           DefaultAction: ALLOW
           AwsRegion: !Ref AWS::Region
       DataSources:
-        Lambda:
-          LambdaHandler:
-            FunctionArn: !GetAtt LambdaHandler.Arn
+        # Lambda:
+        #   LambdaHandler:
+        #     FunctionArn: !GetAtt LambdaHandler.Arn
         DynamoDb:
           ProjectTable:
             TableName: !Ref ProjectTableName
@@ -71,8 +71,8 @@ Resources:
           Runtime:
             Name: APPSYNC_JS
             Version: 1.0.0
-          DataSource: LambdaHandler
-          CodeUri: ./build/resolvers/invokeLambda.js
+          DataSource: ProjectTable
+          CodeUri: ./build/resolvers/deleteProject.js
         listProjects:
           Runtime:
             Name: APPSYNC_JS
