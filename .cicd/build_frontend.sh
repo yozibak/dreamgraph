@@ -2,7 +2,6 @@
 
 stack_name="dreamgraph-$1"
 
-# leave these operations to see if the role works
 api_endpoint=$(
     aws cloudformation describe-stacks \
         --stack-name "$stack_name" \
@@ -10,14 +9,14 @@ api_endpoint=$(
         --output text
     )
 
-$user_pool_id=$(
+user_pool_id=$(
     aws cloudformation describe-stacks \
         --stack-name "$stack_name" \
         --query "Stacks[0].Outputs[?OutputKey=='UserPoolId'].OutputValue" \
         --output text
     )
 
-$user_pool_client_id=$(
+user_pool_client_id=$(
     aws cloudformation describe-stacks \
         --stack-name "$stack_name" \
         --query "Stacks[0].Outputs[?OutputKey=='UserPoolClientId'].OutputValue" \
