@@ -22,10 +22,6 @@ jobs:
           node-version: 20.12.1
           cache: 'pnpm'
 
-      - name: build frontend
-        run: |
-          sh .cicd/build_frontend.sh ${{inputs.environment}}
-
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -33,6 +29,7 @@ jobs:
           role-session-name: counter-app-deploy-session
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: upload the build
+      - name: build frontend & upload the build
         run: |
+          sh .cicd/build_frontend.sh ${{inputs.environment}}
           sh .cicd/deploy_frontend.sh ${{inputs.environment}}
