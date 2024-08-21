@@ -1,13 +1,8 @@
-name: deploy
+name: deploy to test env
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-env:
-  ENV: test
 
 permissions:
   id-token: write   # This is required for requesting the JWT
@@ -17,10 +12,10 @@ jobs:
   deploy-stacks:
     uses: ./.github/workflows/deploy-aws-stack.yml
     with:
-      environment: test
+      environment: prod
 
   deploy-frontend:
     needs: deploy-stacks
     uses: ./.github/workflows/deploy-frontend.yml
     with:
-      environment: test
+      environment: prod
