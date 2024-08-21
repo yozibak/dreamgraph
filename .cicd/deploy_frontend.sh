@@ -16,6 +16,7 @@ s3_bucket_name=$(
         --output text
     )
 
+cd frontend/app
 aws s3 sync dist s3://$s3_bucket_name/
 echo "--upload complete--"
 
@@ -35,4 +36,4 @@ cloudfront_domain_name=$(
     )
 
 echo "Invalidation is being processed...wait until invalidation is complete ☕️"
-echo "The app will be up on $cloudfront_domain_name"
+echo "The app will be up on https://$cloudfront_domain_name"
