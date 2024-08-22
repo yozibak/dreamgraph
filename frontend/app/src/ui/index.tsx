@@ -24,8 +24,7 @@ const App = () => {
   }, [welcome, setWelcome])
 
   return welcome ? (
-    <></>
-    // <Welcome appVersion={AppVersion} login={() => setWelcome(false)} />
+    <Welcome appVersion={AppVersion} login={() => setWelcome(false)} />
   ) : (
     <AuthenticatedApp />
   )
