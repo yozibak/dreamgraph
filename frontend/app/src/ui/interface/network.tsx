@@ -1,22 +1,21 @@
 import { Graph, GraphOptions } from 'graph'
 import { useContext } from 'react'
+import { AppContext, network } from '../../application'
+import { NodeConnection } from '../../application/controllers/networkInteraction'
 import { Colors } from '../../constants'
-import { InteractionContext, NodeConnection } from '../../domain/interaction'
-import { network } from '../../domain/network'
-import { AppContext } from '../../domain/project'
 
 export const GraphNetwork = () => {
-  const { selectProject, unselectProject } = useContext(AppContext)
-  const { connectNodes } = useContext(InteractionContext)
-  const options = includeAddEdgeOptions(graphOptions, connectNodes)
+  const { networkInteraction: interction } = useContext(AppContext)
+  const options = includeAddEdgeOptions(graphOptions, interction.connectNodes)
+
   return (
     <div className="h-full w-full">
       <Graph
         network={network}
         options={options}
         interactions={{
-          onClickNode: selectProject,
-          onClickBackground: unselectProject,
+          onClickNode: interction.clickNode,
+          onClickBackground: interction.blurNode,
           options: {
             moveOnClick: {
               offset: { x: 0, y: 0 },
@@ -40,7 +39,7 @@ const includeAddEdgeOptions = (
   ...baseOptions,
   manipulation: {
     enabled: false,
-    addEdge: (conn: NodeConnection, cb:(args: unknown) => void) => {
+    addEdge: (conn: NodeConnection, cb: (args: unknown) => void) => {
       connect(conn)
       cb(null)
     },

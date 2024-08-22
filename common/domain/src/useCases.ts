@@ -93,23 +93,30 @@ export class ProjectLoopError extends Error {
   }
 }
 
-export type DataStore = {
+export type ProjectDataRepository = {
   fetchProjects: () => Promise<Project[]>
   createProject: (newPj: Project) => Promise<Project>
   updateProject: (updatedPj: Partial<Project> & Pick<Project, 'id'>) => Promise<Project>
   deleteProject: (id: Project['id']) => Promise<void>
 }
 
-export type ProjectDetail = {
-  project: Project
-  availableUnlockOptions: Project[]
+export type RelationalProjectExcerpt = {
+  id: string
+  title: string
+}
+
+export type ProjectDetail = Omit<Project, 'unlocks'> & {
+  unlocks: RelationalProjectExcerpt[]
+  availableUnlockOptions: RelationalProjectExcerpt[]
 }
 
 export type ProjectWithValue = Project & {
   value: number
 }
 
-export const makeGraphUseCases = (store: DataStore) => {
+export type UseCases = ReturnType<typeof makeGraphUseCases>
+
+export const makeGraphUseCases = (repo: ProjectDataRepository) => {
   const projectGraph: ProjectGraph = makeProjectGraph()
   const getPj = (pjOrId: ProjectOrId) =>
     typeof pjOrId === 'string'
@@ -120,13 +127,13 @@ export const makeGraphUseCases = (store: DataStore) => {
      * initialize the graph nodes with stored data
      */
     initialize: async () => {
-      const projects = await store.fetchProjects()
+      const projects = await repo.fetchProjects()
       projectGraph.loadProjects(projects)
     },
 
     insertNewProject: async (pj?: Partial<Project>) => {
       const newPj = initProject(pj)
-      await store.createProject(newPj)
+      await repo.createProject(newPj)
       projectGraph.insertProject(newPj)
       return newPj
     },
@@ -137,7 +144,7 @@ export const makeGraphUseCases = (store: DataStore) => {
     ) => {
       const original = getPj(target)
       const update = { ...original, ...updateProps }
-      await store.updateProject(update)
+      await repo.updateProject(update)
       projectGraph.updateProject(update)
     },
 
@@ -150,14 +157,14 @@ export const makeGraphUseCases = (store: DataStore) => {
       if (projectGraph.willMakeLoop(project, unlock)) {
         throw new ProjectLoopError()
       }
-      await store.updateProject({ ...project, unlocks: [...project.unlocks, unlock] })
+      await repo.updateProject({ ...project, unlocks: [...project.unlocks, unlock] })
       projectGraph.connect(target, unlock)
     },
 
     disconnectProjectUnlocks: async (target: ProjectOrId, unlock: Project['id']) => {
       const project = getPj(target)
       const update = { ...project, unlocks: project.unlocks.filter((p) => p !== unlock) }
-      await store.updateProject(update)
+      await repo.updateProject(update)
       projectGraph.updateProject(update)
     },
 
@@ -173,13 +180,13 @@ export const makeGraphUseCases = (store: DataStore) => {
       relatedPjs.forEach((rel) => projectGraph.disconnect(rel, project))
       await Promise.all(
         relatedPjs.map((relatedPj) =>
-          store.updateProject({
+          repo.updateProject({
             ...relatedPj,
             unlocks: relatedPj.unlocks.filter((p) => p !== project.id),
           })
         )
       )
-      await store.deleteProject(project.id)
+      await repo.deleteProject(project.id)
       projectGraph.removeProject(project.id)
     },
 
@@ -200,7 +207,8 @@ export const makeGraphUseCases = (store: DataStore) => {
       const availableUnlockOptions = allProjects.filter(
         (other) => project.id !== other.id && !project.unlocks.includes(other.id)
       )
-      return { project, availableUnlockOptions }
+      const unlocks = project.unlocks.map(id => ({ id, title: projectGraph.getProjectById(id).title }))
+      return { ...project, unlocks, availableUnlockOptions }
     },
   }
 }

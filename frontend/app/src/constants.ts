@@ -1,4 +1,4 @@
-import { ProjectStatus } from 'use-cases/src/project'
+import { ProjectStatus } from 'app-domain'
 import { NodeColorDefinition } from './types'
 
 export const Colors = {

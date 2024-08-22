@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { DataStore, Project, ProjectImportance, ProjectStatus } from 'app-domain'
+import { ProjectDataRepository, Project, ProjectImportance, ProjectStatus } from 'app-domain'
 import type { RawProjectData } from '../api'
 import * as api from '../api'
 
@@ -21,7 +21,7 @@ const convertRawData = (raw: RawProjectData): Project => {
   }
 }
 
-export const makeCloudProjectStore = (): DataStore => {
+export const makeCloudRepository = (): ProjectDataRepository => {
   return {
     fetchProjects: async () => {
       const pjs = await api.listProjects()

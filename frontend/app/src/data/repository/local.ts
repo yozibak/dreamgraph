@@ -1,4 +1,4 @@
-import { DataStore, Project, ProjectNotFoundError } from 'app-domain'
+import { ProjectDataRepository, Project, ProjectNotFoundError } from 'app-domain'
 
 const exampleProjects: Project[] = [
   {
@@ -24,7 +24,7 @@ const exampleProjects: Project[] = [
   },
 ]
 
-export const makeOfflineProjectsStore = (): DataStore => {
+export const makeLocalRepository = (): ProjectDataRepository => {
   let projects: Project[] = exampleProjects
   return {
     fetchProjects: async () => projects,

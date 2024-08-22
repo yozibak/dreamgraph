@@ -1,9 +1,8 @@
 import { AuthUser } from 'aws-amplify/auth'
-import { AppContext, useAppState } from '../../domain/project'
-import { ProjectModal } from '../interface/project'
-import { GraphNetwork } from '../interface/network'
+import { AppContext, useApplication } from '../../application'
 import { Header } from '../interface/header'
-import { InteractionContext, useInteraction } from '../../domain/interaction'
+import { GraphNetwork } from '../interface/network'
+import { ProjectModal } from '../interface/project'
 
 export const DreamGraph: React.FC<{ user?: AuthUser; signOut?: () => void }> = ({ signOut }) => {
   if (!signOut) return <></>
@@ -16,14 +15,11 @@ export const DreamGraph: React.FC<{ user?: AuthUser; signOut?: () => void }> = (
 }
 
 export const Projects = () => {
-  const interaction = useInteraction()
-  const appState = useAppState(interaction)
+  const app = useApplication()
   return (
-    <InteractionContext.Provider value={interaction}>
-      <AppContext.Provider value={appState}>
-        <GraphNetwork />
-        <ProjectModal />
-      </AppContext.Provider>
-    </InteractionContext.Provider>
+    <AppContext.Provider value={app}>
+      <GraphNetwork />
+      <ProjectModal />
+    </AppContext.Provider>
   )
 }
