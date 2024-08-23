@@ -1,8 +1,7 @@
 import { GraphNetwork } from 'graph'
-import { useEffect, useState } from 'react'
-import { AppState } from '../state/project'
-
-export type InteractionMode = 'normal' | 'addEdge' | 'addNode' | 'detail'
+import { useEffect } from 'react'
+import { AppModeStore } from '../../state/mode'
+import { ProjectsStore } from '../../state/project'
 
 export type NodeConnection = { from: string; to: string }
 
@@ -10,16 +9,17 @@ export type NetworkInteraction = ReturnType<ReturnType<typeof makeNetworkInterac
 
 export const makeNetworkInteraction =
   (network: GraphNetwork) =>
-  ({ connectProjects, selectProject, unselectProject, addProject }: AppState) => {
-    const [mode, setMode] = useState<InteractionMode>('normal')
+  (
+    { connectProjects, selectProject, unselectProject, addProject }: ProjectsStore,
+    { mode, setMode }: AppModeStore
+  ) => {
 
+    // change the mode of network object
     useEffect(() => {
       if (mode === 'normal') {
         network.exitEditMode()
       } else if (mode === 'addEdge') {
         network.addEdgeMode()
-      } else if (mode === 'addNode') {
-        network.addNodeMode()
       } else if (mode === 'detail') {
         network.exitEditMode()
       }
@@ -30,12 +30,27 @@ export const makeNetworkInteraction =
       setMode('normal')
     }
 
+    const clickNode = (nodeId: string) => {
+      selectProject(nodeId)
+      setMode('detail')
+    }
+
+    const hoverNode = (nodeId: string) => {
+      selectProject(nodeId)
+      setMode('hover')
+    }
+
+    const blurNode = () => {
+      unselectProject()
+      setMode('normal')
+    }
+
     return {
-      mode,
       setMode,
       connectNodes,
-      clickNode: selectProject,
-      blurNode: unselectProject,
-      clickAddButton: addProject
+      clickNode,
+      blurNode,
+      hoverNode,
+      clickAddButton: addProject,
     }
   }

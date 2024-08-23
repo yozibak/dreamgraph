@@ -1,8 +1,8 @@
 import { Project, ProjectWithValue } from 'app-domain'
 import { GraphNetwork } from 'graph'
-import { NodeColors } from '../../constants'
+import { NodeColors } from '../../../constants'
 
-export const makeNetworkPresenter =
+export const makeNetworkPresentation =
   (network: GraphNetwork) =>
   (projects: ProjectWithValue[]): void => {
     if (!projects.length) return

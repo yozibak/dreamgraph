@@ -1,12 +1,14 @@
 import { makeGraphUseCases } from 'app-domain'
 import { makeLocalRepository } from '../data/repository/local'
 import { makeGraphNetwork, NodeItem, EdgeItem } from 'graph'
-import { makeNetworkPresenter } from './presenters/network'
-import { makeProjectDetailPresenter } from './presenters/projectDetail'
-import { makeAppState } from './state/project'
-import { makeNetworkInteraction } from './controllers/networkInteraction'
-import { useProjectsControl } from './controllers/projectDetail'
+import { makeNetworkPresentation } from './services/network/presentation'
+import { makeProjectsStore } from './state/project'
+import { makeNetworkInteraction } from './services/network/interaction'
+import { makeProjectDetailService } from './services/projectDetail'
 import { createContext } from 'react'
+import { useAppModes } from './state/mode'
+import { useTools } from './services/tools'
+import { useProjectExcerpt } from './services/projectExcerpt'
 
 // dependencies
 export const network = makeGraphNetwork<NodeItem, EdgeItem>()
@@ -14,26 +16,29 @@ const repository = makeLocalRepository()
 const useCases = makeGraphUseCases(repository)
 
 // inject dependencies
-const useNetworkPresenter = makeNetworkPresenter(network)
-const useProjectDetailPresenter = makeProjectDetailPresenter(useCases)
+const useNetworkPresentation = makeNetworkPresentation(network)
 const useNetworkInteraction = makeNetworkInteraction(network)
-const useAppState = makeAppState(useCases, network)
+const useProjects = makeProjectsStore(useCases, network)
+const useProjectDetail = makeProjectDetailService(useCases)
 
 export const useApplication = () => {
-  const appState = useAppState()
+  const projectsStore = useProjects()
+  const appModeStore = useAppModes()
 
   // update the view data
-  void useNetworkPresenter(appState.projects)
-  const projectDetail = useProjectDetailPresenter(appState.selectedId)
+  void useNetworkPresentation(projectsStore.projects)
 
-  // expose controls for the new state
-  const networkInteraction = useNetworkInteraction(appState)
-  const projectDetailControl = useProjectsControl(appState)
+  // update services every time state changes
+  const networkInteraction = useNetworkInteraction(projectsStore, appModeStore)
+  const projectDetail = useProjectDetail(projectsStore, appModeStore.mode)
+  const tools = useTools(projectsStore.addProject, appModeStore)
+  const projectExcerpt = useProjectExcerpt(appModeStore.mode, projectsStore)
 
   return {
     projectDetail,
     networkInteraction,
-    projectDetailControl
+    tools,
+    projectExcerpt
   }
 }
 

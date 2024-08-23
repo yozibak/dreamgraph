@@ -2,9 +2,9 @@ import { Project, ProjectWithValue, UseCases } from 'app-domain'
 import { GraphNetwork } from 'graph'
 import { useEffect, useState } from 'react'
 
-export type AppState = ReturnType<ReturnType<typeof makeAppState>>
+export type ProjectsStore = ReturnType<ReturnType<typeof makeProjectsStore>>
 
-export const makeAppState = (useCases: UseCases, network: GraphNetwork) => () => {
+export const makeProjectsStore = (useCases: UseCases, network: GraphNetwork) => () => {
   const [projects, setProjects] = useState<ProjectWithValue[]>([])
   const [selectedId, setSelected] = useState<Project['id']>()
 

@@ -1,21 +1,18 @@
 import { Graph, GraphOptions } from 'graph'
-import { useContext } from 'react'
-import { AppContext, network } from '../../application'
-import { NodeConnection } from '../../application/controllers/networkInteraction'
+import { network } from '../../application'
+import { NetworkInteraction, NodeConnection } from '../../application/services/network/interaction'
 import { Colors } from '../../constants'
 
-export const GraphNetwork = () => {
-  const { networkInteraction: interction } = useContext(AppContext)
-  const options = includeAddEdgeOptions(graphOptions, interction.connectNodes)
-
+export const GraphNetwork: React.FC<NetworkInteraction> = (interaction) => {
+  const options = includeAddEdgeOptions(graphOptions, interaction.connectNodes)
   return (
     <div className="h-full w-full">
       <Graph
         network={network}
         options={options}
         interactions={{
-          onClickNode: interction.clickNode,
-          onClickBackground: interction.blurNode,
+          onClickNode: interaction.clickNode,
+          onClickBackground: interaction.blurNode,
           options: {
             moveOnClick: {
               offset: { x: 0, y: 0 },
