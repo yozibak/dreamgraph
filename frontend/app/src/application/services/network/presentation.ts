@@ -24,7 +24,6 @@ const convertProjectIntoNode = (pj: ProjectWithValue) => {
   return {
     id: pj.id,
     label: pj.status === 'done' ? '' : pj.title,
-    title: pj.status !== 'done' ? '' : pj.title,
     size: 10 + constrainedDynamicValue / 2, // 10 ~ 80
     mass: 1 + constrainedDynamicValue / 10, // 1 ~ 10
     color: {

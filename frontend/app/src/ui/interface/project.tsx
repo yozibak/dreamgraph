@@ -6,11 +6,11 @@ import { CenterBottom, TwoColumnsGrid } from '../components/layout'
 import { Panel } from '../components/paper'
 import { Toggle } from '../components/toggle'
 import { StatusSlider, ValueSlider } from '../compounds/slider'
-import { withContext } from '../utils'
+import { withNullableContext } from '../utils'
 
 export const ProjectDetailContext = createContext<ProjectDetailService>({} as ProjectDetailService)
 
-export const ProjectDetailPanel = withContext(ProjectDetailContext, () => {
+export const ProjectDetailPanel = withNullableContext(ProjectDetailContext, () => {
   const service = useContext(ProjectDetailContext)
   return (
     <CenterBottom>

@@ -6,9 +6,9 @@ import { makeProjectsStore } from './state/project'
 import { makeNetworkInteraction } from './services/network/interaction'
 import { makeProjectDetailService } from './services/projectDetail'
 import { createContext } from 'react'
-import { useAppModes } from './state/mode'
+import { useAppInteraction } from './state/interaction'
 import { useTools } from './services/tools'
-import { useProjectExcerpt } from './services/projectExcerpt'
+import { useProjectTooltip } from './services/projectExcerpt'
 
 // dependencies
 export const network = makeGraphNetwork<NodeItem, EdgeItem>()
@@ -23,22 +23,22 @@ const useProjectDetail = makeProjectDetailService(useCases)
 
 export const useApplication = () => {
   const projectsStore = useProjects()
-  const appModeStore = useAppModes()
+  const appInteractionStore = useAppInteraction()
 
   // update the view data
   void useNetworkPresentation(projectsStore.projects)
 
   // update services every time state changes
-  const networkInteraction = useNetworkInteraction(projectsStore, appModeStore)
-  const projectDetail = useProjectDetail(projectsStore, appModeStore.mode)
-  const tools = useTools(projectsStore.addProject, appModeStore)
-  const projectExcerpt = useProjectExcerpt(appModeStore.mode, projectsStore)
+  const networkInteraction = useNetworkInteraction(projectsStore, appInteractionStore)
+  const projectDetail = useProjectDetail(projectsStore, appInteractionStore.mode)
+  const tools = useTools(projectsStore.addProject, appInteractionStore)
+  const projectTooltip = useProjectTooltip(appInteractionStore, projectsStore)
 
   return {
     projectDetail,
     networkInteraction,
     tools,
-    projectExcerpt
+    projectTooltip,
   }
 }
 

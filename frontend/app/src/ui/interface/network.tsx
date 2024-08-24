@@ -53,7 +53,7 @@ export const graphOptions: GraphOptions = {
     dragNodes: true,
     dragView: true,
     hover: true,
-    hoverConnectedEdges: true,
+    hoverConnectedEdges: false,
     selectable: true,
     selectConnectedEdges: true,
     zoomSpeed: 1,

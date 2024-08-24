@@ -9,7 +9,7 @@
  *
  * const Context = createContext<NonNullable<NullableStore>>({} as NonNullable<NullableStore>)
  *
- * const Comp = withContext(Context, () => {
+ * const Comp = withNullableContext(Context, () => {
  *   const value = useContext(Context) // it always gets concrete value
  *   return <>{value.foo}</>
  * })
@@ -21,7 +21,7 @@
  * }
  * ```
  */
-export const withContext =
+export const withNullableContext =
   <CtxType,>(
     Context: React.Context<CtxType>,
     Component: React.FC
@@ -34,3 +34,4 @@ export const withContext =
       </Context.Provider>
     )
   }
+

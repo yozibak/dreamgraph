@@ -2,11 +2,11 @@ import { createContext, useContext } from 'react'
 import { ToolsController } from '../../application/services/tools'
 import { CenterBottom } from '../components/layout'
 import { Tools } from '../compounds/tools'
-import { withContext } from '../utils'
+import { withNullableContext } from '../utils'
 
 const ToolsContext = createContext<ToolsController>({} as ToolsController)
 
-export const ToolBox = withContext(ToolsContext, () => {
+export const ToolBox = withNullableContext(ToolsContext, () => {
   const { clickAdd, clickArrow, mode } = useContext(ToolsContext)
   return (
     <CenterBottom>

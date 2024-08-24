@@ -1,5 +1,5 @@
 import { ProjectImportance, ProjectStatus, UseCases } from 'app-domain'
-import { AppMode } from '../state/mode'
+import { InteractionMode } from '../state/interaction'
 import { ProjectsStore } from '../state/project'
 
 export type ProjectDetailService = NonNullable<ReturnType<ReturnType<typeof makeProjectDetailService>>>
@@ -15,7 +15,7 @@ export const makeProjectDetailService =
       selectProject,
       removeProject,
     }: ProjectsStore,
-    appMode: AppMode
+    appMode: InteractionMode
   ) => {
     if (!selectedId || appMode !== 'detail') return
 

@@ -1,6 +1,6 @@
 import { GraphNetwork } from 'graph'
 import { useEffect } from 'react'
-import { AppModeStore } from '../../state/mode'
+import { InteractionStore, Position } from '../../state/interaction'
 import { ProjectsStore } from '../../state/project'
 
 export type NodeConnection = { from: string; to: string }
@@ -11,7 +11,7 @@ export const makeNetworkInteraction =
   (network: GraphNetwork) =>
   (
     { connectProjects, selectProject, unselectProject, addProject }: ProjectsStore,
-    { mode, setMode }: AppModeStore
+    { mode, setMode, setHoverPosition }: InteractionStore
   ) => {
 
     // change the mode of network object
@@ -40,8 +40,9 @@ export const makeNetworkInteraction =
       setMode('normal')
     }
 
-    const hoverNode = (nodeId: string) => {
+    const hoverNode = (nodeId: string, hoverPosition: Position) => {
       selectProject(nodeId)
+      setHoverPosition(hoverPosition)
       setMode('hover')
     }
 

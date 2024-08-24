@@ -1,15 +1,28 @@
 import { ProjectWithValue } from 'app-domain'
-import { AppMode } from '../state/mode'
+import { InteractionStore, Position } from '../state/interaction'
 import { ProjectsStore } from '../state/project'
 
-export type ProjectExcerptInfo = Pick<ProjectWithValue, 'title' | 'value' | 'status'>
+export type ProjectTooltipInfo = {
+  shouldOpen: boolean
+  nodePosition: Position
+  projectExcerpt?: Pick<ProjectWithValue, 'title' | 'value' | 'status'>
+}
 
-export const useProjectExcerpt = (
-  mode: AppMode,
+export const useProjectTooltip = (
+  { mode, hoverPosition }: InteractionStore,
   { projects, selectedId }: ProjectsStore
-): ProjectExcerptInfo | undefined => {
-  if (mode !== 'hover' || !selectedId) return
-  const pj = projects.find((p) => p.id === selectedId)
-  if (!pj) throw Error(`project not found at useProjectExcerpt`)
-  return pj
+): ProjectTooltipInfo => {
+  const shouldOpen = mode === 'hover' && !!selectedId && !!hoverPosition
+  const projectExcerpt = getPjExcerpt()
+
+  return {
+    shouldOpen,
+    nodePosition: hoverPosition || { x: 0, y: 0 },
+    projectExcerpt,
+  }
+
+  function getPjExcerpt() {
+    if (!selectedId) return
+    return projects.find((p) => p.id === selectedId)
+  }
 }
