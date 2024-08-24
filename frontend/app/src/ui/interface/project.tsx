@@ -1,13 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { ProjectDetailService } from '../../application/services/projectDetail'
 import { CircleWithEdge } from '../components/icon'
 import { Input, Select } from '../components/input'
 import { CenterBottom, TwoColumnsGrid } from '../components/layout'
 import { Panel } from '../components/paper'
 import { Toggle } from '../components/toggle'
 import { StatusSlider, ValueSlider } from '../compounds/slider'
-import { ProjectDetailContext } from '../view/app'
+import { withContext } from '../utils'
 
-export const ProjectDetailPanel: React.FC = () => {
+export const ProjectDetailContext = createContext<ProjectDetailService>({} as ProjectDetailService)
+
+export const ProjectDetailPanel = withContext(ProjectDetailContext, () => {
   const service = useContext(ProjectDetailContext)
   return (
     <CenterBottom>
@@ -53,7 +56,7 @@ export const ProjectDetailPanel: React.FC = () => {
       </Panel>
     </CenterBottom>
   )
-}
+})
 
 const ProjectField: React.FC<{ fieldName: string }> = ({ fieldName }) => <div>{fieldName}</div>
 

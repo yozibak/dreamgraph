@@ -1,9 +1,12 @@
-import { useContext } from 'react'
+import { createContext, useContext } from 'react'
+import { ToolsController } from '../../application/services/tools'
 import { CenterBottom } from '../components/layout'
 import { Tools } from '../compounds/tools'
-import { ToolsContext } from '../view/app'
+import { withContext } from '../utils'
 
-export const ToolBox: React.FC = () => {
+const ToolsContext = createContext<ToolsController>({} as ToolsController)
+
+export const ToolBox = withContext(ToolsContext, () => {
   const { clickAdd, clickArrow, mode } = useContext(ToolsContext)
   return (
     <CenterBottom>
@@ -22,5 +25,4 @@ export const ToolBox: React.FC = () => {
       />
     </CenterBottom>
   )
-}
- 
+})

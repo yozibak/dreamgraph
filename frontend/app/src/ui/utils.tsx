@@ -1,26 +1,31 @@
 /**
- * filters out nullish value and render only when truthy
+ * make a context-injected component that 
+ * - accepts nullable context value 
+ * - only renders when context value is not nullish
+ 
  * ```ts
- * type Store = { foo: string }
+ * // example
+ * type NullableStore = { foo: string } | undefined
  *
- * const Context = createContext<NonNullable<Store>>({} as NonNullable<Store>)
+ * const Context = createContext<NonNullable<NullableStore>>({} as NonNullable<NullableStore>)
  *
- * const Comp = withNonNullableContext(Context, () => {
- *   const value = useContext(Context)
+ * const Comp = withContext(Context, () => {
+ *   const value = useContext(Context) // it always gets concrete value
  *   return <>{value.foo}</>
  * })
  *
- * now children can get concrete context value
+ * // it can pass undefined and it won't render
  * const Example: React.FC = () => {
- *  return <Comp nullableContextValue={undefined} />
+ *  const store: NullableStore = undefined
+ *  return <Comp nullableContextValue={store} />
  * }
  * ```
  */
-export const withNonNullableContext =
-  <NonNullableCtx,>(
-    Context: React.Context<NonNullableCtx>,
+export const withContext =
+  <CtxType,>(
+    Context: React.Context<CtxType>,
     Component: React.FC
-  ): React.FC<{ nullableContextValue: NonNullableCtx | undefined }> =>
+  ): React.FC<{ nullableContextValue: CtxType | undefined }> =>
   ({ nullableContextValue }) => {
     if (!nullableContextValue) return <></>
     return (
