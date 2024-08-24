@@ -12,7 +12,9 @@ export const GraphNetwork: React.FC<NetworkInteraction> = (interaction) => {
         options={options}
         interactions={{
           onClickNode: interaction.clickNode,
-          onClickBackground: interaction.blurNode,
+          onClickBackground: interaction.clickBackground,
+          onHoverNode: interaction.hoverNode,
+          onBlurNode: interaction.blurNode,
           options: {
             moveOnClick: {
               offset: { x: 0, y: 0 },
@@ -113,7 +115,7 @@ export const graphOptions: GraphOptions = {
     widthConstraint: false,
   },
   layout: {
-    improvedLayout: true,
+    improvedLayout: false,
     clusterThreshold: 20,
   },
 }

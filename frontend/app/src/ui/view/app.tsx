@@ -23,7 +23,7 @@ export const Projects = () => {
       <GraphNetwork {...networkInteraction} />
       <ProjectDetailPanel nullableContextValue={projectDetail} />
       <ToolBox nullableContextValue={tools} />
-      <ProjectExcerptToolTip nullableContextValue={{ title: 'example', value: 3, status: 'ongoing'}} />
+      <ProjectExcerptToolTip nullableContextValue={projectExcerpt} />
     </>
   )
 }

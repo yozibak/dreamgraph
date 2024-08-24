@@ -35,12 +35,18 @@ export const makeNetworkInteraction =
       setMode('detail')
     }
 
+    const clickBackground = () => {
+      unselectProject()
+      setMode('normal')
+    }
+
     const hoverNode = (nodeId: string) => {
       selectProject(nodeId)
       setMode('hover')
     }
 
     const blurNode = () => {
+      if (mode === 'detail') return
       unselectProject()
       setMode('normal')
     }
@@ -49,8 +55,9 @@ export const makeNetworkInteraction =
       setMode,
       connectNodes,
       clickNode,
-      blurNode,
+      clickBackground,
       hoverNode,
+      blurNode,
       clickAddButton: addProject,
     }
   }
