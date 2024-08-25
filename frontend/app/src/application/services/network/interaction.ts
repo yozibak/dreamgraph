@@ -31,6 +31,7 @@ export const makeNetworkInteraction =
     }
 
     const clickNode = (nodeId: string) => {
+      if (mode === 'addEdge') return
       selectProject(nodeId)
       setMode('detail')
     }
@@ -41,13 +42,14 @@ export const makeNetworkInteraction =
     }
 
     const hoverNode = (nodeId: string, hoverPosition: Position) => {
+      if (mode !== 'normal') return
       selectProject(nodeId)
       setHoverPosition(hoverPosition)
       setMode('hover')
     }
 
     const blurNode = () => {
-      if (mode === 'detail') return
+      if (mode !== 'hover') return
       unselectProject()
       setMode('normal')
     }
