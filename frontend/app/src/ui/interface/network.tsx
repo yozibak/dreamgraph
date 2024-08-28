@@ -15,16 +15,16 @@ export const GraphNetwork: React.FC<NetworkInteraction> = (interaction) => {
           onClickBackground: interaction.clickBackground,
           onHoverNode: interaction.hoverNode,
           onBlurNode: interaction.blurNode,
-          options: {
-            moveOnClick: {
-              offset: { x: 0, y: 0 },
-              scale: 1,
-              animation: {
-                duration: 500,
-                easingFunction: 'linear',
-              },
-            },
-          },
+          // options: {
+          //   moveOnClick: {
+          //     offset: { x: 0, y: 0 },
+          //     scale: 1,
+          //     animation: {
+          //       duration: 500,
+          //       easingFunction: 'linear',
+          //     },
+          //   },
+          // },
         }}
       />
     </div>

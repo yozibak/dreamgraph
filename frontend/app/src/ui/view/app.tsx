@@ -2,7 +2,7 @@ import { AuthUser } from 'aws-amplify/auth'
 import { useApplication } from '../../application'
 import { Header } from '../interface/header'
 import { GraphNetwork } from '../interface/network'
-import { ProjectDetailPanel } from '../interface/project'
+import { LegacyProjectDetailPanel, ProjectDetailPanel } from '../interface/project'
 import { ToolBox } from '../interface/tools'
 import { ProjectExcerptTooltip } from '../interface/tooltip'
 

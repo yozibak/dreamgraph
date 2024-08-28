@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import { IProjectGraph, Project, ProjectOrId } from './entities'
+import { IProjectGraph, Project, ProjectImportance, ProjectOrId, ProjectStatus } from './entities'
 
 /**
  * initialize project with default value
@@ -211,4 +211,18 @@ export const makeGraphUseCases = (repo: ProjectDataRepository) => {
       return { ...project, unlocks, availableUnlockOptions }
     },
   }
+}
+
+export const ProjectImportanceExpression: Record<ProjectImportance, string> = {
+  1: 'Not Important',
+  2: 'Slightly Important',
+  3: 'Important',
+  4: 'Very Important',
+  5: 'Critical'
+}
+
+export const ProjectStatusExpression: Record<ProjectStatus, string> = {
+  normal: 'Not Started',
+  ongoing: 'In Progress',
+  done: 'Done'
 }

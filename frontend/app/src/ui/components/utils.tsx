@@ -1,3 +1,10 @@
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
 /**
  * make a context-injected component that 
  * - accepts nullable context value 
@@ -34,4 +41,3 @@ export const withNullableContext =
       </Context.Provider>
     )
   }
-

@@ -1,5 +1,9 @@
-import { useEffect, useState } from 'react'
+import { ProjectImportanceExpression, ProjectStatusExpression } from 'app-domain'
+import React, { useEffect, useState } from 'react'
 import { ProjectTooltipInfo } from '../../application/services/projectExcerpt'
+import { Card } from '../components/card'
+import { Positioned } from '../components/layout'
+import { Badge } from '../components/ui/badge'
 
 const AnimationMs = 150
 
@@ -7,6 +11,7 @@ export const ProjectExcerptTooltip: React.FC<ProjectTooltipInfo> = ({
   projectExcerpt,
   shouldOpen,
   nodePosition,
+  clickOnInfo,
 }) => {
   const [shouldRender, setRender] = useState(false)
 
@@ -27,22 +32,38 @@ export const ProjectExcerptTooltip: React.FC<ProjectTooltipInfo> = ({
     }
   }
 
-  if (!shouldRender) return
+  if (!shouldRender || !excerpt) return
   return (
-    <div className="fixed" style={{ left: nodePosition.x, top: nodePosition.y }}>
-      <div
+    <Positioned position={nodePosition} width={320}>
+      <Card
+        className="cursor-pointer w-80 opacity-95"
+        onClick={clickOnInfo}
         onAnimationStart={() => scheduleUnmount()}
         data-state={shouldOpen ? 'open' : 'closed'}
-        data-side={'right'}
-        className="
-    z-50 w-64 rounded-md border border-zinc-200 bg-white p-4 text-zinc-950 shadow-md outline-none 
-    data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95
-    data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 
-    dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50"
+        data-side={'bottom'}
       >
-        <div>{excerpt?.title}:</div>
-        <div className='ml-4'>status: {excerpt?.status}</div>
-        <div className='ml-4'>value: {excerpt?.value}</div>
+        <div className="flex justify-left space-x-2">
+          <CircleWithValue value={excerpt.value} />
+          <div className="flex flex-col justify-center space-y-2">
+            <div className="ml-1 font-semibold leading-none tracking-tight">{excerpt.title}</div>
+            <div className="inline-flex">
+              <Badge variant="secondary">{ProjectImportanceExpression[excerpt.importance]}</Badge>
+              <div className="inline-flex align-middle ml-2">
+                <p className="text-sm text-zinc-500">{ProjectStatusExpression[excerpt.status]}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </Positioned>
+  )
+}
+
+export const CircleWithValue: React.FC<{ value?: number }> = ({ value }) => {
+  return (
+    <div className="w-14 h-14 inline-flex items-center justify-center">
+      <div className="w-14 h-14 m-auto rounded-full border-4 border-zinc-600 inline-flex items-center justify-center">
+        <div className="text-zinc-600">{value}</div>
       </div>
     </div>
   )

@@ -1,8 +1,10 @@
 import { ProjectImportance, ProjectStatus, UseCases } from 'app-domain'
-import { InteractionMode } from '../state/interaction'
+import { InteractionStore } from '../state/interaction'
 import { ProjectsStore } from '../state/project'
 
-export type ProjectDetailService = NonNullable<ReturnType<ReturnType<typeof makeProjectDetailService>>>
+export type ProjectDetailService = NonNullable<
+  ReturnType<ReturnType<typeof makeProjectDetailService>>
+>
 
 export const makeProjectDetailService =
   (useCases: UseCases) =>
@@ -15,9 +17,9 @@ export const makeProjectDetailService =
       selectProject,
       removeProject,
     }: ProjectsStore,
-    appMode: InteractionMode
+    { mode, hoverPosition }: InteractionStore
   ) => {
-    if (!selectedId || appMode !== 'detail') return
+    if (!selectedId || mode !== 'detail' || !hoverPosition) return
 
     const projectDetail = useCases.getProjectDetail(selectedId)
 
@@ -42,6 +44,7 @@ export const makeProjectDetailService =
     const deleteProject = () => removeProject(selectedId)
 
     return {
+      nodePosition: hoverPosition,
       projectDetail,
       editProjectTitle,
       updateProjectImportance,

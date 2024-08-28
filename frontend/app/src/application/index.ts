@@ -30,7 +30,7 @@ export const useApplication = () => {
 
   // update services every time state changes
   const networkInteraction = useNetworkInteraction(projectsStore, appInteractionStore)
-  const projectDetail = useProjectDetail(projectsStore, appInteractionStore.mode)
+  const projectDetail = useProjectDetail(projectsStore, appInteractionStore)
   const tools = useTools(projectsStore.addProject, appInteractionStore)
   const projectTooltip = useProjectTooltip(appInteractionStore, projectsStore)
 

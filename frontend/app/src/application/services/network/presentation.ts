@@ -1,14 +1,17 @@
 import { Project, ProjectWithValue } from 'app-domain'
 import { GraphNetwork } from 'graph'
 import { NodeColors } from '../../../constants'
+import { useEffect } from 'react'
 
 export const makeNetworkPresentation =
   (network: GraphNetwork) =>
   (projects: ProjectWithValue[]): void => {
-    if (!projects.length) return
-    const { nodes, edges } = convertProjectsIntoNetworkData(projects)
-    nodes.forEach((n) => network.putNode(n))
-    edges.forEach((e) => network.putEdge(e))
+    useEffect(() => {
+      if (!projects.length) return
+      const { nodes, edges } = convertProjectsIntoNetworkData(projects)
+      nodes.forEach((n) => network.putNode(n))
+      edges.forEach((e) => network.putEdge(e))
+    }, [projects])
   }
 
 const convertProjectsIntoNetworkData = (pjs: ProjectWithValue[]) => {

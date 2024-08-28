@@ -10,7 +10,7 @@ const buttonVariants = cva(
   'inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors ' +
   'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950 ' +
     'disabled:pointer-events-none disabled:opacity-50 ' +
-    'border border-zinc-200 bg-white shadow-md hover:bg-zinc-50 hover:text-zinc-950',
+    'border border-zinc-300 bg-white shadow-md hover:bg-zinc-50 hover:text-zinc-950',
   {
     variants: {
       variant: {

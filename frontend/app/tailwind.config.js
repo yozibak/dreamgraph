@@ -25,7 +25,7 @@ export default{
         gray: colors.zinc
       },
       gridTemplateColumns: {
-        'project': '4rem 1fr'
+        'project': '1fr 180px'
       },
       keyframes: {
         "accordion-down": {
