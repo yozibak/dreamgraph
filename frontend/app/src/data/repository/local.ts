@@ -24,12 +24,19 @@ const exampleProjects: Project[] = [
   },
 ]
 
+const ProjectsStorageKey = 'dreamgraph-projects-local'
+
 export const makeLocalRepository = (): ProjectDataRepository => {
-  let projects: Project[] = exampleProjects
+  const data = localStorage.getItem(ProjectsStorageKey)
+  let projects: Project[] = data ? JSON.parse(data) as Project[] : exampleProjects
+  function updateData(newProjectsData: Project[]) {
+    projects = newProjectsData
+    localStorage.setItem(ProjectsStorageKey, JSON.stringify(projects))
+  }
   return {
     fetchProjects: async () => projects,
     createProject: async (newPj) => {
-      projects = [...projects, newPj]
+      updateData([...projects, newPj])
       return newPj
     },
     updateProject: async (updatePj) => {
@@ -38,11 +45,11 @@ export const makeLocalRepository = (): ProjectDataRepository => {
         throw new ProjectNotFoundError(updatePj.id)
       }
       const update = { ...pj, ...updatePj }
-      projects = projects.map((pj) => (pj.id === updatePj.id ? update : pj))
+      updateData(projects.map((pj) => (pj.id === updatePj.id ? update : pj)))
       return update
     },
     deleteProject: async (id) => {
-      projects = projects.filter((pj) => pj.id !== id)
+      updateData(projects.filter((pj) => pj.id !== id))
     },
   }
 }
