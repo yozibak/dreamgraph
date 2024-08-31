@@ -7,7 +7,7 @@ import { IProjectGraph, Project, ProjectImportance, ProjectOrId, ProjectStatus }
 export const initProject = (pj?: Partial<Project>): Project => ({
   id: pj?.id ?? uuid(),
   title: pj?.title ?? 'new project',
-  status: pj?.status ?? 'normal',
+  status: pj?.status ?? 'not-started',
   importance: pj?.importance ?? 3,
   unlocks: pj?.unlocks ?? [],
 })
@@ -43,7 +43,7 @@ export const makeProjectGraph = (): ProjectGraph => {
       return Object.values(projectTable).map((pj) => pj)
     },
     loadProjects(projects) {
-      Object.keys(projectTable).forEach(key => {
+      Object.keys(projectTable).forEach((key) => {
         delete projectTable[key]
       })
       projects.forEach((pj) => {
@@ -228,7 +228,7 @@ export const ProjectImportanceExpression: Record<ProjectImportance, string> = {
 }
 
 export const ProjectStatusExpression: Record<ProjectStatus, string> = {
-  normal: 'Not Started',
-  ongoing: 'In Progress',
+  'not-started': 'Not Started',
+  'in-progress': 'In Progress',
   done: 'Done',
 }
