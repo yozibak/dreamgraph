@@ -21,6 +21,14 @@ export const makeGraphNetwork = <N extends NodeItem, E extends EdgeItem>(
     setInteractions: (interactions?: Interaction) => {
       setInteractions(_network, interactions)
     },
+    /**
+     * remove all the nodes and edges from network,
+     * preserving the canvas dom
+     */
+    flush: () => {
+      nodes.map((n) => n.id).forEach((id) => nodes.remove(id))
+      edges.map((n) => n.id).forEach((id) => edges.remove(id))
+    },
     destroy: () => {
       _network.destroy()
     },

@@ -8,11 +8,12 @@ export const makeProjectsStore = (useCases: UseCases, network: GraphNetwork) => 
   const [projects, setProjects] = useState<ProjectWithValue[]>([])
   const [selectedId, setSelected] = useState<Project['id']>()
 
+  async function init() {
+    await useCases.initialize()
+    setProjects(useCases.readAll())
+  }
+
   useEffect(() => {
-    async function init() {
-      await useCases.initialize()
-      setProjects(useCases.readAll())
-    }
     init()
   }, [])
 
@@ -63,5 +64,6 @@ export const makeProjectsStore = (useCases: UseCases, network: GraphNetwork) => 
     disconnectProjects,
     selectProject,
     unselectProject,
+    reload: init,
   }
 }

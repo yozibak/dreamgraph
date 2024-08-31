@@ -26,9 +26,13 @@ const exampleProjects: Project[] = [
 
 const ProjectsStorageKey = 'dreamgraph-projects-local'
 
-export const makeLocalRepository = (): ProjectDataRepository => {
+export type LocalProjectRepository = ProjectDataRepository & {
+  deleteLocalData: () => void
+}
+
+export const makeLocalRepository = (): LocalProjectRepository => {
   const data = localStorage.getItem(ProjectsStorageKey)
-  let projects: Project[] = data ? JSON.parse(data) as Project[] : exampleProjects
+  let projects: Project[] = data ? (JSON.parse(data) as Project[]) : exampleProjects
   function updateData(newProjectsData: Project[]) {
     projects = newProjectsData
     localStorage.setItem(ProjectsStorageKey, JSON.stringify(projects))
@@ -50,6 +54,9 @@ export const makeLocalRepository = (): ProjectDataRepository => {
     },
     deleteProject: async (id) => {
       updateData(projects.filter((pj) => pj.id !== id))
+    },
+    deleteLocalData: () => {
+      localStorage.setItem(ProjectsStorageKey, JSON.stringify([]))
     },
   }
 }

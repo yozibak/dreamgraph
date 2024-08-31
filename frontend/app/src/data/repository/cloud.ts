@@ -21,7 +21,11 @@ const convertRawData = (raw: RawProjectData): Project => {
   }
 }
 
-export const makeCloudRepository = (): ProjectDataRepository => {
+export type CloudDataRepository = ProjectDataRepository & {
+  syncLocalData: (localData: Project[]) => Promise<void>
+}
+
+export const makeCloudRepository = (): CloudDataRepository => {
   return {
     fetchProjects: async () => {
       const pjs = await api.listProjects()
@@ -43,6 +47,9 @@ export const makeCloudRepository = (): ProjectDataRepository => {
     },
     deleteProject: async (id) => {
       await api.deleteProject(id)
+    },
+    syncLocalData: async (localData) => {
+      throw Error(`not implemented yet`)
     },
   }
 }

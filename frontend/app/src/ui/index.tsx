@@ -1,41 +1,58 @@
 import { Authenticator } from '@aws-amplify/ui-react'
 import '@aws-amplify/ui-react/styles.css'
-import { DreamGraph } from './view/app'
-import { Container } from './components/layout'
+import * as auth from 'aws-amplify/auth'
 import { useEffect, useState } from 'react'
-import { Welcome } from './view/welcome'
-import { getCurrentUser } from 'aws-amplify/auth'
-import pjson from '../../package.json'
+import { AuthContext } from '../auth'
+import { Container } from './components/layout'
+import { App } from './view/app'
 
-const AppVersion = pjson.version
+type AppMode = 'local' | 'cloud'
 
-const App = () => {
-  const [welcome, setWelcome] = useState(true)
+const Main = () => {
+  const [appMode, setAppMode] = useState<AppMode>()
+
   useEffect(() => {
-    async function checkAuth() {
-      try {
-        await getCurrentUser()
-        setWelcome(false)
-      } catch (e) {
-        // not authenticated
-      }
-    }
-    checkAuth()
-  }, [welcome, setWelcome])
+    ;(async () => {
+      const session = await auth.fetchAuthSession()
+      setAppMode(session.tokens?.accessToken ? 'cloud' : 'local')
+    })()
+  }, [])
 
-  return welcome ? (
-    <Welcome appVersion={AppVersion} login={() => setWelcome(false)} />
-  ) : (
-    <AuthenticatedApp />
-  )
+  if (appMode === 'cloud') {
+    return (
+      <Container>
+        <Authenticator loginMechanisms={['email']}>
+          {({ signOut }) => (
+            <AuthContext.Provider
+              value={{
+                isAuthenticated: true,
+                switchAuth: () => {
+                  signOut?.()
+                },
+              }}
+            >
+              <App />
+            </AuthContext.Provider>
+          )}
+        </Authenticator>
+      </Container>
+    )
+  }
+  if (appMode === 'local') {
+    return (
+      <AuthContext.Provider
+        value={{
+          isAuthenticated: false,
+          switchAuth: function signIn() {
+            setAppMode('cloud')
+          },
+        }}
+      >
+        <App />
+      </AuthContext.Provider>
+    )
+  }
+  return <></> // loading
 }
 
-const AuthenticatedApp = () => (
-  <Container>
-    <Authenticator loginMechanisms={['email']}>
-      {(props) => <DreamGraph {...props} />}
-    </Authenticator>
-  </Container>
-)
-
-export default App
+export default Main

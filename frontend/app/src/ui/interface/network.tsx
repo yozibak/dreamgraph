@@ -3,10 +3,12 @@ import { network } from '../../application'
 import { NetworkInteraction, NodeConnection } from '../../application/services/network/interaction'
 import { Colors } from '../../constants'
 
-export const GraphNetwork: React.FC<NetworkInteraction> = (interaction) => {
+export const NetworkInterface: React.FC<{
+  interaction: NetworkInteraction
+}> = ({ interaction }) => {
   const options = includeAddEdgeOptions(graphOptions, interaction.connectNodes)
   return (
-    <div className="h-full w-full">
+    <div className="h-dvh w-full">
       <Graph
         network={network}
         options={options}
@@ -15,16 +17,6 @@ export const GraphNetwork: React.FC<NetworkInteraction> = (interaction) => {
           onClickBackground: interaction.clickBackground,
           onHoverNode: interaction.hoverNode,
           onBlurNode: interaction.blurNode,
-          // options: {
-          //   moveOnClick: {
-          //     offset: { x: 0, y: 0 },
-          //     scale: 1,
-          //     animation: {
-          //       duration: 500,
-          //       easingFunction: 'linear',
-          //     },
-          //   },
-          // },
         }}
       />
     </div>
