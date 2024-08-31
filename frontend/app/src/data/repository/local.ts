@@ -1,28 +1,4 @@
-import { ProjectDataRepository, Project, ProjectNotFoundError } from 'app-domain'
-
-const exampleProjects: Project[] = [
-  {
-    id: '1',
-    title: 'first',
-    status: 'normal',
-    importance: 3,
-    unlocks: ['2', '3'],
-  },
-  {
-    id: '2',
-    title: 'second',
-    status: 'normal',
-    importance: 3,
-    unlocks: ['3'],
-  },
-  {
-    id: '3',
-    title: 'third',
-    status: 'normal',
-    importance: 3,
-    unlocks: [],
-  },
-]
+import { Project, ProjectDataRepository, ProjectNotFoundError, initProject } from 'app-domain'
 
 const ProjectsStorageKey = 'dreamgraph-projects-local'
 
@@ -32,7 +8,7 @@ export type LocalProjectRepository = ProjectDataRepository & {
 
 export const makeLocalRepository = (): LocalProjectRepository => {
   const data = localStorage.getItem(ProjectsStorageKey)
-  let projects: Project[] = data ? (JSON.parse(data) as Project[]) : exampleProjects
+  let projects: Project[] = data ? (JSON.parse(data) as Project[]) : exampleProjects()
   function updateData(newProjectsData: Project[]) {
     projects = newProjectsData
     localStorage.setItem(ProjectsStorageKey, JSON.stringify(projects))
@@ -59,4 +35,57 @@ export const makeLocalRepository = (): LocalProjectRepository => {
       localStorage.setItem(ProjectsStorageKey, JSON.stringify([]))
     },
   }
+}
+
+const exampleProjects = () => {
+  const target = initProject({
+    title: 'make my videogame successful',
+    importance: 2,
+  })
+  const nice = initProject({
+    title: 'make the game nicer',
+    importance: 5,
+  })
+  const resource = initProject({
+    title: 'prepare minimum resources to start the project',
+    importance: 5,
+  })
+  const money = initProject({
+    title: 'prepare some money',
+  })
+  const dev = initProject({
+    title: 'hire a nice game developer',
+    importance: 4,
+  })
+  const sound = initProject({
+    title: 'hire a sound person maybe?',
+    importance: 1,
+  })
+  const funding = initProject({
+    title: 'apply for funding',
+  })
+  const pitch = initProject({
+    title: 'prepare a nice, convincing pitch',
+    importance: 4,
+    status: 'in-progress',
+  })
+  const design = initProject({
+    title: 'initial game design',
+    status: 'done',
+  })
+  const demo = initProject({
+    title: 'build & release the first demo',
+  })
+
+  design.unlocks.push(pitch.id)
+  pitch.unlocks.push(funding.id, dev.id)
+  funding.unlocks.push(resource.id, money.id)
+  money.unlocks.push(dev.id)
+  dev.unlocks.push(resource.id)
+  sound.unlocks.push(nice.id)
+  nice.unlocks.push(target.id)
+  resource.unlocks.push(demo.id)
+  demo.unlocks.push(nice.id)
+
+  return [target, resource, dev, sound, funding, pitch, design, money, nice, demo]
 }

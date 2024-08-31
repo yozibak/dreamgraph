@@ -23,12 +23,12 @@ const convertProjectsIntoNetworkData = (pjs: ProjectWithValue[]) => {
 const convertProjectIntoNode = (pj: ProjectWithValue) => {
   const colors = NodeColors[pj.status]
   const constrainedDynamicValue =
-    pj.status === 'done' ? pj.importance : Math.min(pj.value, 30) * pj.importance
+    pj.status === 'done' ? pj.importance : Math.min(pj.value, 60) * pj.importance // max 300
   return {
     id: pj.id,
     label: pj.status === 'done' ? '' : pj.title,
-    size: 10 + constrainedDynamicValue / 2, // 10 ~ 80
-    mass: 1 + constrainedDynamicValue / 10, // 1 ~ 10
+    size: 10 + constrainedDynamicValue / 3, // 10 ~ 110
+    mass: 1 + constrainedDynamicValue / 10, // 1 ~ 60
     color: {
       border: colors.normal.border,
       background: colors.normal.background,
