@@ -1,4 +1,4 @@
-import { ProjectStatus, ProjectImportance } from 'common'
+import { ProjectStatus, ProjectImportance } from 'app-domain'
 import { CircleBig, CircleEdge } from '../components/icon'
 import { useState } from 'react'
 

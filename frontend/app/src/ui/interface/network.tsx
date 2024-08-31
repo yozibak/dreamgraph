@@ -1,32 +1,22 @@
 import { Graph, GraphOptions } from 'graph'
-import { useContext } from 'react'
+import { network } from '../../application'
+import { NetworkInteraction, NodeConnection } from '../../application/services/network/interaction'
 import { Colors } from '../../constants'
-import { InteractionContext, NodeConnection } from '../../domain/interaction'
-import { network } from '../../domain/network'
-import { AppContext } from '../../domain/project'
 
-export const GraphNetwork = () => {
-  const { selectProject, unselectProject } = useContext(AppContext)
-  const { connectNodes } = useContext(InteractionContext)
-  const options = includeAddEdgeOptions(graphOptions, connectNodes)
+export const NetworkInterface: React.FC<{
+  interaction: NetworkInteraction
+}> = ({ interaction }) => {
+  const options = includeAddEdgeOptions(graphOptions, interaction.connectNodes)
   return (
-    <div className="h-full w-full">
+    <div className="h-dvh w-full">
       <Graph
         network={network}
         options={options}
         interactions={{
-          onClickNode: selectProject,
-          onClickBackground: unselectProject,
-          options: {
-            moveOnClick: {
-              offset: { x: 0, y: 0 },
-              scale: 1,
-              animation: {
-                duration: 500,
-                easingFunction: 'linear',
-              },
-            },
-          },
+          onClickNode: interaction.clickNode,
+          onClickBackground: interaction.clickBackground,
+          onHoverNode: interaction.hoverNode,
+          onBlurNode: interaction.blurNode,
         }}
       />
     </div>
@@ -40,7 +30,7 @@ const includeAddEdgeOptions = (
   ...baseOptions,
   manipulation: {
     enabled: false,
-    addEdge: (conn: NodeConnection, cb:(args: unknown) => void) => {
+    addEdge: (conn: NodeConnection, cb: (args: unknown) => void) => {
       connect(conn)
       cb(null)
     },
@@ -55,7 +45,7 @@ export const graphOptions: GraphOptions = {
     dragNodes: true,
     dragView: true,
     hover: true,
-    hoverConnectedEdges: true,
+    hoverConnectedEdges: false,
     selectable: true,
     selectConnectedEdges: true,
     zoomSpeed: 1,
@@ -117,7 +107,7 @@ export const graphOptions: GraphOptions = {
     widthConstraint: false,
   },
   layout: {
-    improvedLayout: true,
+    improvedLayout: false,
     clusterThreshold: 20,
   },
 }

@@ -10,13 +10,21 @@ type Props = {
   interactions?: Interaction
 }
 
+// since it's tricky to update the handlers in network once initialized,
+// we keep the reference and swap the handlers each time `interactions` prop updates
+const interactionsPersistence: Interaction = {}
+
 export const Graph: React.FC<Props> = ({ network, options, interactions }) => {
   const container = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    Object.assign(interactionsPersistence, interactions)
+  }, [interactions])
+
+  useEffect(() => {
     if (!container.current) return
     network.initialize(container.current, options)
-    network.setInteractions(interactions)
+    network.setInteractions(interactionsPersistence)
     return () => {
       network.destroy()
     }

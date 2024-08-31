@@ -1,6 +1,6 @@
 import { Project } from './entities'
 import {
-  DataStore,
+  ProjectDataRepository,
   initProject,
   makeGraphUseCases,
   makeProjectGraph,
@@ -81,7 +81,7 @@ describe(`${makeGraphUseCases.name}`, () => {
     fetchProjects: jest.fn(),
     updateProject: jest.fn(),
     deleteProject: jest.fn(),
-  } satisfies DataStore
+  } satisfies ProjectDataRepository
 
   beforeEach(() => store.fetchProjects.mockResolvedValue([]))
   afterEach(() => jest.resetAllMocks())
@@ -171,5 +171,37 @@ describe(`${makeGraphUseCases.name}`, () => {
 
   test.todo(`read all`)
   test.todo(`get project by id`)
-  test.todo(`get project detail`)
+  test(`get project detail`, async () => {
+    const [p1, p2, p3] = [
+      initProject({
+        title: '1',
+      }),
+      initProject({
+        title: '2',
+      }),
+      initProject({
+        title: '3',
+      }),
+    ]
+    store.fetchProjects.mockResolvedValue([p1,p2,p3])
+    const graph = makeGraphUseCases(store)
+    await graph.initialize()
+    await graph.connectUnlockingProject(p1, p2.id)
+
+    const detail = graph.getProjectDetail(p1.id)
+    expect(detail.unlocks).toMatchObject([{
+      id: p2.id,
+      title: '2'
+    }])
+    expect(detail.availableUnlockOptions).toMatchObject([
+      {
+        id: p3.id,
+        title: '3'
+      }
+    ])
+    expect(detail.title).toBe('1')
+    expect(detail.id).toBe(p1.id)
+    expect(detail.importance).toBe(p1.importance)
+    expect(detail.status).toBe(p1.status)
+  })
 })

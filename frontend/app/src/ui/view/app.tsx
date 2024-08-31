@@ -1,29 +1,19 @@
-import { AuthUser } from 'aws-amplify/auth'
-import { AppContext, useAppState } from '../../domain/project'
-import { ProjectModal } from '../interface/project'
-import { GraphNetwork } from '../interface/network'
+import { useApplication } from '../../application'
 import { Header } from '../interface/header'
-import { InteractionContext, useInteraction } from '../../domain/interaction'
+import { NetworkInterface } from '../interface/network'
+import { ProjectDetailPanel } from '../interface/project'
+import { ToolBox } from '../interface/tools'
+import { ProjectExcerptTooltip } from '../interface/tooltip'
 
-export const DreamGraph: React.FC<{ user?: AuthUser; signOut?: () => void }> = ({ signOut }) => {
-  if (!signOut) return <></>
+export const App: React.FC = () => {
+  const { networkInteraction, projectDetail, tools, projectTooltip } = useApplication()
   return (
     <div className="h-full flex flex-col">
-      <Header signOut={signOut} />
-      <Projects />
+      <Header />
+      <NetworkInterface interaction={networkInteraction} />
+      <ProjectDetailPanel nullableContextValue={projectDetail} />
+      <ToolBox nullableContextValue={tools} />
+      <ProjectExcerptTooltip {...projectTooltip} />
     </div>
-  )
-}
-
-export const Projects = () => {
-  const interaction = useInteraction()
-  const appState = useAppState(interaction)
-  return (
-    <InteractionContext.Provider value={interaction}>
-      <AppContext.Provider value={appState}>
-        <GraphNetwork />
-        <ProjectModal />
-      </AppContext.Provider>
-    </InteractionContext.Provider>
   )
 }

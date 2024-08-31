@@ -1,4 +1,4 @@
-import { ProjectStatus } from 'use-cases/src/project'
+import { ProjectStatus } from 'app-domain'
 import { NodeColorDefinition } from './types'
 
 export const Colors = {
@@ -18,7 +18,7 @@ export const Colors = {
 } as const
 
 export const NodeColors: Record<ProjectStatus, NodeColorDefinition> = {
-  normal: {
+  'not-started': {
     normal: {
       background: Colors.White,
       border: Colors.Gray600,
@@ -28,7 +28,7 @@ export const NodeColors: Record<ProjectStatus, NodeColorDefinition> = {
       border: Colors.Gray400,
     },
   },
-  ongoing: {
+  'in-progress': {
     normal: {
       background: Colors.White,
       border: Colors.Blue800,

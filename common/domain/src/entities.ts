@@ -24,7 +24,7 @@ export type Project = {
 
 export type ProjectImportance = 1 | 2 | 3 | 4 | 5
 
-export type ProjectStatus = 'normal' | 'ongoing' | 'done'
+export type ProjectStatus = 'not-started' | 'in-progress' | 'done'
 
 export type ProjectOrId = Project | Project['id']
 

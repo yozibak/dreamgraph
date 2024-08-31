@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { makeGraphNetwork } from '../lib/network'
 import { Graph } from '../lib/graph'
+import { makeGraphNetwork } from '../lib/network'
 import { options } from './options'
 
 // init data outside react
@@ -16,17 +16,16 @@ const network = makeGraphNetwork(
         hover: {
           background: '#fafafa',
           border: '#ef4444',
-        },     
+        },
       },
       chosen: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         node: (values: any) => {
-          values.color = '#fafafa',
-          values.borderColor = '#ef4444'
-        }
+          ;(values.color = '#fafafa'), (values.borderColor = '#ef4444')
+        },
       },
       size: 15,
-      mass: 30
+      mass: 30,
     },
     { id: '2', label: '', title: 'Node2', size: 10 },
     { id: '3', label: 'Node 3', size: 20 },
@@ -59,6 +58,12 @@ const DemoUse = () => {
           options={options}
           interactions={{
             onClickNode: (id) => setSelected(id),
+            onHoverNode: (hoverNodeId, hoverNodePosition) => {
+              setSelected(hoverNodeId)
+            },
+            onBlurNode() {
+              setSelected(undefined)
+            },
             options: {
               moveOnClick: {
                 scale: 2,
@@ -69,30 +74,23 @@ const DemoUse = () => {
           }}
         />
       </div>
-      <UI />
-      {selected ? <Form selected={selected} /> : <></>}
+      <UI selected={selected} />
     </div>
   )
 }
 
-const UI = () => {
+const UI = ({ selected }: { selected?: string }) => {
   return (
-    <div>
-      <button onClick={() => network.putNode({ id: '6', label: 'foo' })}>Add node</button>
-      <button onClick={() => network.putEdge({ from: '1', to: '6' })}>Add edge</button>
-      <button onClick={() => network.removeNode('6')}>Remove node</button>
-      <button onClick={() => network.removeEdge({ from: '1', to: '6' })}>Remove edge</button>
-      <button onClick={() => network.updateNodeLabel('6', 'baz')}>change label</button>
-    </div>
-  )
-}
-
-const Form = ({ selected }: { selected: string }) => {
-  return (
-    <div>
-      <h1>Form</h1>
-      <div>{selected}</div>
-    </div>
+    <>
+      <div>
+        <button onClick={() => network.putNode({ id: '6', label: 'foo' })}>Add node</button>
+        <button onClick={() => network.putEdge({ from: '1', to: '6' })}>Add edge</button>
+        <button onClick={() => network.removeNode('6')}>Remove node</button>
+        <button onClick={() => network.removeEdge({ from: '1', to: '6' })}>Remove edge</button>
+        <button onClick={() => network.updateNodeLabel('6', 'baz')}>change label</button>
+      </div>
+      <div>{selected ?? '-'}</div>
+    </>
   )
 }
 

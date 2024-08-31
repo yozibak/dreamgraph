@@ -1,5 +1,11 @@
 /* eslint-disable no-console */
-import { DataStore, Project, ProjectImportance, ProjectStatus } from 'app-domain'
+import {
+  ProjectDataRepository,
+  Project,
+  ProjectImportance,
+  ProjectStatus,
+  ProjectStatusExpression,
+} from 'app-domain'
 import type { RawProjectData } from '../api'
 import * as api from '../api'
 
@@ -8,9 +14,9 @@ const convertRawData = (raw: RawProjectData): Project => {
     console.error(`invalid importance value detected: `, raw.importance)
     raw.importance = 3
   }
-  if (!['normal', 'ongoing', 'done'].includes(raw.status)) {
+  if (!(raw.status in ProjectStatusExpression)) {
     console.error(`invalid status detected: `, raw.status)
-    raw.status = 'normal'
+    raw.status = 'not-started' as ProjectStatus
   }
   return {
     title: raw.title,
@@ -21,7 +27,11 @@ const convertRawData = (raw: RawProjectData): Project => {
   }
 }
 
-export const makeCloudProjectStore = (): DataStore => {
+export type CloudDataRepository = ProjectDataRepository & {
+  syncLocalData: (localData: Project[]) => Promise<void>
+}
+
+export const makeCloudRepository = (): CloudDataRepository => {
   return {
     fetchProjects: async () => {
       const pjs = await api.listProjects()
@@ -43,6 +53,9 @@ export const makeCloudProjectStore = (): DataStore => {
     },
     deleteProject: async (id) => {
       await api.deleteProject(id)
+    },
+    syncLocalData: async (localData) => {
+      throw Error(`not implemented yet`)
     },
   }
 }

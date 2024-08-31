@@ -1,7 +1,0 @@
-version: 0.2
-
-phases:
-  build:
-    commands:
-      - . pipeline/assume-role.sh "${FRONTEND_DEPLOY_ROLE}" "${ENV}-deploy-frontend"
-      - sh pipeline/deploy_frontend.sh "${ENV}"
