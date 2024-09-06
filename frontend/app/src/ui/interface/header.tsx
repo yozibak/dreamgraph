@@ -1,24 +1,35 @@
 import { WaypointsIcon } from 'lucide-react'
 import { useContext } from 'react'
 import { AuthContext } from '../../auth'
+import githubIcon from '../assets/github.svg'
+import pjson from '../../../package.json'
 
 export const Header: React.FC = () => {
   const auth = useContext(AuthContext)
-  const command = auth.isAuthenticated ? 'Sign Out' : 'Sign In'
+  const command = auth.isAuthenticated ? 'Sign Out' : 'Log In'
   return (
-    <div className="fixed top-0 z-20 flex flex-row justify-start align-middle space-x-2 py-3 px-4">
-      <div className="inline-flex justify-start space-x-2">
-        <WaypointsIcon className="block" size={24} />
-        <div className="font-semibold tracking-tight text-zinc-800">dreamgraph.me</div>
-      </div>
+    <div className="fixed top-0 w-full z-50">
+      <div className="flex flex-row justify-between align-middle space-x-2 py-3 px-4">
+        {/* left */}
+        <div className="flex justify-start space-x-2">
+          <WaypointsIcon className="block" size={24} />
+          <div className="font-semibold tracking-tight text-zinc-800">dreamgraph.me</div>
+        </div>
 
-      {/* TODO: make this better */}
-      <button
-        className="opacity-0 hover:opacity-100 inline-flex flex-col justify-center text-sm text-zinc-600 "
-        onClick={auth.switchAuth}
-      >
-        <p className="min-w-4 ">{command}</p>
-      </button>
+        {/* right */}
+        <div className="flex justify-end items-center">
+          <button
+            onClick={auth.switchAuth}
+            className="block text-sm tracking-tight font-semibold text-zinc-700 cursor-pointer mr-3"
+          >
+            {command}
+          </button>
+          <a href="https://github.com/yozibak/dreamgraph" className="flex">
+            <img src={githubIcon} className="block w-4 h-4 mr-1 opacity-60" />
+            <div className="text-sm tracking-tight text-zinc-500 leading-none">{pjson.version}</div>
+          </a>
+        </div>
+      </div>
     </div>
   )
 }

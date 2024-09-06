@@ -8,7 +8,7 @@ export const NetworkInterface: React.FC<{
 }> = ({ interaction }) => {
   const options = includeAddEdgeOptions(graphOptions, interaction.connectNodes)
   return (
-    <div className="h-dvh w-full">
+    <div className="h-dvh w-full relative">
       <Graph
         network={network}
         options={options}

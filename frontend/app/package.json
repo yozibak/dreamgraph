@@ -1,7 +1,7 @@
 {
   "name": "dreamgraph",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
